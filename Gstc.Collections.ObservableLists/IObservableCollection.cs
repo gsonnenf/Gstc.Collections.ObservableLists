@@ -4,6 +4,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists {
+
+    /// <summary>
+    /// Implements ICollection, INotifyCollectionChanged and INotifyPropertyChanged for a collection.
+    /// </summary>
     public interface IObservableCollection :
         ICollection,
         INotifyCollectionChanged,
@@ -11,6 +15,9 @@ namespace Gstc.Collections.ObservableLists {
         new int Count { get; }
     }
 
+    /// <summary>
+    /// Implements ICollection, INotifyCollectionChanged and INotifyPropertyChanged for a generic collection.
+    /// </summary>
     public interface IObservableCollection<TItem> :
         ICollection<TItem>,
         IObservableCollection {

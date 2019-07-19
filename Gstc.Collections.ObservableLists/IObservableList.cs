@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 namespace Gstc.Collections.ObservableLists {
 
     /// <summary>
-    /// A List that triggers INotifyCollectionChanged and INotifyPropertyChanged when list changes.
+    /// An interface containing IList, IList{T}, and also IObservableCollection{T}.
     /// </summary>
     /// <typeparam name="TItem"></typeparam>
     public interface IObservableList<TItem> :

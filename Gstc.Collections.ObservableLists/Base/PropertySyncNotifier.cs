@@ -2,7 +2,10 @@
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Base {
-    public class PropertySyncNotifier {
+    /// <summary>
+    /// This class provides change notifications between two cooresponding objects when using the Observable List sync.
+    /// </summary>
+    internal class PropertySyncNotifier {
 
         public List<PropertyChangedEventArgs> LastArgs = new List<PropertyChangedEventArgs>();
         public INotifyPropertySyncChanged SourceSync { get; set; }
@@ -35,18 +38,5 @@ namespace Gstc.Collections.ObservableLists.Base {
             SourceSync.OnPropertyChanged(sender, args);
         }
 
-        /*
-        private int updateCount = 0;
-
-        public void DestTrigger(object sender, PropertyChangedEventArgs args) {
-            if (updateCount++ == 3) { updateCount = 0; return; }
-            DestSync.OnPropertyChanged(sender,args);          
-        }
-
-        public void SourceTrigger(object sender, PropertyChangedEventArgs args) {
-            if (updateCount++ == 3) { updateCount = 0; return; }
-            SourceSync.OnPropertyChanged(sender, args); 
-        }
-        */
     }
 }

@@ -3,6 +3,9 @@ using System.Collections.Specialized;
 
 namespace Gstc.Collections.ObservableLists.Base {
 
+    /// <summary>
+    /// Provides functionality for generating collection changed events.
+    /// </summary>
     public abstract class NotifyCollection :
         NotifyProperty,
         INotifyCollectionChanged {

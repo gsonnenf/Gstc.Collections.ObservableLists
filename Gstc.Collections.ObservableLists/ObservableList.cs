@@ -5,29 +5,32 @@ using Gstc.Collections.ObservableLists.Base;
 namespace Gstc.Collections.ObservableLists {
 
     /// <summary>
-    /// This class is a wrapper for a List that implements IList, INotifyCollectionChanged and contains
-    /// additional utility functions. It can be instantated on its own, or instantied with an already
-    /// existing List. In many cases using ObservableList may be preffered over using the .NET ObservableCollection
-    /// for its compatiblity with existing collection types and interface.
+    /// An observable that has collection changed and property changed events. It implements base collection interfaces:
+    /// IList, IList{T}, ICollection, ICollection{T}, INotifyCollectionChanged, and implements observable interfaces:
+    /// INotifyCollectionChanged and INotifyPropertyChanged. This list still triggers notify events when downcast to its interfaces.  
+    /// The ObservableList{T} has an internal List{T} that serves as the base collection. This is generated on instantiation, 
+    /// or you can provide your own list and use this class as a wrapper. In many cases using ObservableList may be preferred
+    /// over using the .NET ObservableCollection for its compatiblity with existing collection types and interface.
     /// </summary>
-    /// <typeparam name="TItem"></typeparam>
+    /// <typeparam name="TItem">The type of list.</typeparam>
     public class ObservableList<TItem> : BaseObservableList<TItem> {
 
         private List<TItem> _list;
 
         /// <summary>
-        /// Reference to internal list for use by base classes. Perhaps this should be internal instead of protected.
+        /// A reference to internal list for use by base classes.
         /// </summary>
         protected override IList<TItem> InternalList => _list;
 
         /// <summary>
-        /// Creates an observable list. The observable list is backed internally by a new .NET List.
+        /// Creates an observable list. The observable list is backed internally by a new List{T}.
         /// </summary>
         public ObservableList() { _list = new List<TItem>(); }
 
         /// <summary>
-        /// Creates an observable list using the list supplied in the constructor. Events are only triggered
-        /// when using the observable list or a downcast version of the observable list.
+        /// Creates an observable list using the list supplied in the constructor. Events are triggered
+        /// when using the ObservableList{T} or a downcast version of the observable list. They will not be
+        /// triggered if using your provided list directly.
         /// </summary>
         /// <param name="list">List to wrap with observable list.</param>
         public ObservableList(List<TItem> list) { List = list; }

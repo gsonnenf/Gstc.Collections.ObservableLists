@@ -5,6 +5,10 @@ using Gstc.Collections.ObservableLists;
 
 namespace Gstc.Collections.ObservableLists.Base {
 
+    /// <summary>
+    /// A base class to assist in the down casting of ObservableList{T} to its base interfaces and still provide notification.
+    /// </summary>
+    /// <typeparam name="TItem"></typeparam>
     public abstract class BaseObservableList<TItem> :
         NotifyCollection,
         IObservableList<TItem> {

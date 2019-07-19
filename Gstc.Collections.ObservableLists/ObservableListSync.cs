@@ -6,6 +6,7 @@ using Gstc.Collections.ObservableLists.Base;
 
 namespace Gstc.Collections.ObservableLists {
     /// <summary>
+    /// The ObservableListSync an Observable
     /// The Observable list adapter is a one-way synchronizer between a source observable list of type
     /// TInput and a destination observable list of TOutput. The method Convert(...) must be implemented
     /// as an adapter between the source element and destination element. 
