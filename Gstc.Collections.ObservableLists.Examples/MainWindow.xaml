@@ -1,0 +1,22 @@
+﻿<Window x:Class="Gstc.Collections.ObservableLists.Examples.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Gstc.Collections.ObservableLists.Examples"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <TabControl TabStripPlacement="Bottom">
+            <TabItem Header="Observable List Adapter">
+                <local:ObservableListAdapterControl></local:ObservableListAdapterControl>
+            </TabItem>
+            <TabItem Header="Observable List Control">
+                <local:ObservableListControl></local:ObservableListControl>
+            </TabItem>
+            <TabItem Header="Observable List Sync">
+                <local:ObservableListSyncControl x:Name="ObvListSync"></local:ObservableListSyncControl>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

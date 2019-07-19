@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Gstc.Collections.Observable</id>
+    <version>0.1.4-alpha</version>
+    <title>Extended Observable Collection Library</title>
+    <authors>Greg Sonnenfeld</authors>
+    <owners>Greg Sonnenfeld</owners>
+    <licenseUrl>https://github.com/gsonnenf/ExtendedObservableCollection/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/gsonnenf/ExtendedObservableCollection</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This library provides comprehensive observable Collection/List/Dictionary. Interfaces (Icollection, IList, etc) are also implemented and trigger INotifyCollectionChanged. The library includes utility collections such as a ObservableListAdapter which can syncronize two lists of different, but related types.</description>
+    <releaseNotes>Initial alpha pre-release. I've made very comprehensive unit tests to validate this library. It still needs community review.</releaseNotes>
+    <copyright>Greg Sonnenfeld Copyright 2019</copyright>
+    <tags>ObservableCollection Observable ObservableList Collections</tags>
+  </metadata>
+  <files>
+    <file src="bin\Debug\*.*" target="lib\net35-client\Debug"></file>
+    <file src="bin\Release\*.*" target="lib\net35-client\Release"></file>
+  </files>
+  
+</package>
