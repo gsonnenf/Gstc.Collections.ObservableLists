@@ -3,8 +3,12 @@
   <img src="https://user-images.githubusercontent.com/686792/53543486-0e638800-3ae0-11e9-9566-6d2f18a28e61.jpg" height="350">
 </p>
 
-## What is it?
 
+Gstc.Collections.ObservableLists <br>
+Author - Greg Sonnenfeld, Copyright 2019 <br>
+License: LGPL 3.0 <br>
+
+## What is it?
 This library implements an ObservableList<T>, which generates INotifyCollectionChanged events, and an 
 ObservableListSynchronizer<TSource,TDestination>, which keeps two related observable lists synchronized. The code has very strong
 unit testing and provides example usage.
