@@ -10,34 +10,40 @@ namespace Gstc.Collections.ObservableLists.Examples {
         /// <summary>
         /// The syncronized observable list for viewmodel.
         /// </summary>       
-        private ObservableListSync<TestModel, TestViewModel> ObvListSync =
-           new ObservableListSyncFunc<TestModel, TestViewModel>(
+        private ObservableListSynchronizer<TestModel, TestViewModel> ObvListSync =
+           new ObservableListSynchronizerFunc<TestModel, TestViewModel>(
                (sourceItem) => new TestViewModel(sourceItem),
                (destItem) => destItem.TestModel
            );
 
-        /// <summary>
-        /// The source list to insert into the syrnchonized observable list.
-        /// </summary>
-        public ObservableList<TestModel> SourceObvList {
-            get => ObvListSync.SourceObservableList;
-            set {
-                ObvListSync.SourceObservableList = value;
-                SourceGrid.ItemsSource = value;
-                DestGrid.ItemsSource = ObvListSync;
-            }
-        }
-  
+        public ObservableList<TestModel> SourceObvList = new ObservableList<TestModel>();
+        public ObservableList<TestViewModel> DestObvList = new ObservableList<TestViewModel>();
+
+
         public ObservableListSyncControl() {
             InitializeComponent();
             //Initializes example data
+
+            ObvListSync.SourceObservableList = SourceObvList;
+            ObvListSync.DestinationObservableList = DestObvList;
+
+            SourceGrid.ItemsSource = SourceObvList;
+            DestGrid.ItemsSource = DestObvList;
+
+          
+
+            SourceObvList.Add(new TestModel { Num1 = 1, Num2 = 2 });
+            SourceObvList.Add(new TestModel { Num1 = 10, Num2 = 20 });
+            SourceObvList.Add(new TestModel { Num1 = 100, Num2 = 200 });
+
+            /*
             ObservableList<TestModel> obvList = new ObservableList<TestModel>() {
                 new TestModel {Num1=1, Num2 = 2},
                 new TestModel {Num1=10, Num2 = 20},
                 new TestModel {Num1=100, Num2 = 200},
             };
-
             SourceObvList = obvList;
+            */
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
@@ -45,7 +51,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e) {
-            ObvListSync[0].Num2 += 40;
+            DestObvList[0].Num2 += 40;
         }
    
     }

@@ -55,16 +55,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Customer.cs" />
-    <Compile Include="CustomerViewModel.cs" />
-    <Compile Include="CustomerViewModelList.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ObservableDictionaryControl.xaml.cs">
-      <DependentUpon>ObservableDictionaryControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ObservableListAdapterControl.xaml.cs">
-      <DependentUpon>ObservableListAdapterControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ObservableListControl.xaml.cs">
       <DependentUpon>ObservableListControl.xaml</DependentUpon>
@@ -72,7 +64,7 @@
     <Compile Include="ObservableListSyncControl.xaml.cs">
       <DependentUpon>ObservableListSyncControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ObservableListTest.cs" />
+    <Compile Include="ObservableListDemo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -106,14 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="ObservableDictionaryControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="ObservableListAdapterControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

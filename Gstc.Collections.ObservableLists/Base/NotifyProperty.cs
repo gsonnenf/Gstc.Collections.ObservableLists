@@ -29,26 +29,29 @@ namespace Gstc.Collections.ObservableLists.Base {
         #region Reentrancy
         private readonly SimpleMonitor _monitor = new SimpleMonitor();
 
-
+        //TODO: Thread Safe access is not currently implemented. This will be implemented and tested in a future version.
         protected IDisposable BlockReentrancy() {
-            _monitor.Enter();
-            return _monitor;
+            //_monitor.Enter();
+            //return _monitor;
+            return new Disposable();
         }
 
         //TODO: Add Monitor for Collection Changed and Dictionary Changed
         internal void CheckReentrancy() {
-            if (!_monitor.Busy) return;
+            //if (!_monitor.Busy) return;
             //if ((CollectionChanged == null) || (CollectionChanged.GetInvocationList().Length <= 1)) return;
             //throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
         }
 
+        private class Disposable : IDisposable {
+            public void Dispose() {}
+        }
         private class SimpleMonitor : IDisposable {
             int _busyCount;
             public void Enter() => ++_busyCount;
             public void Dispose() => --_busyCount;
             public bool Busy => _busyCount > 0;
         }
-
         #endregion
     }
 }

@@ -15,7 +15,6 @@ namespace Gstc.Collections.ObservableLists.Base {
         /// Triggers events on any change of collection. 
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
         /// <summary>
         /// Triggers events when an item or items are added. 
         /// </summary>
@@ -54,7 +53,7 @@ namespace Gstc.Collections.ObservableLists.Base {
                 Added?.Invoke(this, eventArgs);
             }
         }
-
+        //TODO: "Range actions" in WPF is not supported. This is a WPF problem, not a GSTC problem. Perhaps a workaround could be good. 
         internal void OnCollectionChangedAddMany(IList valueList, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, valueList, index);
             using (BlockReentrancy()) {

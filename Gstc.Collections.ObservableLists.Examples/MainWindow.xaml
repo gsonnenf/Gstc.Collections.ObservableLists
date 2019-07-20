@@ -8,9 +8,6 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <TabControl TabStripPlacement="Bottom">
-            <TabItem Header="Observable List Adapter">
-                <local:ObservableListAdapterControl></local:ObservableListAdapterControl>
-            </TabItem>
             <TabItem Header="Observable List Control">
                 <local:ObservableListControl></local:ObservableListControl>
             </TabItem>
