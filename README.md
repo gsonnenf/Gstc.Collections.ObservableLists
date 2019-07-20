@@ -25,7 +25,7 @@ interfaces. It also cannot be used as a collection wrapper.
 The ObservableListSynchronizer<TSource,TDestination> provides synchronization between two ObservableLists of different but related 
 types <TSource> and <TDestination>. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
 
-<TSource> and <TDestination> are classes that map to each other, in a one to one fashion, but may have differing field or 
+The <TSource> and <TDestination> are classes that map to each other in a one to one fashion, but may have differing field or include a
 data transformation. The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) that provide a two way conversion
 between a <TSource> and <TDestination> object. This is most often used when one needs to transform model data for display or 
 a public API. A good example is mapping between a list of models and viewmodels. 
