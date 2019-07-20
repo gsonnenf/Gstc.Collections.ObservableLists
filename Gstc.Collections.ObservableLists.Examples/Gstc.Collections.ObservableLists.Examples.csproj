@@ -60,7 +60,6 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="ObservableDictionaryControl.xaml.cs">
       <DependentUpon>ObservableDictionaryControl.xaml</DependentUpon>
     </Compile>

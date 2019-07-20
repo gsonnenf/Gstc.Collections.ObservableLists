@@ -12,7 +12,7 @@ namespace Gstc.Collections.ObservableLists.Test {
         public ObservableListSynchronizer<SourceItemA, DestItemA> ObvListSyncA;
 
         [SetUp]
-        public new void TestInit() {
+        public void TestInit() {
 
         }
 

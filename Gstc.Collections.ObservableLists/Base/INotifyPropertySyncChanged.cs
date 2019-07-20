@@ -6,6 +6,11 @@ namespace Gstc.Collections.ObservableLists.Base {
     /// objects when using the ObservableListSync. 
     /// </summary>
     public interface INotifyPropertySyncChanged : INotifyPropertyChanged {
+        /// <summary>
+        /// This method should execute the PropertyChanged event on an object.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         void OnPropertyChanged(object sender, PropertyChangedEventArgs args);
     }
 }
