@@ -63,6 +63,7 @@ namespace Gstc.Collections.ObservableLists.Test {
             MockEvent.Verify(m => m.Call("dest[0] event"), Times.Exactly(1));
             MockEvent.Verify(m => m.Call("source[1] event"), Times.Exactly(2));
             MockEvent.Verify(m => m.Call("dest[1] event"), Times.Exactly(2));
+
         }
 
         #region Test Helpers
@@ -107,8 +108,8 @@ namespace Gstc.Collections.ObservableLists.Test {
             public DestItemB(SourceItemB sourceItem) => SourceItem = sourceItem;
 
             public string MyNum {
-                get => SourceItem.ToString();
-                set => int.Parse(value);
+                get => SourceItem.MyNum.ToString();
+                set => SourceItem.MyNum = int.Parse(value);
             }
             public string MyStringUpper {
                 get => SourceItem.MyStringLower.ToUpper();
