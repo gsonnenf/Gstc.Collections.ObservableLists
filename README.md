@@ -23,16 +23,16 @@ interfaces. It also cannot be used as a collection wrapper.
 
 ### ObservableListSynchronizer<TSource,TDestination>
 The ObservableListSynchronizer<TSource,TDestination> provides synchronization between two ObservableLists of different but related 
-types <TSource> and <TDestination>. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
+types TSource and TDestination. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
 
-The <TSource> and <TDestination> are classes that map to each other in a one to one fashion, but may have differing field or include a
+The TSource and TDestination are classes that map to each other in a one to one fashion, but may have differing field or include a
 data transformation. The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) that provide a two way conversion
-between a <TSource> and <TDestination> object. This is most often used when one needs to transform model data for display or 
+between a TSource and TDestination object. This is most often used when one needs to transform model data for display or 
 a public API. A good example is mapping between a list of models and viewmodels. 
 
 Used in conjunction with objects that implement an INotifyPropertySyncChanged interace, this class can also provide synchronization 
-of PropertyChanged notify events in <TSource> and <TDestination> objects. If a PropertyChanged event is triggered on an item in 
-<TSource>, an option exists to trigger a PropertyChanged event in the corresponding <TDestination> item, and vice-versa.
+of PropertyChanged notify events in TSource and TDestination objects. If a PropertyChanged event is triggered on an item in 
+TSource, an option exists to trigger a PropertyChanged event in the corresponding TDestination item, and vice-versa.
 
 This package is a polished subset of another library (which includes observable dictionaries) still under development. The Extended Observable Collection. 
 
