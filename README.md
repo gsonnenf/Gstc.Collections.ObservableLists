@@ -14,9 +14,7 @@ ObservableListSynchronizer`<TSource,TDestination>`, which keeps two related obse
 unit testing and provides example usage.
 
 ### ObservableList`<T>`
-The ObservableList`<T>` implmenents IList, IList`<T>`, ICollection, ICollection`<T>`, INotifyCollectionChanged,INotifyPropertyChanged and will
-still generate collection changed events when downcast to its interfaces. The base functionality of the ObservableList`<T>` is backed
-by a standard List`<T>`. The ObservableList can thus serve as a wrapper for a pre-existing List`<T>`. 
+The ObservableList`<T>` implmenents IList, IList`<T>`, ICollection, ICollection`<T>`, INotifyCollectionChanged, INotifyPropertyChanged and will still generate collection changed events when downcast to its interfaces. The base functionality of the ObservableList`<T>` is backed by a standard List`<T>`. The ObservableList can thus serve as a wrapper for a pre-existing List`<T>`. 
 
 The standard .net ObservableCollection is a bit limiting to work with. I believe it is sealed and does not implement many desirable
 interfaces. It also cannot be used as a collection wrapper.
