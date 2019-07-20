@@ -13,7 +13,7 @@ namespace Gstc.Collections.ObservableLists.Base {
 
         public INotifyPropertyChanged SourceNotify { get; set; }
         public INotifyPropertyChanged DestNotify { get; set; }
-        public PropertySyncNotifier(INotifyPropertyChanged sourceItem, INotifyPropertyChanged destItem) {
+        public PropertySyncNotifier(INotifyPropertyChanged sourceItem, INotifyPropertyChanged destItem, bool sourceToDest = true, bool destToSource = true) {
             SourceNotify = sourceItem;
             DestNotify = destItem;
 
@@ -22,8 +22,8 @@ namespace Gstc.Collections.ObservableLists.Base {
 
             if (sourceItem == null && destItem == null) throw new System.ArgumentException("One of the objects must implement INotifyPropertySyncChanged."); ;
 
-            if (DestSync != null) SourceNotify.PropertyChanged += DestTrigger;
-            if (SourceSync != null) DestNotify.PropertyChanged += SourceTrigger;
+            if (DestSync != null && sourceToDest) SourceNotify.PropertyChanged += DestTrigger;
+            if (SourceSync != null && destToSource) DestNotify.PropertyChanged += SourceTrigger;
         }
 
         public void DestTrigger(object sender, PropertyChangedEventArgs args) {

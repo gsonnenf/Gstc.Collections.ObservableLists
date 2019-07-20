@@ -19,7 +19,7 @@ namespace Gstc.Collections.ObservableLists.Test {
 
         [Test]
         public void CollectionInterface() {
-            //Test needs 3 test items.
+            //Test needs 3 test items. ICollection does not provide Add.
             Observable.Add(new TestItem());
             Observable.Add(new TestItem());
             Observable.Add(new TestItem());
@@ -29,17 +29,8 @@ namespace Gstc.Collections.ObservableLists.Test {
         [Test]
         public void CollectionGenericInterface() => _testCases.CollectionGenericTest(Observable);
 
-        //[Test]
-        //public void CollectionKvp() => _testCases.CollectionKeyValuePairTest(Observable);
-
-        //[Test]
-        //public void Dictionary() => _testCases.DictionaryTest(Observable);
-
-        //[Test]
-        //public void DictionaryGeneric() => _testCases.DictionaryGenericTest(Observable);
-
         [Test]
-        public void ListGenericInterface() => _testCases.ListGenericTest(Observable);
+        public void ListInteerfaceGeneric() => _testCases.ListGenericTest(Observable);
 
         [Test]
         public void ListInterface() => _testCases.ListTest(Observable);
