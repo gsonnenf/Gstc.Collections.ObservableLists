@@ -9,28 +9,28 @@ Author - Greg Sonnenfeld, Copyright 2019 <br>
 License: LGPL 3.0 <br>
 
 ## What is it?
-This library implements an ObservableList{T}, which generates INotifyCollectionChanged events, and an 
-ObservableListSynchronizer<TSource,TDestination>, which keeps two related observable lists synchronized. The code has very strong
+This library implements an ObservableList`<T>`, which generates INotifyCollectionChanged events, and an 
+ObservableListSynchronizer`<TSource,TDestination>`, which keeps two related observable lists synchronized. The code has very strong
 unit testing and provides example usage.
 
-### ObservableList{T}
-The ObservableList{T} implmenents IList, IList{T}, ICollection, ICollection{T}, INotifyCollectionChanged,INotifyPropertyChanged and will
-still generate collection changed events when downcast to its interfaces. The base functionality of the ObservableList{T} is backed
-by a standard List{T}. The ObservableList can thus serve as a wrapper for a pre-existing List{T}. 
+### ObservableList`<T>`
+The ObservableList`<T>` implmenents IList, IList`<T>`, ICollection, ICollection`<T>`, INotifyCollectionChanged,INotifyPropertyChanged and will
+still generate collection changed events when downcast to its interfaces. The base functionality of the ObservableList`<T>` is backed
+by a standard List`<T>`. The ObservableList can thus serve as a wrapper for a pre-existing List`<T>`. 
 
 The standard .net ObservableCollection is a bit limiting to work with. I believe it is sealed and does not implement many desirable
 interfaces. It also cannot be used as a collection wrapper.
 
 ### ObservableListSynchronizer<TSource,TDestination>
 The ObservableListSynchronizer<TSource,TDestination> provides synchronization between two ObservableLists of different but related 
-types {TSource} and {TDestination}. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
+types `<TSource>` and `<TDestination>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
 
 The {TSource} and {TDestination} are classes that map to each other in a one to one fashion, but may have differing field or include a
-data transformation. The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) that provide a two way conversion between a {TSource} and {TDestination} object. This is most often used when one needs to transform model data for display or a public API. A good example is mapping between a list of models and viewmodels. 
+data transformation. The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) that provide a two way conversion between a `<TSource>` and `<TDestination>` object. This is most often used when one needs to transform model data for display or a public API. A good example is mapping between a list of models and viewmodels. 
 
 Used in conjunction with objects that implement an INotifyPropertySyncChanged interace, this class can also provide synchronization 
-of PropertyChanged notify events in {TSource} and {TDestination} objects. If a PropertyChanged event is triggered on an item in 
-{TSource}, an option exists to trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
+of PropertyChanged notify events in `<TSource>` and `<TDestination>` objects. If a PropertyChanged event is triggered on an item in 
+`<TSource>`, an option exists to trigger a PropertyChanged event in the corresponding `<TDestination>` item, and vice-versa.
 
 This package is a polished subset of another library (which includes observable dictionaries) still under development. The Extended Observable Collection. 
 
@@ -38,12 +38,12 @@ https://github.com/gsonnenf/ExtendedObservableCollection
 
 ## How do I get started?
 
-The ObservableList{T} should work somewhat similar to the standard .NET ObservableCollection{T}. First, add the nuget package 
+The ObservableList`<T>` should work somewhat similar to the standard .NET ObservableCollection`<T>`. First, add the nuget package 
 [ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project. 
 
-The following example shows usage of an ObservableList{T}:
+The following example shows usage of an ObservableList`<T>`:
 
-### ObservableList{ T } Example
+### ObservableList`< T >` Example
 ```csharp
 var myObvList = new ObservableList<string>();
 myObvList.CollectionChanged += (sender, args) => Console.Writeline("Collection has changed!");
@@ -84,7 +84,7 @@ myList.Add("I will not trigger an event. It may be better to copy me into an obs
 
 ``` 
 
-### ObservableListSynchronizer< TSource,TDestination > Example
+### ObservableListSynchronizer`< TSource,TDestination >` Example
 
 The following show how easy it is to setup a synchronization using ObservableListSynchronizer. It demonstrates a sync between
 a Model and ViewModel list, where the ViewModel performs a transform on the data provided by the Model. For a different implementation
