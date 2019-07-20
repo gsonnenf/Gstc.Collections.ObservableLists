@@ -1,4 +1,9 @@
-﻿using Gstc.Collections.ObservableLists.Base;
+﻿///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
+///
+
+using Gstc.Collections.ObservableLists.Base;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;

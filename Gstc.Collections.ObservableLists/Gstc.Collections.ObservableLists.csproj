@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>Gstc.Collections.ObservableLists.nuspec</NuspecFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Gstc.Collections.Observable.nuspec">
+    <None Update="Gstc.Collections.ObservableLists.nuspec">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>

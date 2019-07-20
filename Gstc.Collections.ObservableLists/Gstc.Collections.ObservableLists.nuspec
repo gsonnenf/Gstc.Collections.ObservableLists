@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Gstc.Collections.ObservableLists</id>
+    <version>1.0.0</version>
+    <title>ObservableList and ObservableListSynchronizer</title>
+    <authors>Greg Sonnenfeld</authors>
+    <owners>Greg Sonnenfeld</owners>
+    <licenseUrl>https://github.com/gsonnenf/Gstc.Collections.ObservableLists/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/gsonnenf/Gstc.Collections.ObservableLists</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>
+      This library implements an extendable ObservableList&lt;T&gt;, which generates INotifyCollectionChanged events, works when downcast, and can wrap IList&lt;T&gt;, and ObservableListSynchronizer&lt;TSource,TDestination&gt; which synchronizes two related ObservableLists&lt;T&gt;.
+    </summary>
+    <description>
+      This library implements an extendable ObservableList&lt;T&gt;, which generates INotifyCollectionChanged events, works when downcast, and can wrap IList&lt;T&gt;, and ObservableListSynchronizer&lt;TSource,TDestination&gt; which synchronizes two related ObservableLists&lt;T&gt;.
+
+      The ObservableList implmenents IList, IList&lt;T&gt;, ICollection, ICollection&lt;T&gt;, INotifyCollectionChanged, INotifyPropertyChanged and generates CollectionChanged events even when downcast to its interfaces. The base functionality of the ObservableList&lt;T&gt; is backed by a standard List&lt;T&gt;. The ObservableList can thus serve as a wrapper for a pre-existing List&lt;T&gt;.
+
+      The ObservableListSynchronizer&lt;TSource,TDestination&gt; provides synchronization between two ObservableList&lt;T&gt; of different but related types &lt;TSource&gt; and &lt;TDestination&gt;. When an item is added, moved or removed from one list, the change will be propagated to the other list.
+    </description>
+    <releaseNotes>This code is strongly unit tested, reviewed and commented. It still needs community usage and additional usage to see if any difficulties pop up.</releaseNotes>
+    <copyright>Greg Sonnenfeld Copyright 2019</copyright>
+    <tags>ObservableCollection ObservableList IObservableCollection IObservableList IList List Collections Synchronization</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="bin\release\netstandard2.0\*.*" target="lib\netstandard2.0\" />
+  </files>
+</package>

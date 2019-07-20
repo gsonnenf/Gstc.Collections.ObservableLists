@@ -1,4 +1,9 @@
-﻿using System.Collections;
+﻿///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
+///
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;

@@ -1,4 +1,9 @@
-﻿using System;
+﻿///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
+///
+
+using System;
 
 namespace Gstc.Collections.ObservableLists {
 
