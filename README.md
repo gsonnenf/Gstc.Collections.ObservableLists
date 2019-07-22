@@ -7,6 +7,7 @@
 Gstc.Collections.ObservableLists <br>
 Author - Greg Sonnenfeld, Copyright 2019 <br>
 License: LGPL 3.0 <br>
+Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
 
 ## What is it?
 This library implements an `ObservableList<T>`, which generates `INotifyCollectionChanged` events, and an 
