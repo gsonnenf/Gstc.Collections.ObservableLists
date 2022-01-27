@@ -13,16 +13,16 @@ namespace Gstc.Collections.ObservableLists.Base {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        internal virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
-        internal void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
-        internal void OnPropertyChangedCountAndIndex() {
+        protected void OnPropertyChangedCountAndIndex() {
             OnPropertyChanged(CountString);
             OnPropertyChanged(IndexerName);
         }
 
-        internal void OnPropertyChangedIndex() {
+        protected void OnPropertyChangedIndex() {
             OnPropertyChanged(IndexerName);
         }
 
@@ -37,7 +37,7 @@ namespace Gstc.Collections.ObservableLists.Base {
         }
 
         //TODO: Add Monitor for Collection Changed and Dictionary Changed
-        internal void CheckReentrancy() {
+        protected void CheckReentrancy() {
             //if (!_monitor.Busy) return;
             //if ((CollectionChanged == null) || (CollectionChanged.GetInvocationList().Length <= 1)) return;
             //throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");

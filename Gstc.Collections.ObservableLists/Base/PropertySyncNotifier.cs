@@ -5,7 +5,7 @@ namespace Gstc.Collections.ObservableLists.Base {
     /// <summary>
     /// This class provides change notifications between two cooresponding objects when using the Observable List sync.
     /// </summary>
-    internal class PropertySyncNotifier {
+    public class PropertySyncNotifier {
 
         public List<PropertyChangedEventArgs> LastArgs = new List<PropertyChangedEventArgs>();
         public INotifyPropertySyncChanged SourceSync { get; set; }
