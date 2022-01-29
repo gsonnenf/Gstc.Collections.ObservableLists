@@ -134,16 +134,16 @@ namespace Gstc.Collections.ObservableLists {
             if (_sourceObservableList != null) _sourceObservableList.CollectionChanged -= SourceCollectionChanged;
             _sourceObservableList = sourceObvList;
             if (_sourceObservableList == null) { _destinationObservableList?.Clear(); return; }
-          
-            if (_destinationObservableList == null) { _sourceObservableList.CollectionChanged += SourceCollectionChanged; return;  }
 
-           
+            if (_destinationObservableList == null) { _sourceObservableList.CollectionChanged += SourceCollectionChanged; return; }
+
+
             _destinationObservableList.CollectionChanged -= DestinationCollectionChanged;
             _destinationObservableList.Clear();
-                  
+
             foreach (var sourceItem in _sourceObservableList) {
                 var destItem = ConvertSourceToDestination(sourceItem);
-                _destinationObservableList.Add(destItem);               
+                _destinationObservableList.Add(destItem);
                 if (IsPropertyNotify) CreatePropertySync(sourceItem, destItem);
             }
             _sourceObservableList.CollectionChanged += SourceCollectionChanged;
@@ -157,18 +157,18 @@ namespace Gstc.Collections.ObservableLists {
 
             if (_sourceObservableList != null) _sourceObservableList.CollectionChanged -= SourceCollectionChanged;
             _sourceObservableList = sourceObvList;
-            if (_sourceObservableList == null)  return; 
+            if (_sourceObservableList == null) return;
 
             _sourceObservableList.Clear();
 
-            if (_destinationObservableList == null) {                              
+            if (_destinationObservableList == null) {
                 _sourceObservableList.CollectionChanged += SourceCollectionChanged;
                 return;
-            }                 
+            }
 
             foreach (var destItem in _destinationObservableList) {
                 var sourceItem = ConvertDestinationToSource(destItem);
-                _sourceObservableList.Add(sourceItem);                              
+                _sourceObservableList.Add(sourceItem);
                 if (IsPropertyNotify) CreatePropertySync(sourceItem, destItem);
             }
             _sourceObservableList.CollectionChanged += SourceCollectionChanged;
@@ -255,7 +255,7 @@ namespace Gstc.Collections.ObservableLists {
 
                 case NotifyCollectionChangedAction.Remove:
                     for (var index = 0; index < args.OldItems.Count; index++)
-                        _destinationObservableList.RemoveAt(args.OldStartingIndex + index); 
+                        _destinationObservableList.RemoveAt(args.OldStartingIndex + index);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:

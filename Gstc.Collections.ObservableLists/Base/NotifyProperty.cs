@@ -44,7 +44,7 @@ namespace Gstc.Collections.ObservableLists.Base {
         }
 
         private class Disposable : IDisposable {
-            public void Dispose() {}
+            public void Dispose() { }
         }
         private class SimpleMonitor : IDisposable {
             int _busyCount;

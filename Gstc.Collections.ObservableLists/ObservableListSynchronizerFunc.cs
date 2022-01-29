@@ -26,12 +26,12 @@ namespace Gstc.Collections.ObservableLists {
     /// <typeparam name="TSource">The source or model list type.</typeparam>
     /// <typeparam name="TDestination">The destination or viewmodel list type.</typeparam>
     public class ObservableListSynchronizerFunc<TSource, TDestination> : ObservableListSynchronizer<TSource, TDestination> {
-    
+
         private readonly Func<TSource, TDestination> _convertSourceToDest;
         private readonly Func<TDestination, TSource> _convertDestToSource;
-     
+
         public override TDestination ConvertSourceToDestination(TSource item) => _convertSourceToDest(item);
-      
+
         public override TSource ConvertDestinationToSource(TDestination item) => _convertDestToSource(item);
 
 
@@ -54,12 +54,11 @@ namespace Gstc.Collections.ObservableLists {
         /// <param name="convertDestToSource">Method for converting a {TDestination} type to {TSource} type.</param>
         /// <param name="propertyNotifySourceToDest">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
         /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
-        public ObservableListSynchronizerFunc (
+        public ObservableListSynchronizerFunc(
                 Func<TSource, TDestination> convertSourceToDest,
                 Func<TDestination, TSource> convertDestToSource,
                 bool propertyNotifySourceToDest = true,
-                bool propertyNotifyDestToSource = true) : base(propertyNotifySourceToDest, propertyNotifyDestToSource) 
-            {
+                bool propertyNotifyDestToSource = true) : base(propertyNotifySourceToDest, propertyNotifyDestToSource) {
             _convertSourceToDest = convertSourceToDest;
             _convertDestToSource = convertDestToSource;
         }
@@ -92,8 +91,7 @@ namespace Gstc.Collections.ObservableLists {
                 ObservableList<TSource> sourceObvList,
                 ObservableList<TDestination> destObvList,
                 bool propertyNotifySourceToDest = true,
-                bool propertyNotifyDestToSource = true) : base(propertyNotifySourceToDest, propertyNotifyDestToSource)
-            {
+                bool propertyNotifyDestToSource = true) : base(propertyNotifySourceToDest, propertyNotifyDestToSource) {
             _convertSourceToDest = convertSourceToDest;
             _convertDestToSource = convertDestToSource;
             SourceObservableList = sourceObvList;

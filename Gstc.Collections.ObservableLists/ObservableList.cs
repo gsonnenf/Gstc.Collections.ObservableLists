@@ -3,9 +3,9 @@
 /// Copyright 2019
 ///
 
+using Gstc.Collections.ObservableLists.Base;
 using System.Collections;
 using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.Base;
 
 namespace Gstc.Collections.ObservableLists {
 
