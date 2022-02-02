@@ -1,30 +1,33 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Gstc.Collections.ObservableLists.Test.MockObjects;
 
 namespace Gstc.Collections.ObservableLists.Test {
 
+    /// <summary>
+    /// Test the ObservableListSynchronizer class.
+    /// </summary>
     [TestFixture]
-    public class ObservableListSyncronizerTest {
+    public class ObservableListSynchronizerTest {
 
-        public ObservableList<SourceItemA> SourceObvListA;
-        public ObservableList<DestItemA> DestObvListA;
-        public ObservableListSynchronizer<SourceItemA, DestItemA> ObvListSyncA;
+        public ObservableList<ItemASource> SourceObvListA;
+        public ObservableList<ItemADest> DestObvListA;
+        public ObservableListSynchronizer<ItemASource, ItemADest> ObvListSyncA;
 
         [SetUp]
         public void TestInit() {
 
         }
 
-
         [Test, Description("Creates a sync and tests initialization copying from source item to dest item.")]
         public void TestMethod_CopyOnInitialize() {
-            SourceObvListA = getSampleSourceList();
-            DestObvListA = new ObservableList<DestItemA>();
+            SourceObvListA = ItemASource.GetSampleSourceItemAList();
+            DestObvListA = new ObservableList<ItemADest>();
 
-            ObvListSyncA = new ObservableListSynchronizerFunc<SourceItemA, DestItemA>(
-                (sourceItem) => new DestItemA { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-                (destItem) => new SourceItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+            ObvListSyncA = new ObservableListSynchronizerFunc<ItemASource, ItemADest>(
+                (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+                (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
                 SourceObvListA,
                 DestObvListA
             );
@@ -40,12 +43,12 @@ namespace Gstc.Collections.ObservableLists.Test {
         [TestCase("SourceFirst")]
         [TestCase("DestFirst")]
         public void TestMethod_TestAfterInitialize(string order) {
-            SourceObvListA = getSampleSourceList();
-            DestObvListA = new ObservableList<DestItemA>();
+            SourceObvListA = ItemASource.GetSampleSourceItemAList();
+            DestObvListA = new ObservableList<ItemADest>();
 
-            ObvListSyncA = new ObservableListSynchronizerFunc<SourceItemA, DestItemA>(
-                (sourceItem) => new DestItemA { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-                (destItem) => new SourceItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() }
+            ObvListSyncA = new ObservableListSynchronizerFunc<ItemASource, ItemADest>(
+                (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+                (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() }
             );
 
             //Tests several order with same boiler plate code.
@@ -76,16 +79,17 @@ namespace Gstc.Collections.ObservableLists.Test {
         [TestCase(2, 1, "Dest")]
         [TestCase(3, 0, "Source")]
         [TestCase(3, 1, "Clear")]
+
         public void TestMethod_TestAfterInitializeReplace(int firstCommand, int secondCommand, string result) {
-            SourceObvListA = getSampleSourceList();
-            DestObvListA = getSampleDestList();
+            SourceObvListA = ItemASource.GetSampleSourceItemAList();
+            DestObvListA = ItemADest.GetSampleDestItemAList();
 
             var sourceItemCheck = SourceObvListA[0].MyStringLower;
             var destItemCheck = DestObvListA[0].MyStringUpper;
 
-            ObvListSyncA = new ObservableListSynchronizerFunc<SourceItemA, DestItemA>(
-                (sourceItem) => new DestItemA { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-                (destItem) => new SourceItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() }
+            ObvListSyncA = new ObservableListSynchronizerFunc<ItemASource, ItemADest>(
+                (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+                (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() }
             );
 
             List<Action> actionList = new List<Action>();
@@ -98,7 +102,6 @@ namespace Gstc.Collections.ObservableLists.Test {
 
             actionList[firstCommand].Invoke();
             actionList[secondCommand].Invoke();
-
 
             ///Both lists are cleared
             if (result == "Clear") { 
@@ -121,27 +124,26 @@ namespace Gstc.Collections.ObservableLists.Test {
 
         [Test, Description("Tests synchronization when adding and removing items for a two way sync.")]
         public void TestMethod_AddSubtractTwoWaySync() {
-            SourceObvListA = new ObservableList<SourceItemA>();
-            DestObvListA = new ObservableList<DestItemA>();
+            SourceObvListA = new ObservableList<ItemASource>();
+            DestObvListA = new ObservableList<ItemADest>();
 
-            ObvListSyncA = new ObservableListSynchronizerFunc<SourceItemA, DestItemA>(
-                (sourceItem) => new DestItemA { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-                (destItem) => new SourceItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+            ObvListSyncA = new ObservableListSynchronizerFunc<ItemASource, ItemADest>(
+                (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+                (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
                 SourceObvListA,
                 DestObvListA
             );
 
-            var item1 = new SourceItemA {MyNum = 10, MyStringLower = "x" };
-            var item2 = new SourceItemA { MyNum = 15, MyStringLower = "y" };
+            var item1 = new ItemASource {MyNum = 10, MyStringLower = "x" };
+            var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };
 
             SourceObvListA.Add(item1);
             SourceObvListA.Add(item2);
 
-            var item3 = new DestItemA { MyNum = "1000", MyStringUpper = "A" };
-            var item4 = new DestItemA { MyNum = "2000", MyStringUpper = "B" };
+            var item3 = new ItemADest { MyNum = "1000", MyStringUpper = "A" };
+            var item4 = new ItemADest { MyNum = "2000", MyStringUpper = "B" };
             DestObvListA.Add( item3 );
             DestObvListA.Add( item4 );
-
 
             Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
             Assert.AreEqual(4, SourceObvListA.Count);
@@ -156,18 +158,16 @@ namespace Gstc.Collections.ObservableLists.Test {
             Assert.AreEqual(SourceObvListA[1], item2);
             Assert.AreEqual(DestObvListA[2], item3);
             Assert.AreEqual(DestObvListA[3], item4);
-
         }
-
 
         [Test, Description("Tests synchronization when adding and removing items for a one way sync.")]
         public void TestMethod_AddSubtractOneWaySync() {
-            SourceObvListA = new ObservableList<SourceItemA>();
-            DestObvListA = new ObservableList<DestItemA>();
+            SourceObvListA = new ObservableList<ItemASource>();
+            DestObvListA = new ObservableList<ItemADest>();
 
-            ObvListSyncA = new ObservableListSynchronizerFunc<SourceItemA, DestItemA>(
-                (sourceItem) => new DestItemA { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-                (destItem) => new SourceItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+            ObvListSyncA = new ObservableListSynchronizerFunc<ItemASource, ItemADest>(
+                (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+                (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
                 SourceObvListA,
                 DestObvListA
             );
@@ -175,17 +175,16 @@ namespace Gstc.Collections.ObservableLists.Test {
             ObvListSyncA.IsSyncSourceToDestCollection = true;
             ObvListSyncA.IsSyncDestToSourceCollection = false;
 
-            var item1 = new SourceItemA { MyNum = 10, MyStringLower = "x" };
-            var item2 = new SourceItemA { MyNum = 15, MyStringLower = "y" };        
-            var item3 = new DestItemA { MyNum = "1000", MyStringUpper = "A" };
-            var item4 = new DestItemA { MyNum = "2000", MyStringUpper = "B" };
+            var item1 = new ItemASource { MyNum = 10, MyStringLower = "x" };
+            var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };        
+            var item3 = new ItemADest { MyNum = "1000", MyStringUpper = "A" };
+            var item4 = new ItemADest { MyNum = "2000", MyStringUpper = "B" };
 
             SourceObvListA.Add(item1);         
             SourceObvListA.Add(item2);
 
             DestObvListA.Add(item3);
             DestObvListA.Add(item4);
-
 
             Assert.AreEqual(SourceObvListA.Count, 2);
             Assert.AreEqual(DestObvListA.Count, 4);
@@ -204,54 +203,6 @@ namespace Gstc.Collections.ObservableLists.Test {
 
             Assert.AreEqual(DestObvListA[2], item3);
             Assert.AreEqual(DestObvListA[3], item4);
-
         }
-
-
-
-        #region Test Helpers
-
-        private ObservableList<SourceItemA> getSampleSourceList() {
-            return new ObservableList<SourceItemA> {
-                new SourceItemA { MyNum = 10, MyStringLower = "x" },
-                new SourceItemA { MyNum = 15, MyStringLower = "y" },
-                new SourceItemA { MyNum = 20, MyStringLower = "z" },
-                };
-        }
-
-        private ObservableList<DestItemA> getSampleDestList() {
-            return new ObservableList<DestItemA> {
-                new DestItemA { MyNum = "1000", MyStringUpper = "A" },
-                new DestItemA { MyNum = "1500", MyStringUpper = "B" },
-                new DestItemA { MyNum = "2000", MyStringUpper = "C" },
-                new DestItemA { MyNum = "3000", MyStringUpper = "D" },
-                };
-        }
-
-
-       
-        public class SourceItemA {
-            public int MyNum { get; set; }
-            public string MyStringLower { get; set; }
-
-            public override bool Equals(object obj) {
-                var temp = obj as SourceItemA;
-                if (temp == null) return false;
-                if (temp.MyNum == MyNum && temp.MyStringLower == MyStringLower) return true;
-                return false;
-            }
-        }
-
-        public class DestItemA {
-            public string MyNum { get; set; }
-            public string MyStringUpper { get; set; }
-            public override bool Equals(object obj) {
-                var temp = obj as DestItemA;
-                if (temp == null) return false;
-                if (temp.MyNum == MyNum && temp.MyStringUpper == MyStringUpper) return true;
-                return false;
-            }
-        }
-        #endregion
     }
 }

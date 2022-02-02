@@ -6,7 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Gstc.Collections.ObservableLists {
+namespace Gstc.Collections.ObservableLists.Interface {
 
     /// <summary>
     /// An interface containing IList, IList{T}, and also IObservableCollection{T}.

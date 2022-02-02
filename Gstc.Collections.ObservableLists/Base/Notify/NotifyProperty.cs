@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Base {
+namespace Gstc.Collections.ObservableLists.Base.Notify {
 
     /// <summary>
     /// Provides functionality for generating Property changed events on collections.
-    /// When reentrance is enabled (it is not currently enabled) it will create a threadsafe list.
+    /// When re-entrance is enabled (it is not currently enabled) it will create a threadsafe list.
     /// </summary>
     public abstract class NotifyProperty : INotifyPropertyChanged {
         protected const string CountString = "Count";

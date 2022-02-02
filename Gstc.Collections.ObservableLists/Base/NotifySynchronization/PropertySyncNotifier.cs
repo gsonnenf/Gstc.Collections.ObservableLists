@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Base {
+namespace Gstc.Collections.ObservableLists.Base.NotifySynchronization {
     /// <summary>
     /// This class provides change notifications between two cooresponding objects when using the Observable List sync.
     /// </summary>

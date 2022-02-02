@@ -3,7 +3,7 @@
 /// Copyright 2019
 ///
 
-using Gstc.Collections.ObservableLists.Base;
+using Gstc.Collections.ObservableLists.Base.NotifySynchronization;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;

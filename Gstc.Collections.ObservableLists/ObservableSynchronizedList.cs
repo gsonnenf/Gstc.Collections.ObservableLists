@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Gstc.Collections.ObservableLists.Base;
+using System.Collections.Generic;
 namespace Gstc.Collections.ObservableLists {
 
     /// <summary>

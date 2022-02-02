@@ -1,8 +1,7 @@
-﻿using Gstc.Collections.ObservableLists.Base;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Gstc.Collections.ObservableLists {
+namespace Gstc.Collections.ObservableLists.Base {
     /// <summary>
     /// An observable generic for collections of type IList{T}, that has collection changed and property changed events.
     /// It implements base collection interfaces: IList, IList{T}, ICollection, ICollection{T}, INotifyCollectionChanged, 

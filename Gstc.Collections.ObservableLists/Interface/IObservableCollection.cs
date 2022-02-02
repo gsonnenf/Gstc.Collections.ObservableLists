@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists {
+namespace Gstc.Collections.ObservableLists.Interface {
 
     /// <summary>
     /// Implements ICollection, INotifyCollectionChanged and INotifyPropertyChanged for a collection.

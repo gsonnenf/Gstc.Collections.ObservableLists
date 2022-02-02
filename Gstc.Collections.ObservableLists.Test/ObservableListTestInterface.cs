@@ -1,6 +1,6 @@
-﻿using Gstc.Collections.ObservableLists;
+﻿using Gstc.Collections.ObservableLists.Test.MockObjects;
+using Gstc.Collections.ObservableLists.Test.Tools;
 using NUnit.Framework;
-using static Gstc.Collections.ObservableLists.Test.InterfaceTestCases;
 
 namespace Gstc.Collections.ObservableLists.Test {
 
@@ -30,7 +30,7 @@ namespace Gstc.Collections.ObservableLists.Test {
         public void CollectionGenericInterface() => _testCases.CollectionGenericTest(Observable);
 
         [Test]
-        public void ListInteerfaceGeneric() => _testCases.ListGenericTest(Observable);
+        public void ListInterfaceGeneric() => _testCases.ListGenericTest(Observable);
 
         [Test]
         public void ListInterface() => _testCases.ListTest(Observable);

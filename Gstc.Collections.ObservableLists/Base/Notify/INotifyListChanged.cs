@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace Gstc.Collections.ObservableLists.Base {
+namespace Gstc.Collections.ObservableLists.Base.Notify {
     /// <summary>
     /// Provides a set of events that will be triggered by changes to a List.
     /// </summary>

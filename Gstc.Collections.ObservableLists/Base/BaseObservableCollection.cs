@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Gstc.Collections.ObservableLists.Base.Notify;
+using Gstc.Collections.ObservableLists.Interface;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 

@@ -2,13 +2,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AutoFixture;
-
+using Gstc.Collections.ObservableLists.Interface;
+using Gstc.Collections.ObservableLists.Test.MockObjects;
 using NUnit.Framework;
 
-
-namespace Gstc.Collections.ObservableLists.Test {
-    public class InterfaceTestCases : CollectionTestBase<string, TestItem> {
+namespace Gstc.Collections.ObservableLists.Test.Tools {
+    public class InterfaceTestCases : CollectionTestBase<TestItem> {
 
         /// <summary>
         /// Test the interface for ICollection to make sure these are implemented.
@@ -20,8 +19,13 @@ namespace Gstc.Collections.ObservableLists.Test {
             //Count Test
             Assert.AreEqual(3, collection.Count);
 
-            //Syncroot Test
-            Assert.IsNotNull(collection.SyncRoot);
+            //SyncRoot Test
+            try {
+                Assert.IsNotNull(collection.SyncRoot);
+            }
+            catch (NotSupportedException e) {
+                Console.WriteLine(e.Message); //Concurrent Collections will not support syncroot.
+            }
 
             //isSyncronized Test
             Assert.AreEqual(collection.IsSynchronized, false);
@@ -42,7 +46,7 @@ namespace Gstc.Collections.ObservableLists.Test {
         }
 
         /// <summary>
-        /// Tests methods specific to ICollection<>. 
+        /// Tests cast to ICollection<TItem>. 
         /// </summary>
         /// <param name="collection"></param>
         public void CollectionGenericTest(ICollection<TestItem> collection) {
@@ -104,9 +108,10 @@ namespace Gstc.Collections.ObservableLists.Test {
 
         }
 
-
-
-
+        /// <summary>
+        /// Tests cast to Generic List
+        /// </summary>
+        /// <param name="list"></param>
         public void ListGenericTest(IList<TestItem> list) {
 
             Assert.IsNotNull(list as IObservableCollection);
@@ -159,27 +164,10 @@ namespace Gstc.Collections.ObservableLists.Test {
             Assert.AreEqual(Item3, list[0]);
             MockEvent.AssertMockNotifiersCollection(2, 1);
 
-
             //RemoveAt()
             list.RemoveAt(0);
             Assert.AreEqual(Item2, list[0]);
             MockEvent.AssertMockNotifiersCollection(2, 1);
-
         }
-
     }
-
-        /// <summary>
-        /// A Test item used in these tests
-        /// </summary>
-        public class TestItem {
-            private static Fixture Fixture { get; } = new Fixture();
-
-            public string Id { get; set; }
-
-            public TestItem() {
-                Id = Fixture.Create<string>();
-            }
-        }
-    
 }

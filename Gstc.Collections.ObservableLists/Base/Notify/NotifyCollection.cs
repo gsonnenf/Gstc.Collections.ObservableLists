@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
 
-namespace Gstc.Collections.ObservableLists.Base {
+namespace Gstc.Collections.ObservableLists.Base.Notify {
 
     /// <summary>
     /// Provides functionality for generating collection changed events.
     /// </summary>
     public abstract class NotifyCollection :
         NotifyProperty,
+        INotifyListChanged,
         INotifyCollectionChanged {
 
         #region Events

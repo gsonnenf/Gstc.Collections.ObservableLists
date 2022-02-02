@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Gstc.Collections.ObservableLists;
+using Gstc.Collections.ObservableLists.Test.Tools;
 using Moq;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test {
     [TestFixture]
-    public class ObservableListTest : CollectionTestBase<object, object> {
+    public class ObservableListTest : CollectionTestBase<object> {
 
         private ObservableList<object> ObvList { get; set; }
 
