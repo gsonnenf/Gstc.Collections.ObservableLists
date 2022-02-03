@@ -1,6 +1,6 @@
-﻿using Moq;
+﻿using Gstc.Collections.ObservableLists.Test.MockObjects;
+using Moq;
 using NUnit.Framework;
-using Gstc.Collections.ObservableLists.Test.MockObjects;
 
 namespace Gstc.Collections.ObservableLists.Test {
 
@@ -37,10 +37,10 @@ namespace Gstc.Collections.ObservableLists.Test {
               true,
               true
           );
-           
-            var item1 = new ItemBSource { MyNum = 10, MyStringLower = "x" };       
+
+            var item1 = new ItemBSource { MyNum = 10, MyStringLower = "x" };
             var item2 = new ItemBDest { MyNum = "1000", MyStringUpper = "A" };
-            
+
             SourceObvListB.Add(item1);
             DestObvListB.Add(item2);
 
@@ -48,7 +48,7 @@ namespace Gstc.Collections.ObservableLists.Test {
             DestObvListB[0].PropertyChanged += (sender, args) => AssertEvent.Call("dest[0] event");
             SourceObvListB[1].PropertyChanged += (sender, args) => AssertEvent.Call("source[1] event");
             DestObvListB[1].PropertyChanged += (sender, args) => AssertEvent.Call("dest[1] event");
-            
+
             var string1 = "TEST STRING";
             var string2 = "TEST STRING AGAIN";
             SourceObvListB[0].MyNum = -1;

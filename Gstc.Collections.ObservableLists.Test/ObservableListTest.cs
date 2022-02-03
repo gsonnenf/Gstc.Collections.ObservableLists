@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.Test.Tools;
+﻿using Gstc.Collections.ObservableLists.Test.Tools;
 using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Gstc.Collections.ObservableLists.Test {
     [TestFixture]

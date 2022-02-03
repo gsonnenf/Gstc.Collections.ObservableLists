@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Gstc.Collections.ObservableLists;
 
 
 namespace Gstc.Collections.ObservableLists.Examples {
     public class ObservableListDemo {
         public List<Customer> CustomerList { get; set; }
-        public ObservableList<Customer> CustomerObservableListWrapper{ get; set; }
+        public ObservableList<Customer> CustomerObservableListWrapper { get; set; }
         public ObservableList<Customer> CustomerObservableList { get; set; }
 
         public ObservableListDemo() {
@@ -43,6 +42,6 @@ namespace Gstc.Collections.ObservableLists.Examples {
             //Adds list of customers from initial list into second observable list.
             CustomerObservableList.AddRange(CustomerList);
 
-        }      
+        }
     }
 }

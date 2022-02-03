@@ -1,10 +1,10 @@
 ﻿
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using NUnit.Framework;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Gstc.Collections.ObservableLists.Test.Tools {
     public class InterfaceTestCases : CollectionTestBase<TestItem> {
@@ -22,8 +22,7 @@ namespace Gstc.Collections.ObservableLists.Test.Tools {
             //SyncRoot Test
             try {
                 Assert.IsNotNull(collection.SyncRoot);
-            }
-            catch (NotSupportedException e) {
+            } catch (NotSupportedException e) {
                 Console.WriteLine(e.Message); //Concurrent Collections will not support syncroot.
             }
 

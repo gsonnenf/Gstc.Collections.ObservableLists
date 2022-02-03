@@ -1,9 +1,9 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
-using Gstc.Collections.ObservableDictionary.Interface;
+﻿using Gstc.Collections.ObservableDictionary.Interface;
 using Gstc.Collections.ObservableDictionary.NotificationDictionary;
 using Gstc.Collections.ObservableLists.Interface;
 using Moq;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Test.MockObjects {
     /// <summary>

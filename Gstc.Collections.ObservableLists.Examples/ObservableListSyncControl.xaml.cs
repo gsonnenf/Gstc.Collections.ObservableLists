@@ -30,7 +30,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
             SourceGrid.ItemsSource = SourceObvList;
             DestGrid.ItemsSource = DestObvList;
 
-          
+
 
             SourceObvList.Add(new TestModel { Num1 = 1, Num2 = 2 });
             SourceObvList.Add(new TestModel { Num1 = 10, Num2 = 20 });
@@ -53,6 +53,6 @@ namespace Gstc.Collections.ObservableLists.Examples {
         private void Button_Click_1(object sender, RoutedEventArgs e) {
             DestObvList[0].Num2 += 40;
         }
-   
+
     }
 }

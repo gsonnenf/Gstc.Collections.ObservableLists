@@ -1,5 +1,4 @@
-﻿using Gstc.Collections.ObservableLists.Base;
-using System;
+﻿using System;
 
 
 namespace Gstc.Collections.ObservableLists.Examples {
@@ -23,7 +22,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
             sourceList.Add(new Model { MyNum = 10, MyStringLower = "x" });
             destList.Add(new ViewModel { MyNum = "1000", MyStringUpper = "A" });
 
-            Console.WriteLine(sourceList.Count); 
+            Console.WriteLine(sourceList.Count);
             Console.WriteLine(destList.Count);
 
             //OUTPUT
@@ -41,15 +40,15 @@ namespace Gstc.Collections.ObservableLists.Examples {
 
             destList[1].MyStringUpper = "TEST";
 
-            Console.WriteLine(sourceList[1].MyStringLower); 
+            Console.WriteLine(sourceList[1].MyStringLower);
             Console.WriteLine(destList[1].MyStringUpper);
 
             //OUTPUT
             // test
             // TEST
 
-            sourceList[0].PropertyChanged += (sender,args) => Console.WriteLine("Source Event");
-            destList[0].PropertyChanged += (sender,args) => Console.WriteLine("Dest Event");
+            sourceList[0].PropertyChanged += (sender, args) => Console.WriteLine("Source Event");
+            destList[0].PropertyChanged += (sender, args) => Console.WriteLine("Dest Event");
 
             destList[0].MyNum = "100000";
 
@@ -57,7 +56,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
             //Dest Event
             //Source Event
 
-    }
+        }
         public class Model : NotifyPropertySyncChanged {
             private int myNum;
             private string myStringLower;

@@ -1,7 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Gstc.Collections.ObservableLists.Test.MockObjects;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.Test.MockObjects;
 
 namespace Gstc.Collections.ObservableLists.Test {
 
@@ -94,7 +94,7 @@ namespace Gstc.Collections.ObservableLists.Test {
 
             List<Action> actionList = new List<Action>();
 
-            actionList.Insert(0, () => ObvListSyncA.ReplaceSource_SyncToDestination(SourceObvListA) );
+            actionList.Insert(0, () => ObvListSyncA.ReplaceSource_SyncToDestination(SourceObvListA));
             actionList.Insert(1, () => ObvListSyncA.ReplaceSource_SyncFromDestination(SourceObvListA));
 
             actionList.Insert(2, () => ObvListSyncA.ReplaceDestination_SyncToSource(DestObvListA));
@@ -104,7 +104,7 @@ namespace Gstc.Collections.ObservableLists.Test {
             actionList[secondCommand].Invoke();
 
             ///Both lists are cleared
-            if (result == "Clear") { 
+            if (result == "Clear") {
                 Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
                 Assert.AreEqual(SourceObvListA.Count, 0);
                 return;
@@ -117,8 +117,8 @@ namespace Gstc.Collections.ObservableLists.Test {
                 Assert.AreEqual(SourceObvListA[index].MyStringLower.ToUpper(), DestObvListA[index].MyStringUpper);
                 Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
             }
-           
-            if (result == "Source" ) Assert.AreEqual(sourceItemCheck, SourceObvListA[0].MyStringLower); // Source list is preserved
+
+            if (result == "Source") Assert.AreEqual(sourceItemCheck, SourceObvListA[0].MyStringLower); // Source list is preserved
             if (result == "Dest") Assert.AreEqual(destItemCheck, DestObvListA[0].MyStringUpper); // Dest list is preserved
         }
 
@@ -134,7 +134,7 @@ namespace Gstc.Collections.ObservableLists.Test {
                 DestObvListA
             );
 
-            var item1 = new ItemASource {MyNum = 10, MyStringLower = "x" };
+            var item1 = new ItemASource { MyNum = 10, MyStringLower = "x" };
             var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };
 
             SourceObvListA.Add(item1);
@@ -142,8 +142,8 @@ namespace Gstc.Collections.ObservableLists.Test {
 
             var item3 = new ItemADest { MyNum = "1000", MyStringUpper = "A" };
             var item4 = new ItemADest { MyNum = "2000", MyStringUpper = "B" };
-            DestObvListA.Add( item3 );
-            DestObvListA.Add( item4 );
+            DestObvListA.Add(item3);
+            DestObvListA.Add(item4);
 
             Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
             Assert.AreEqual(4, SourceObvListA.Count);
@@ -176,11 +176,11 @@ namespace Gstc.Collections.ObservableLists.Test {
             ObvListSyncA.IsSyncDestToSourceCollection = false;
 
             var item1 = new ItemASource { MyNum = 10, MyStringLower = "x" };
-            var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };        
+            var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };
             var item3 = new ItemADest { MyNum = "1000", MyStringUpper = "A" };
             var item4 = new ItemADest { MyNum = "2000", MyStringUpper = "B" };
 
-            SourceObvListA.Add(item1);         
+            SourceObvListA.Add(item1);
             SourceObvListA.Add(item2);
 
             DestObvListA.Add(item3);

@@ -6,7 +6,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
 
         public MainWindow() {
             //GithubExample2.Start();
-            InitializeComponent();          
+            InitializeComponent();
         }
 
     }
