@@ -1,5 +1,5 @@
-﻿using Gstc.Collections.ObservableDictionary.Interface;
-using Gstc.Collections.ObservableDictionary.NotificationDictionary;
+﻿using Gstc.Collections.ObservableDictionary.ComponentModel;
+using Gstc.Collections.ObservableDictionary.Interface;
 using Gstc.Collections.ObservableLists.Interface;
 using Moq;
 using System.Collections.Specialized;

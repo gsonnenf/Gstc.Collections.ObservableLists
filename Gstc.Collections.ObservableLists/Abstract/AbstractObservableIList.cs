@@ -1,7 +1,11 @@
-﻿using System.Collections;
+﻿using Gstc.Collections.ObservableLists.ComponentModel;
+using Gstc.Collections.ObservableLists.Interface;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Base {
+namespace Gstc.Collections.ObservableLists.Abstract {
     /// <summary>
     /// An observable generic for collections of type IList{T}, that has collection changed and property changed events.
     /// It implements base collection interfaces: IList, IList{T}, ICollection, ICollection{T}, INotifyCollectionChanged, 
@@ -11,28 +15,53 @@ namespace Gstc.Collections.ObservableLists.Base {
     /// </summary>
     /// <typeparam name="TItem">The type of list.</typeparam>
     /// /// <typeparam name="TIList">The type of internal list that implements IList{T}.</typeparam>
-    public abstract class AbstractObservableIList<TIList, TItem> :
-        BaseObservableList<TItem>
+    /// <typeparam name="TNotify">A class implementing INotifyCollection for IPropertyChanged, ICollectionChanged notifications.</typeparam>
+    public abstract class AbstractObservableIList<TItem, TIList, TNotify> :
+        AbstractListAdapter<TItem>,
+        IObservableList<TItem>
+        where TNotify : INotifyCollection, new()
         where TIList : IList<TItem>, new() {
+
+        #region Events
+        public event NotifyCollectionChangedEventHandler CollectionChanged {
+            add => Notify.CollectionChanged += value;
+            remove => Notify.CollectionChanged -= value;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged {
+            add => Notify.PropertyChanged += value;
+            remove => Notify.PropertyChanged -= value;
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Notification handler for INotifyPropertyChanged and INotifyCollectionChanged events and callbacks.
+        /// </summary>
+        protected readonly TNotify Notify = new TNotify();
 
         /// <summary>
         /// A reference to internal list for use by base classes.
         /// </summary>
         protected override IList<TItem> InternalList => _list;
-
         /// <summary>
         /// Gets internal list and allows replacement of internal list with notify observable events.
         /// </summary>
-        #region Properties
         public TIList List {
             get => _list;
             set {
                 _list = value;
-                OnPropertyChangedCountAndIndex();
-                OnCollectionChangedReset();
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedReset();
             }
         }
         private TIList _list = new TIList();
+        #endregion
+
+        #region Constructor
+        protected AbstractObservableIList() {
+            Notify.Sender = this;
+        }
         #endregion
 
         #region overrides
@@ -46,8 +75,8 @@ namespace Gstc.Collections.ObservableLists.Base {
             set {
                 var oldItem = _list[index];
                 _list[index] = value;
-                OnPropertyChangedIndex();
-                OnCollectionChangedReplace(oldItem, value, index);
+                Notify.OnPropertyChangedIndex();
+                Notify.OnCollectionChangedReplace(oldItem, value, index);
             }
         }
 
@@ -57,8 +86,8 @@ namespace Gstc.Collections.ObservableLists.Base {
         /// <param name="item">Item to add</param>
         public override void Add(TItem item) {
             _list.Add(item);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedAdd(item, _list.IndexOf(item));
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedAdd(item, _list.IndexOf(item));
         }
 
         /// <summary>
@@ -69,8 +98,8 @@ namespace Gstc.Collections.ObservableLists.Base {
             var count = _list.Count;
             //_list.AddRange(items);
             foreach (var item in items) _list.Add(item);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedAddMany((IList)items, count);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedAddMany((IList)items, count);
         }
 
         /// <summary>
@@ -78,8 +107,8 @@ namespace Gstc.Collections.ObservableLists.Base {
         /// </summary>
         public override void Clear() {
             _list.Clear();
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedReset();
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedReset();
         }
 
         /// <summary>
@@ -89,8 +118,8 @@ namespace Gstc.Collections.ObservableLists.Base {
         /// <param name="item"></param>
         public override void Insert(int index, TItem item) {
             _list.Insert(index, item);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedAdd(item, index);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedAdd(item, index);
         }
 
         /// <summary>
@@ -102,8 +131,8 @@ namespace Gstc.Collections.ObservableLists.Base {
             var removedItem = this[oldIndex];
             _list.RemoveAt(oldIndex);
             _list.Insert(newIndex, removedItem);
-            OnPropertyChangedIndex();
-            OnCollectionChangedMove(removedItem, oldIndex, newIndex);
+            Notify.OnPropertyChangedIndex();
+            Notify.OnCollectionChangedMove(removedItem, oldIndex, newIndex);
         }
 
         /// <summary>
@@ -111,12 +140,13 @@ namespace Gstc.Collections.ObservableLists.Base {
         /// </summary>
         /// <param name="item">Item to remove.</param>
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
+        //TODO: Consider and benchmark aggressive inlining. [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Remove(TItem item) {
             var index = _list.IndexOf(item);
             if (index == -1) return false;
             _list.RemoveAt(index);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedRemove(item, index);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedRemove(item, index);
             return true;
         }
 
@@ -127,8 +157,8 @@ namespace Gstc.Collections.ObservableLists.Base {
         public override void RemoveAt(int index) {
             var item = _list[index];
             _list.RemoveAt(index);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedRemove(item, index);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedRemove(item, index);
         }
         #endregion
 

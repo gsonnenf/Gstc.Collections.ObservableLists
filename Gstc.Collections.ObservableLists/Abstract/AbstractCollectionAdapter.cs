@@ -1,18 +1,16 @@
-﻿using Gstc.Collections.ObservableLists.Base.Notify;
-using Gstc.Collections.ObservableLists.Interface;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Gstc.Collections.ObservableLists.Base {
+namespace Gstc.Collections.ObservableLists.Abstract {
 
     /// <summary>
     /// A base class to assist in the down casting of observable collections to its base interfaces and still provide notification.
     /// </summary>
     /// <typeparam name="TItem"></typeparam>
-    public abstract class BaseObservableCollection<TItem> :
-        NotifyCollection,
-        IObservableCollection<TItem> {
+    public abstract class AbstractCollectionAdapter<TItem> :
+        ICollection,
+        ICollection<TItem> {
 
         protected abstract ICollection<TItem> InternalCollection { get; }
         //public abstract TItem this[int index] { get; set; }
@@ -37,5 +35,6 @@ namespace Gstc.Collections.ObservableLists.Base {
         void ICollection.CopyTo(Array array, int arrayIndex) => ((ICollection)InternalCollection).CopyTo(array, arrayIndex);
         bool ICollection.IsSynchronized => ((ICollection)InternalCollection).IsSynchronized;
         object ICollection.SyncRoot => ((ICollection)InternalCollection).SyncRoot;
+
     }
 }

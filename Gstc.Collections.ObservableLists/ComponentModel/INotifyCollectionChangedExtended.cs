@@ -1,10 +1,10 @@
 ﻿using System.Collections.Specialized;
 
-namespace Gstc.Collections.ObservableLists.Base.Notify {
+namespace Gstc.Collections.ObservableLists.ComponentModel {
     /// <summary>
     /// Provides a set of events that will be triggered by changes to a List.
     /// </summary>
-    public interface INotifyListChanged {
+    public interface INotifyCollectionChangedExtended {
 
         /// <summary>
         /// Triggers events when an item or items are added. 

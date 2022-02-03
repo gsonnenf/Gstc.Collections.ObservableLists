@@ -3,7 +3,8 @@
 /// Copyright 2019
 ///
 
-using Gstc.Collections.ObservableLists.Base.NotifySynchronization;
+using Gstc.Collections.ObservableLists.ComponentModel;
+using Gstc.Collections.ObservableLists.Notify;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -230,7 +231,7 @@ namespace Gstc.Collections.ObservableLists {
             if (!(sourceItem is INotifyPropertyChanged && destItem is INotifyPropertyChanged)) return;
             if (!(sourceItem is INotifyPropertySyncChanged || destItem is INotifyPropertySyncChanged)) return;
 
-            var propertySyncNotifer = new PropertySyncNotifier(
+            var propertySyncNotifer = new NotifyPropertySync(
                 sourceItem as INotifyPropertyChanged,
                 destItem as INotifyPropertyChanged,
                 IsPropertyNotifySourceToDest,

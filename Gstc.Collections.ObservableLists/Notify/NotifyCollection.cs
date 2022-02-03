@@ -1,15 +1,16 @@
-﻿using System.Collections;
+﻿using Gstc.Collections.ObservableLists.ComponentModel;
+using System.Collections;
 using System.Collections.Specialized;
 
-namespace Gstc.Collections.ObservableLists.Base.Notify {
+namespace Gstc.Collections.ObservableLists.Notify {
 
     /// <summary>
     /// Provides functionality for generating collection changed events.
     /// </summary>
-    public abstract class NotifyCollection :
+    public class NotifyCollection :
         NotifyProperty,
-        INotifyListChanged,
-        INotifyCollectionChanged {
+        INotifyCollection,
+        INotifyCollectionChangedExtended {
 
         #region Events
         /// <summary>
@@ -38,52 +39,55 @@ namespace Gstc.Collections.ObservableLists.Base.Notify {
         public event NotifyCollectionChangedEventHandler Reset;
         #endregion
 
+        public NotifyCollection() { }
+        public NotifyCollection(object sender) : base(sender) { Sender = sender; }
+
         #region Methods
-        protected void OnCollectionChangedReset() {
+        public void OnCollectionChangedReset() {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             using (BlockReentrancy()) {
-                CollectionChanged?.Invoke(this, eventArgs);
-                Reset?.Invoke(this, eventArgs);
+                CollectionChanged?.Invoke(Sender, eventArgs);
+                Reset?.Invoke(Sender, eventArgs);
             }
         }
 
-        protected void OnCollectionChangedAdd(object value, int index) {
+        public void OnCollectionChangedAdd(object value, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, index);
             using (BlockReentrancy()) {
-                CollectionChanged?.Invoke(this, eventArgs);
-                Added?.Invoke(this, eventArgs);
+                CollectionChanged?.Invoke(Sender, eventArgs);
+                Added?.Invoke(Sender, eventArgs);
             }
         }
         //TODO: "Range actions" in WPF is not supported. This is a WPF problem, not a GSTC problem. Perhaps a workaround could be good. 
-        protected void OnCollectionChangedAddMany(IList valueList, int index) {
+        public void OnCollectionChangedAddMany(IList valueList, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, valueList, index);
             using (BlockReentrancy()) {
-                CollectionChanged?.Invoke(this, eventArgs);
-                Added?.Invoke(this, eventArgs);
+                CollectionChanged?.Invoke(Sender, eventArgs);
+                Added?.Invoke(Sender, eventArgs);
             }
         }
 
-        protected void OnCollectionChangedRemove(object value, int index) {
+        public void OnCollectionChangedRemove(object value, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index);
             using (BlockReentrancy()) {
-                CollectionChanged?.Invoke(this, eventArgs);
-                Removed?.Invoke(this, eventArgs);
+                CollectionChanged?.Invoke(Sender, eventArgs);
+                Removed?.Invoke(Sender, eventArgs);
             }
         }
 
-        protected void OnCollectionChangedMove(object value, int index, int oldIndex) {
+        public void OnCollectionChangedMove(object value, int index, int oldIndex) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, index, oldIndex);
             using (BlockReentrancy()) {
-                CollectionChanged?.Invoke(this, eventArgs);
-                Moved?.Invoke(this, eventArgs);
+                CollectionChanged?.Invoke(Sender, eventArgs);
+                Moved?.Invoke(Sender, eventArgs);
             }
         }
 
-        protected void OnCollectionChangedReplace(object oldValue, object newValue, int index) {
+        public void OnCollectionChangedReplace(object oldValue, object newValue, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, index);
             using (BlockReentrancy()) {
-                CollectionChanged?.Invoke(this, eventArgs);
-                Replaced?.Invoke(this, eventArgs);
+                CollectionChanged?.Invoke(Sender, eventArgs);
+                Replaced?.Invoke(Sender, eventArgs);
             }
         }
         #endregion

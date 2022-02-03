@@ -3,9 +3,14 @@
 /// Copyright 2019
 ///
 
-using Gstc.Collections.ObservableLists.Base;
+using Gstc.Collections.ObservableLists.Abstract;
+using Gstc.Collections.ObservableLists.ComponentModel;
+using Gstc.Collections.ObservableLists.Interface;
+using Gstc.Collections.ObservableLists.Notify;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists {
 
@@ -18,19 +23,42 @@ namespace Gstc.Collections.ObservableLists {
     /// over using the .NET ObservableCollection for its compatiblity with existing collection types and interface.
     /// </summary>
     /// <typeparam name="TItem">The type of list.</typeparam>
-    public class ObservableList<TItem> : BaseObservableList<TItem> {
+    public class ObservableList<TItem> :
+        AbstractListAdapter<TItem>,
+        IObservableList<TItem> {
 
+        #region Events
+        public event NotifyCollectionChangedEventHandler CollectionChanged {
+            add => Notify.CollectionChanged += value;
+            remove => Notify.CollectionChanged -= value;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged {
+            add => Notify.PropertyChanged += value;
+            remove => Notify.PropertyChanged -= value;
+        }
+        #endregion
+
+        #region Fields and Properties
         private List<TItem> _list;
-
         /// <summary>
         /// A reference to internal list for use by base classes.
         /// </summary>
         protected override IList<TItem> InternalList => _list;
+        /// <summary>
+        /// Notification handler for INotifyPropertyChanged and INotifyCollectionChanged events and callbacks.
+        /// </summary>
+        protected INotifyCollection Notify { get; set; }
+        #endregion
 
+        #region Constructor
         /// <summary>
         /// Creates an observable list. The observable list is backed internally by a new List{T}.
         /// </summary>
-        public ObservableList() { _list = new List<TItem>(); }
+        public ObservableList() {
+            Notify = new NotifyCollection(this);
+            _list = new List<TItem>();
+        }
 
         /// <summary>
         /// Creates an observable list using the list supplied in the constructor. Events are triggered
@@ -38,9 +66,13 @@ namespace Gstc.Collections.ObservableLists {
         /// triggered if using your provided list directly.
         /// </summary>
         /// <param name="list">List to wrap with observable list.</param>
-        public ObservableList(List<TItem> list) { List = list; }
+        public ObservableList(List<TItem> list) {
+            Notify = new NotifyCollection(this);
+            List = list;
+        }
+        #endregion
 
-        #region Properties
+        #region Methods
         /// <summary>
         /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
         /// </summary>
@@ -48,8 +80,8 @@ namespace Gstc.Collections.ObservableLists {
             get => _list;
             set {
                 _list = value;
-                OnPropertyChangedCountAndIndex();
-                OnCollectionChangedReset();
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedReset();
             }
         }
 
@@ -60,12 +92,12 @@ namespace Gstc.Collections.ObservableLists {
         public void AddRange(IList<TItem> items) {
             var count = _list.Count;
             _list.AddRange(items);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedAddMany((IList)items, count);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedAddMany((IList)items, count);
         }
         #endregion
 
-        #region overrides
+        #region Method Overrides
         /// <summary>
         /// Indexes an element of the list. CollectionChanged and Replaced events are triggered on assignment.
         /// </summary>
@@ -76,8 +108,8 @@ namespace Gstc.Collections.ObservableLists {
             set {
                 var oldItem = _list[index];
                 _list[index] = value;
-                OnPropertyChangedIndex();
-                OnCollectionChangedReplace(oldItem, value, index);
+                Notify.OnPropertyChangedIndex();
+                Notify.OnCollectionChangedReplace(oldItem, value, index);
             }
         }
 
@@ -87,8 +119,8 @@ namespace Gstc.Collections.ObservableLists {
         /// <param name="item">Item to add</param>
         public override void Add(TItem item) {
             _list.Add(item);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedAdd(item, _list.IndexOf(item));
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedAdd(item, _list.IndexOf(item));
         }
 
 
@@ -97,8 +129,8 @@ namespace Gstc.Collections.ObservableLists {
         /// </summary>
         public override void Clear() {
             _list.Clear();
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedReset();
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedReset();
         }
 
         /// <summary>
@@ -108,8 +140,8 @@ namespace Gstc.Collections.ObservableLists {
         /// <param name="item"></param>
         public override void Insert(int index, TItem item) {
             _list.Insert(index, item);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedAdd(item, index);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedAdd(item, index);
         }
 
         /// <summary>
@@ -121,8 +153,8 @@ namespace Gstc.Collections.ObservableLists {
             var removedItem = this[oldIndex];
             _list.RemoveAt(oldIndex);
             _list.Insert(newIndex, removedItem);
-            OnPropertyChangedIndex();
-            OnCollectionChangedMove(removedItem, oldIndex, newIndex);
+            Notify.OnPropertyChangedIndex();
+            Notify.OnCollectionChangedMove(removedItem, oldIndex, newIndex);
         }
 
         /// <summary>
@@ -134,8 +166,8 @@ namespace Gstc.Collections.ObservableLists {
             var index = _list.IndexOf(item);
             if (index == -1) return false;
             _list.RemoveAt(index);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedRemove(item, index);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedRemove(item, index);
             return true;
         }
 
@@ -146,8 +178,8 @@ namespace Gstc.Collections.ObservableLists {
         public override void RemoveAt(int index) {
             var item = _list[index];
             _list.RemoveAt(index);
-            OnPropertyChangedCountAndIndex();
-            OnCollectionChangedRemove(item, index);
+            Notify.OnPropertyChangedCountAndIndex();
+            Notify.OnCollectionChangedRemove(item, index);
         }
         #endregion
     }

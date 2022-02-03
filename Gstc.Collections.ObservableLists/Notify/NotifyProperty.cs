@@ -1,30 +1,40 @@
-﻿using System;
+﻿using Gstc.Collections.ObservableLists.ComponentModel;
+using System;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Base.Notify {
+namespace Gstc.Collections.ObservableLists.Notify {
 
     /// <summary>
     /// Provides functionality for generating Property changed events on collections.
-    /// When re-entrance is enabled (it is not currently enabled) it will create a threadsafe list.
+    /// When reentrance is enabled (it is not currently enabled) it will create a threadsafe list.
     /// </summary>
-    public abstract class NotifyProperty : INotifyPropertyChanged {
+    public class NotifyProperty : INotifyProperty {
+
+        #region Fields and Properties
         protected const string CountString = "Count";
         protected const string IndexerName = "Item[]";
-
         public event PropertyChangedEventHandler PropertyChanged;
+        public object Sender { get; set; }
+        #endregion
 
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+        public NotifyProperty() { }
 
-        protected void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        public NotifyProperty(object sender) { Sender = sender; }
 
-        protected void OnPropertyChangedCountAndIndex() {
+        public virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(Sender, e);
+
+        #region Methods
+        public void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+        public void OnPropertyChangedCountAndIndex() {
             OnPropertyChanged(CountString);
             OnPropertyChanged(IndexerName);
         }
 
-        protected void OnPropertyChangedIndex() {
+        public void OnPropertyChangedIndex() {
             OnPropertyChanged(IndexerName);
         }
+        #endregion
 
         #region Reentrancy
         private readonly SimpleMonitor _monitor = new SimpleMonitor();
@@ -42,7 +52,6 @@ namespace Gstc.Collections.ObservableLists.Base.Notify {
             //if ((CollectionChanged == null) || (CollectionChanged.GetInvocationList().Length <= 1)) return;
             //throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
         }
-
         private class Disposable : IDisposable {
             public void Dispose() { }
         }

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Gstc.Collections.ObservableLists.ComponentModel;
+using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Base.NotifySynchronization {
+namespace Gstc.Collections.ObservableLists.Notify {
     /// <summary>
     /// This class provides change notifications between two cooresponding objects when using the Observable List sync.
     /// </summary>
-    public class PropertySyncNotifier {
+    public class NotifyPropertySync {
 
         public List<PropertyChangedEventArgs> LastArgs = new List<PropertyChangedEventArgs>();
         public INotifyPropertySyncChanged SourceSync { get; set; }
@@ -13,7 +14,7 @@ namespace Gstc.Collections.ObservableLists.Base.NotifySynchronization {
 
         public INotifyPropertyChanged SourceNotify { get; set; }
         public INotifyPropertyChanged DestNotify { get; set; }
-        public PropertySyncNotifier(INotifyPropertyChanged sourceItem, INotifyPropertyChanged destItem, bool sourceToDest = true, bool destToSource = true) {
+        public NotifyPropertySync(INotifyPropertyChanged sourceItem, INotifyPropertyChanged destItem, bool sourceToDest = true, bool destToSource = true) {
             SourceNotify = sourceItem;
             DestNotify = destItem;
 
@@ -27,13 +28,13 @@ namespace Gstc.Collections.ObservableLists.Base.NotifySynchronization {
         }
 
         public void DestTrigger(object sender, PropertyChangedEventArgs args) {
-            if (LastArgs.Contains(args)) { LastArgs.Remove(args); return; } //Allows concurrant execution.
+            if (LastArgs.Contains(args)) { LastArgs.Remove(args); return; } //Allows concurrent execution.
             LastArgs.Add(args);
             DestSync.OnPropertyChanged(sender, args);
         }
 
         public void SourceTrigger(object sender, PropertyChangedEventArgs args) {
-            if (LastArgs.Contains(args)) { LastArgs.Remove(args); return; } //Allows concurrant execution.
+            if (LastArgs.Contains(args)) { LastArgs.Remove(args); return; } //Allows concurrent execution.
             LastArgs.Add(args);
             SourceSync.OnPropertyChanged(sender, args);
         }
