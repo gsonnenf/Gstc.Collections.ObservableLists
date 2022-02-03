@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Gstc.Collections.ObservableDictionary.Interface;
 
 namespace Gstc.Collections.ObservableLists.Test.Tools {
     public class InterfaceTestCases : CollectionTestBase<TestItem> {
@@ -22,7 +23,8 @@ namespace Gstc.Collections.ObservableLists.Test.Tools {
             //SyncRoot Test
             try {
                 Assert.IsNotNull(collection.SyncRoot);
-            } catch (NotSupportedException e) {
+            }
+            catch (NotSupportedException e) {
                 Console.WriteLine(e.Message); //Concurrent Collections will not support syncroot.
             }
 
@@ -167,6 +169,72 @@ namespace Gstc.Collections.ObservableLists.Test.Tools {
             list.RemoveAt(0);
             Assert.AreEqual(Item2, list[0]);
             MockEvent.AssertMockNotifiersCollection(2, 1);
+        }
+
+        /// <summary>
+        /// Tests cast to Generic List
+        /// </summary>
+        /// <param name="list"></param>
+        public void ListIObservableListTest(IList<TestItem> inputList) {
+
+            var list = inputList as IObservableList<TestItem>;
+            Assert.IsNotNull(list);
+            MockEvent.AddNotifiersCollectionAndProperty(list);
+
+            //Index Test
+            list.Add(Item1);
+            Assert.AreEqual(Item1, list[0]);
+            MockEvent.AssertMockNotifiersCollection(2, 1);
+            Assert.AreEqual(1, list.Count);
+
+            list[0] = Item2;
+            Assert.AreEqual(Item2, list[0]);
+            MockEvent.AssertMockNotifiersCollection(1, 1);
+            Assert.AreEqual(1, list.Count);
+
+            //Index of test
+            Assert.AreEqual(0, list.IndexOf(Item2));
+
+            //Insert(,)
+            list.Insert(0, Item3);
+            Assert.AreEqual(Item3, list[0]);
+            Assert.AreEqual(2, list.Count);
+            MockEvent.AssertMockNotifiersCollection(2, 1);
+
+            //RemoveAt()
+            list.RemoveAt(0);
+            Assert.AreEqual(Item2, list[0]);
+            MockEvent.AssertMockNotifiersCollection(2, 1);
+            Assert.AreEqual(1, list.Count);
+
+            //Clear(), For ambiguity problem.
+            list.Clear();
+            Assert.AreEqual(0, list.Count);
+        }
+
+        public void ListIObservableCollectionTest(IList<TestItem> inputList) {
+
+            var list = inputList as IObservableCollection<TestItem>;
+            Assert.IsNotNull(list);
+            MockEvent.AddNotifiersCollectionAndProperty(list);
+
+            list.Add(Item1);
+            MockEvent.AssertMockNotifiersCollection(2, 1);
+            Assert.AreEqual(1, list.Count);
+
+            list.Add(Item2);
+            //MockEvent.AssertMockNotifiersCollection(2, 1);
+            Assert.AreEqual(2, list.Count);
+
+            //Remove
+            list.Remove(Item1);
+            //MockEvent.AssertMockNotifiersCollection(2, 1);
+            Assert.AreEqual(1, list.Count);
+
+            //Clear(), For ambiguity problem.
+            list.Clear();
+            Assert.AreEqual(0, list.Count);
+
         }
     }
 }

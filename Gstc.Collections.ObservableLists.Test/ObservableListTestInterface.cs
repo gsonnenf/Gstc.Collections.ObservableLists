@@ -35,6 +35,10 @@ namespace Gstc.Collections.ObservableLists.Test {
         [Test]
         public void ListInterface() => _testCases.ListTest(Observable);
 
+        [Test] 
+        public void ObservableListInterfaceTest() => _testCases.ListIObservableListTest(Observable);
 
+        [Test]
+        public void ObservableDictionaryInterfaceTest() => _testCases.ListIObservableCollectionTest(Observable);
     }
 }

@@ -44,12 +44,15 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// A reference to internal list for use by base classes.
         /// </summary>
         protected override IList<TItem> InternalList => _list;
+
+        public bool IsReadOnly => _list.IsReadOnly;
         /// <summary>
         /// Gets internal list and allows replacement of internal list with notify observable events.
         /// </summary>
         public TIList List {
             get => _list;
             set {
+                Notify.CheckReentrancy();
                 _list = value;
                 Notify.OnPropertyChangedCountAndIndex();
                 Notify.OnCollectionChangedReset();
@@ -73,6 +76,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         public override TItem this[int index] {
             get => _list[index];
             set {
+                Notify.CheckReentrancy();
                 var oldItem = _list[index];
                 _list[index] = value;
                 Notify.OnPropertyChangedIndex();
@@ -85,6 +89,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="item">Item to add</param>
         public override void Add(TItem item) {
+            Notify.CheckReentrancy();
             _list.Add(item);
             Notify.OnPropertyChangedCountAndIndex();
             Notify.OnCollectionChangedAdd(item, _list.IndexOf(item));
@@ -95,6 +100,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
         public void AddRange(IList<TItem> items) {
+            Notify.CheckReentrancy();
             var count = _list.Count;
             //_list.AddRange(items);
             foreach (var item in items) _list.Add(item);
@@ -106,6 +112,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// Clears all item from the list. CollectionChanged and Reset event are triggered.
         /// </summary>
         public override void Clear() {
+            Notify.CheckReentrancy();
             _list.Clear();
             Notify.OnPropertyChangedCountAndIndex();
             Notify.OnCollectionChangedReset();
@@ -117,6 +124,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="index"></param>
         /// <param name="item"></param>
         public override void Insert(int index, TItem item) {
+            Notify.CheckReentrancy();
             _list.Insert(index, item);
             Notify.OnPropertyChangedCountAndIndex();
             Notify.OnCollectionChangedAdd(item, index);
@@ -128,6 +136,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="oldIndex"></param>
         /// <param name="newIndex"></param>
         public override void Move(int oldIndex, int newIndex) {
+            Notify.CheckReentrancy();
             var removedItem = this[oldIndex];
             _list.RemoveAt(oldIndex);
             _list.Insert(newIndex, removedItem);
@@ -142,6 +151,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
         //TODO: Consider and benchmark aggressive inlining. [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Remove(TItem item) {
+            Notify.CheckReentrancy();
             var index = _list.IndexOf(item);
             if (index == -1) return false;
             _list.RemoveAt(index);
@@ -155,6 +165,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="index"></param>
         public override void RemoveAt(int index) {
+            Notify.CheckReentrancy();
             var item = _list[index];
             _list.RemoveAt(index);
             Notify.OnPropertyChangedCountAndIndex();

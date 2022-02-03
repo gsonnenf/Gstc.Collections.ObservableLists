@@ -1,12 +1,11 @@
 ﻿using Gstc.Collections.ObservableLists.ComponentModel;
-using System;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Notify {
 
     /// <summary>
     /// Provides functionality for generating Property changed events on collections.
-    /// When reentrance is enabled (it is not currently enabled) it will create a threadsafe list.
+    /// When reentrancy is enabled (it is not currently enabled) it will create a threadsafe list.
     /// </summary>
     public class NotifyProperty : INotifyProperty {
 
@@ -36,31 +35,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
         }
         #endregion
 
-        #region Reentrancy
-        private readonly SimpleMonitor _monitor = new SimpleMonitor();
+        //TODO: Check if needed PropertyChanged Reentrancy protection.
 
-        //TODO: Thread Safe access is not currently implemented. This will be implemented and tested in a future version.
-        protected IDisposable BlockReentrancy() {
-            //_monitor.Enter();
-            //return _monitor;
-            return new Disposable();
-        }
-
-        //TODO: Add Monitor for Collection Changed and Dictionary Changed
-        protected void CheckReentrancy() {
-            //if (!_monitor.Busy) return;
-            //if ((CollectionChanged == null) || (CollectionChanged.GetInvocationList().Length <= 1)) return;
-            //throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
-        }
-        private class Disposable : IDisposable {
-            public void Dispose() { }
-        }
-        private class SimpleMonitor : IDisposable {
-            int _busyCount;
-            public void Enter() => ++_busyCount;
-            public void Dispose() => --_busyCount;
-            public bool Busy => _busyCount > 0;
-        }
-        #endregion
     }
 }

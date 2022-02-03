@@ -9,5 +9,7 @@ namespace Gstc.Collections.ObservableLists.ComponentModel {
         void OnCollectionChangedRemove(object value, int index);
         void OnCollectionChangedMove(object value, int index, int oldIndex);
         void OnCollectionChangedReplace(object oldValue, object newValue, int index);
+        void CheckReentrancy();
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Gstc.Collections.ObservableLists.ComponentModel;
+﻿using System;
+using Gstc.Collections.ObservableLists.ComponentModel;
 using System.Collections;
 using System.Collections.Specialized;
 
@@ -89,6 +90,28 @@ namespace Gstc.Collections.ObservableLists.Notify {
                 CollectionChanged?.Invoke(Sender, eventArgs);
                 Replaced?.Invoke(Sender, eventArgs);
             }
+        }
+        #endregion
+
+        #region .NET Monitor
+        public SimpleMonitor ReentrancyMonitor => _monitor ??= new SimpleMonitor(this);
+        private SimpleMonitor _monitor; // Lazily allocated only when a subclass calls BlockReentrancy() or during serialization. 
+        private int _blockReentrancyCount;
+
+        public void CheckReentrancy() {
+            if (_blockReentrancyCount <= 0) return;
+            if (CollectionChanged?.GetInvocationList().Length > 1)
+                throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
+        }
+        protected IDisposable BlockReentrancy() {
+            _blockReentrancyCount++;
+            return ReentrancyMonitor;
+        }
+
+        public class SimpleMonitor : IDisposable {
+            private readonly NotifyCollection _notify;
+            public SimpleMonitor(NotifyCollection notify) => _notify = notify;
+            public void Dispose() => _notify._blockReentrancyCount--;
         }
         #endregion
     }

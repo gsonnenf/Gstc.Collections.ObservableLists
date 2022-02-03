@@ -6,5 +6,7 @@ namespace Gstc.Collections.ObservableLists.Interface {
     /// </summary>
     public interface IObservableCollection<TItem> :
         ICollection<TItem>,
-        IObservableCollection { }
+        IObservableCollection {
+        new int Count { get; } //Fixes ambiguity issue
+    }
 }
