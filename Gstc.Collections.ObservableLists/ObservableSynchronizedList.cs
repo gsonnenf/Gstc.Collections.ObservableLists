@@ -15,7 +15,15 @@ namespace Gstc.Collections.ObservableLists {
     where TNotify : INotifyCollection, new() {
         public object SyncRoot => List.SyncRoot;
     }
-
     public class ObservableSynchronizedList<TItem> : 
         ObservableSynchronizedList<TItem, NotifyCollection> { }
+
+    public class ObservableSynchronizedListLock<TItem, TNotify> :
+        AbstractObservableIListLock<TItem, SynchronizedCollection<TItem>, TNotify>
+        where TNotify : INotifyCollectionLock, new() {
+        public object SyncRoot => List.SyncRoot;
+    }
+
+    public class ObservableSynchronizedListLock<TItem> :
+        ObservableSynchronizedList<TItem, NotifyCollectionLock> { }
 }
