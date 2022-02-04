@@ -1,5 +1,5 @@
-﻿using System;
-using Gstc.Collections.ObservableLists.ComponentModel;
+﻿using Gstc.Collections.ObservableLists.ComponentModel;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Threading;
@@ -45,7 +45,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
         public NotifyCollectionLock() { }
         public NotifyCollectionLock(object sender) : base(sender) { Sender = sender; }
         #endregion
-        
+
         #region Methods
         public void OnCollectionChangedReset() {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
@@ -88,7 +88,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
         public void CheckReentrancy() => throw new NotSupportedException("Please use Lock() instead of Check Reentrancy()");
         public IDisposable Lock() => LockMonitor.GetLock();
         public SimpleMonitor LockMonitor = new();
-        
+
         public class SimpleMonitor : IDisposable {
             private Mutex _mutex = new();
             public SimpleMonitor GetLock() {

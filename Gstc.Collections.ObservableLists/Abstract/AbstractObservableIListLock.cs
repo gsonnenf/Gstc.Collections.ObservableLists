@@ -108,7 +108,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
                 //_list.AddRange(items);
                 foreach (var item in items) _list.Add(item);
                 Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedAddMany((IList) items, count);
+                Notify.OnCollectionChangedAddMany((IList)items, count);
             }
         }
 

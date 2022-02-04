@@ -1,5 +1,5 @@
-﻿using System;
-using Gstc.Collections.ObservableLists.ComponentModel;
+﻿using Gstc.Collections.ObservableLists.ComponentModel;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 

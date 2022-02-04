@@ -1,7 +1,7 @@
 ﻿using Gstc.Collections.ObservableLists.Abstract;
+using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Notify;
 using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists {
     /// <summary>
@@ -10,12 +10,12 @@ namespace Gstc.Collections.ObservableLists {
     /// </summary>
     /// <typeparam name="TItem"></typeparam>
     /// <typeparam name="TNotify"></typeparam>
-    public class ObservableSynchronizedList<TItem, TNotify> : 
+    public class ObservableSynchronizedList<TItem, TNotify> :
         AbstractObservableIList<TItem, SynchronizedCollection<TItem>, TNotify>
     where TNotify : INotifyCollection, new() {
         public object SyncRoot => List.SyncRoot;
     }
-    public class ObservableSynchronizedList<TItem> : 
+    public class ObservableSynchronizedList<TItem> :
         ObservableSynchronizedList<TItem, NotifyCollection> { }
 
     public class ObservableSynchronizedListLock<TItem, TNotify> :

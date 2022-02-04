@@ -17,7 +17,7 @@ namespace Gstc.Collections.ObservableLists.Interface {
         IList<TItem>,
         IList {
         //These new members fix ambiguity between IList and ICollection{T}
-        new int Count { get; } 
+        new int Count { get; }
         new bool IsReadOnly { get; }
         new void Clear();
         new void RemoveAt(int index);
