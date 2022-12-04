@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 
 namespace Gstc.Collections.ObservableLists.ComponentModel {
-    public interface INotifyCollection : INotifyProperty, INotifyCollectionChanged {
+    public interface INotifyOnChangedHandler : INotifyPropertyChangedExtended, INotifyCollectionChanged {
         void OnCollectionChangedReset();
         void OnCollectionChangedAdd(object value, int index);
         void OnCollectionChangedAddMany(IList valueList, int index);

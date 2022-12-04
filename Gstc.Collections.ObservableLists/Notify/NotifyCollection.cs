@@ -10,7 +10,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
     /// </summary>
     public class NotifyCollection :
         NotifyProperty,
-        INotifyCollection,
+        INotifyOnChangedHandler,
         INotifyCollectionChangedExtended {
 
         #region Events

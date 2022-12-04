@@ -15,11 +15,11 @@ namespace Gstc.Collections.ObservableLists.Abstract {
     /// </summary>
     /// <typeparam name="TItem">The type of list.</typeparam>
     /// /// <typeparam name="TIList">The type of internal list that implements IList{T}.</typeparam>
-    /// <typeparam name="TNotify">A class implementing INotifyCollection for IPropertyChanged, ICollectionChanged notifications.</typeparam>
-    public abstract class AbstractObservableIList<TItem, TIList, TNotify> :
+    /// <typeparam name="TNotifyEvent">A class implementing INotifyCollection for IPropertyChanged, ICollectionChanged notifications.</typeparam>
+    public abstract class AbstractObservableIList<TItem, TIList, TNotifyEvent> :
         AbstractListAdapter<TItem>,
         IObservableList<TItem>
-        where TNotify : INotifyCollection, new()
+        where TNotifyEvent : INotifyOnChangedHandler, new()
         where TIList : IList<TItem>, new() {
 
         #region Events
@@ -38,7 +38,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <summary>
         /// Notification handler for INotifyPropertyChanged and INotifyCollectionChanged events and callbacks.
         /// </summary>
-        protected readonly TNotify Notify = new TNotify();
+        protected readonly TNotifyEvent Notify = new TNotifyEvent();
 
         /// <summary>
         /// A reference to internal list for use by base classes.

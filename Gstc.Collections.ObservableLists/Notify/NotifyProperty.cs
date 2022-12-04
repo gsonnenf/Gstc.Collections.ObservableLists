@@ -7,7 +7,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
     /// Provides functionality for generating Property changed events on collections.
     /// When reentrancy is enabled (it is not currently enabled) it will create a threadsafe list.
     /// </summary>
-    public class NotifyProperty : INotifyProperty {
+    public class NotifyProperty : INotifyPropertyChangedExtended {
 
         #region Fields and Properties
         protected const string CountString = "Count";

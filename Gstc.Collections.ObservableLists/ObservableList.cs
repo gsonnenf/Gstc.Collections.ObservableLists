@@ -48,7 +48,7 @@ namespace Gstc.Collections.ObservableLists {
         /// <summary>
         /// Notification handler for INotifyPropertyChanged and INotifyCollectionChanged events and callbacks.
         /// </summary>
-        protected INotifyCollection Notify { get; set; }
+        protected INotifyOnChangedHandler Notify { get; set; }
         public bool IsReadOnly => false;
         #endregion
 
