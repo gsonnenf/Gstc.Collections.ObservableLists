@@ -1,4 +1,5 @@
-﻿using Gstc.Collections.ObservableLists.ComponentModel;
+﻿/*
+using Gstc.Collections.ObservableLists.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Specialized;
@@ -9,10 +10,11 @@ namespace Gstc.Collections.ObservableLists.Notify {
     /// <summary>
     /// Provides functionality for generating collection changed events.
     /// </summary>
-    public class NotifyCollectionLock :
-        NotifyProperty,
-        INotifyCollectionLock,
-        INotifyCollectionChangedExtended {
+    public class NotifyCollectionChangedEventsLock :
+        NotifyPropertyChangedExtended,
+        ILock,
+        IObservableListAspect,
+        INotifyListChangedEvents {
 
         #region Events
         /// <summary>
@@ -42,42 +44,42 @@ namespace Gstc.Collections.ObservableLists.Notify {
         #endregion
 
         #region Constructors
-        public NotifyCollectionLock() { }
-        public NotifyCollectionLock(object sender) : base(sender) { Sender = sender; }
+        public NotifyCollectionChangedEventsLock() { }
+        public NotifyCollectionChangedEventsLock(object sender) : base(sender) { Sender = sender; }
         #endregion
 
         #region Methods
-        public void OnCollectionChangedReset() {
+        public void OnListReset() {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             CollectionChanged?.Invoke(Sender, eventArgs);
             Reset?.Invoke(Sender, eventArgs);
         }
 
-        public void OnCollectionChangedAdd(object value, int index) {
+        public void OnListAdd(object value, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, index);
             CollectionChanged?.Invoke(Sender, eventArgs);
             Added?.Invoke(Sender, eventArgs);
         }
         //TODO: "Range actions" in WPF is not supported. This is a WPF problem, not a GSTC problem. Perhaps a workaround could be good. 
-        public void OnCollectionChangedAddMany(IList valueList, int index) {
+        public void OnListRangeAdd(IList valueList, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, valueList, index);
             CollectionChanged?.Invoke(Sender, eventArgs);
             Added?.Invoke(Sender, eventArgs);
         }
 
-        public void OnCollectionChangedRemove(object value, int index) {
+        public void OnListRemove(object value, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index);
             CollectionChanged?.Invoke(Sender, eventArgs);
             Removed?.Invoke(Sender, eventArgs);
         }
 
-        public void OnCollectionChangedMove(object value, int index, int oldIndex) {
+        public void OnListMove(object value, int index, int oldIndex) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, index, oldIndex);
             CollectionChanged?.Invoke(Sender, eventArgs);
             Moved?.Invoke(Sender, eventArgs);
         }
 
-        public void OnCollectionChangedReplace(object oldValue, object newValue, int index) {
+        public void OnListReplace(object oldValue, object newValue, int index) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, index);
             CollectionChanged?.Invoke(Sender, eventArgs);
             Replaced?.Invoke(Sender, eventArgs);
@@ -100,3 +102,4 @@ namespace Gstc.Collections.ObservableLists.Notify {
         #endregion
     }
 }
+*/

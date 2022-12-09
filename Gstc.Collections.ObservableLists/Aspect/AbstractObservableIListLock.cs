@@ -1,4 +1,5 @@
-﻿using Gstc.Collections.ObservableLists.ComponentModel;
+﻿/*
+using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,11 +16,11 @@ namespace Gstc.Collections.ObservableLists.Abstract {
     /// </summary>
     /// <typeparam name="TItem">The type of list.</typeparam>
     /// /// <typeparam name="TIList">The type of internal list that implements IList{T}.</typeparam>
-    /// <typeparam name="TNotifyEvent">A class implementing INotifyCollection for IPropertyChanged, ICollectionChanged notifications.</typeparam>
-    public abstract class AbstractObservableIList<TItem, TIList, TNotifyEvent> :
-        AbstractListAdapter<TItem>,
+    /// <typeparam name="TNotify">A class implementing INotifyCollection for IPropertyChanged, ICollectionChanged notifications.</typeparam>
+    public abstract class AbstractObservableIListLock<TItem, TIList, TNotify> :
+        AbstractListUpcastAdapter<TItem>,
         IObservableList<TItem>
-        where TNotifyEvent : INotifyOnChangedHandler, new()
+        where TNotify : INotifyCollectionLock, INotifyCollectionChangedExtended, new()
         where TIList : IList<TItem>, new() {
 
         #region Events
@@ -38,7 +39,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <summary>
         /// Notification handler for INotifyPropertyChanged and INotifyCollectionChanged events and callbacks.
         /// </summary>
-        protected readonly TNotifyEvent Notify = new TNotifyEvent();
+        protected readonly TNotify Notify = new TNotify();
 
         /// <summary>
         /// A reference to internal list for use by base classes.
@@ -52,17 +53,18 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         public TIList List {
             get => _list;
             set {
-                Notify.CheckReentrancy();
-                _list = value;
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedReset();
+                using (Notify.Lock()) {
+                    _list = value;
+                    Notify.OnPropertyChangedCountAndIndex();
+                    Notify.OnCollectionChangedReset();
+                }
             }
         }
         private TIList _list = new TIList();
         #endregion
 
         #region Constructor
-        protected AbstractObservableIList() {
+        protected AbstractObservableIListLock() {
             Notify.Sender = this;
         }
         #endregion
@@ -76,11 +78,12 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         public override TItem this[int index] {
             get => _list[index];
             set {
-                Notify.CheckReentrancy();
-                var oldItem = _list[index];
-                _list[index] = value;
-                Notify.OnPropertyChangedIndex();
-                Notify.OnCollectionChangedReplace(oldItem, value, index);
+                using (Notify.Lock()) {
+                    var oldItem = _list[index];
+                    _list[index] = value;
+                    Notify.OnPropertyChangedIndex();
+                    Notify.OnCollectionChangedReplace(oldItem, value, index);
+                }
             }
         }
 
@@ -89,10 +92,11 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="item">Item to add</param>
         public override void Add(TItem item) {
-            Notify.CheckReentrancy();
-            _list.Add(item);
-            Notify.OnPropertyChangedCountAndIndex();
-            Notify.OnCollectionChangedAdd(item, _list.IndexOf(item));
+            using (Notify.Lock()) {
+                _list.Add(item);
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedAdd(item, _list.IndexOf(item));
+            }
         }
 
         /// <summary>
@@ -100,22 +104,24 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
         public void AddRange(IList<TItem> items) {
-            Notify.CheckReentrancy();
-            var count = _list.Count;
-            //_list.AddRange(items);
-            foreach (var item in items) _list.Add(item);
-            Notify.OnPropertyChangedCountAndIndex();
-            Notify.OnCollectionChangedAddMany((IList)items, count);
+            using (Notify.Lock()) {
+                var count = _list.Count;
+                //_list.AddRange(items);
+                foreach (var item in items) _list.Add(item);
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedAddMany((IList)items, count);
+            }
         }
 
         /// <summary>
         /// Clears all item from the list. CollectionChanged and Reset event are triggered.
         /// </summary>
         public override void Clear() {
-            Notify.CheckReentrancy();
-            _list.Clear();
-            Notify.OnPropertyChangedCountAndIndex();
-            Notify.OnCollectionChangedReset();
+            using (Notify.Lock()) {
+                _list.Clear();
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedReset();
+            }
         }
 
         /// <summary>
@@ -124,10 +130,11 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="index"></param>
         /// <param name="item"></param>
         public override void Insert(int index, TItem item) {
-            Notify.CheckReentrancy();
-            _list.Insert(index, item);
-            Notify.OnPropertyChangedCountAndIndex();
-            Notify.OnCollectionChangedAdd(item, index);
+            using (Notify.Lock()) {
+                _list.Insert(index, item);
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedAdd(item, index);
+            }
         }
 
         /// <summary>
@@ -136,12 +143,13 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="oldIndex"></param>
         /// <param name="newIndex"></param>
         public override void Move(int oldIndex, int newIndex) {
-            Notify.CheckReentrancy();
-            var removedItem = this[oldIndex];
-            _list.RemoveAt(oldIndex);
-            _list.Insert(newIndex, removedItem);
-            Notify.OnPropertyChangedIndex();
-            Notify.OnCollectionChangedMove(removedItem, oldIndex, newIndex);
+            using (Notify.Lock()) {
+                var removedItem = this[oldIndex];
+                _list.RemoveAt(oldIndex);
+                _list.Insert(newIndex, removedItem);
+                Notify.OnPropertyChangedIndex();
+                Notify.OnCollectionChangedMove(removedItem, oldIndex, newIndex);
+            }
         }
 
         /// <summary>
@@ -151,13 +159,14 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
         //TODO: Consider and benchmark aggressive inlining. [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Remove(TItem item) {
-            Notify.CheckReentrancy();
-            var index = _list.IndexOf(item);
-            if (index == -1) return false;
-            _list.RemoveAt(index);
-            Notify.OnPropertyChangedCountAndIndex();
-            Notify.OnCollectionChangedRemove(item, index);
-            return true;
+            using (Notify.Lock()) {
+                var index = _list.IndexOf(item);
+                if (index == -1) return false;
+                _list.RemoveAt(index);
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedRemove(item, index);
+                return true;
+            }
         }
 
         /// <summary>
@@ -165,14 +174,15 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="index"></param>
         public override void RemoveAt(int index) {
-            Notify.CheckReentrancy();
-            var item = _list[index];
-            _list.RemoveAt(index);
-            Notify.OnPropertyChangedCountAndIndex();
-            Notify.OnCollectionChangedRemove(item, index);
+            using (Notify.Lock()) {
+                var item = _list[index];
+                _list.RemoveAt(index);
+                Notify.OnPropertyChangedCountAndIndex();
+                Notify.OnCollectionChangedRemove(item, index);
+            }
         }
         #endregion
 
     }
 }
-
+*/

@@ -1,4 +1,5 @@
-﻿using Gstc.Collections.ObservableLists.ComponentModel;
+﻿/*
+using Gstc.Collections.ObservableLists.ComponentModel;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Notify {
@@ -7,7 +8,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
     /// Provides functionality for generating Property changed events on collections.
     /// When reentrancy is enabled (it is not currently enabled) it will create a threadsafe list.
     /// </summary>
-    public class NotifyProperty : INotifyPropertyChangedExtended {
+    public class NotifyPropertyChangedExtended : IListPropertyChangedHooks {
 
         #region Fields and Properties
         protected const string CountString = "Count";
@@ -16,9 +17,9 @@ namespace Gstc.Collections.ObservableLists.Notify {
         public object Sender { get; set; }
         #endregion
 
-        public NotifyProperty() { }
+        public NotifyPropertyChangedExtended() { }
 
-        public NotifyProperty(object sender) { Sender = sender; }
+        public NotifyPropertyChangedExtended(object sender) { Sender = sender; }
 
         public virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(Sender, e);
 
@@ -39,3 +40,4 @@ namespace Gstc.Collections.ObservableLists.Notify {
 
     }
 }
+*/

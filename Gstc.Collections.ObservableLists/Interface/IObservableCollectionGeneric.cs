@@ -8,5 +8,6 @@ namespace Gstc.Collections.ObservableLists.Interface {
         ICollection<TItem>,
         IObservableCollection {
         new int Count { get; } //Fixes ambiguity issue
+        bool AllowReentrancy { set; }
     }
 }

@@ -5,7 +5,7 @@ namespace Gstc.Collections.ObservableLists.ComponentModel {
     /// This interface allows external triggering of PropertyChanged events. This is used to trigger notify on corresponding 
     /// objects when using the ObservableListSync. 
     /// </summary>
-    public interface INotifyPropertySyncChanged : INotifyPropertyChanged {
+    public interface IPropertyChangedSyncHook : INotifyPropertyChanged {
         /// <summary>
         /// This method should execute the PropertyChanged event on an object.
         /// </summary>

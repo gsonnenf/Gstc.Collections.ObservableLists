@@ -8,7 +8,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
     /// A base class to assist in the down casting of ObservableList{T} to its base interfaces and still provide notification.
     /// </summary>
     /// <typeparam name="TItem"></typeparam>
-    public abstract class AbstractListAdapter<TItem> :
+    public abstract class AbstractListUpcast<TItem> :
         IList<TItem>,
         IList {
 
@@ -39,13 +39,13 @@ namespace Gstc.Collections.ObservableLists.Abstract {
 
         #region IList<>
         TItem IList<TItem>.this[int index] {
-            get => this[index];
+            get => this[index]; //TODO: Does this trigger the observable by calling the higher level indexer?
             set => this[index] = value;
         }
-        public int Count => InternalList.Count;
-        public bool Contains(TItem item) => InternalList.Contains(item);
-        public void CopyTo(TItem[] array, int arrayIndex) => InternalList.CopyTo(array, arrayIndex);
-        public int IndexOf(TItem item) => InternalList.IndexOf(item);
+        public virtual int Count => InternalList.Count;
+        public virtual bool Contains(TItem item) => InternalList.Contains(item);
+        public virtual void CopyTo(TItem[] array, int arrayIndex) => InternalList.CopyTo(array, arrayIndex);
+        public virtual int IndexOf(TItem item) => InternalList.IndexOf(item);
         public IEnumerator<TItem> GetEnumerator() => InternalList.GetEnumerator();
         bool ICollection<TItem>.IsReadOnly => InternalList.IsReadOnly;
         IEnumerator IEnumerable.GetEnumerator() => InternalList.GetEnumerator();

@@ -59,6 +59,7 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NotifyPropertySyncChanged.cs" />
     <Compile Include="ObservableListControl.xaml.cs">
       <DependentUpon>ObservableListControl.xaml</DependentUpon>
     </Compile>

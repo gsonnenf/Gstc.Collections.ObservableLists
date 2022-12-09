@@ -1,9 +1,10 @@
-﻿using Gstc.Collections.ObservableDictionary.ComponentModel;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
+
 using Gstc.Collections.ObservableDictionary.Interface;
 using Gstc.Collections.ObservableLists.Interface;
 using Moq;
-using System.Collections.Specialized;
-using System.ComponentModel;
+
 
 namespace Gstc.Collections.ObservableLists.Test.MockObjects {
     /// <summary>
@@ -21,12 +22,13 @@ namespace Gstc.Collections.ObservableLists.Test.MockObjects {
             obvList.CollectionChanged += OnCollectionChanged;
         }
 
+        /*
         public void AddNotifiersDictionary(INotifyDictionaryChanged obvDict) {
             //Sets up event testers
             obvDict.PropertyChanged += OnPropertyChanged;
             obvDict.DictionaryChanged += OnDictionaryChanged;
         }
-
+        */
         public void AssertMockNotifiersCollection(int timesPropertyCalled, int timesCollectionCalled) {
             _timesPropertyCalled += timesPropertyCalled;
             _timesCollectionCalled += timesCollectionCalled;
@@ -45,16 +47,16 @@ namespace Gstc.Collections.ObservableLists.Test.MockObjects {
             obvList.PropertyChanged -= OnPropertyChanged;
             obvList.CollectionChanged -= OnCollectionChanged;
         }
-
+        /*
         public void RemoveDictionaryNotifiers(IObservableDictionary<string, TestItem> obvDict) {
             obvDict.PropertyChanged -= OnPropertyChanged;
             obvDict.DictionaryChanged -= OnDictionaryChanged;
         }
-
+        */
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => Object.Call("CollectionChanged");
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) => Object.Call("PropertyChanged");
 
-        private void OnDictionaryChanged(object sender, NotifyDictionaryChangedEventArgs e) => Object.Call("DictionaryChanged");
+        //private void OnDictionaryChanged(object sender, NotifyDictionaryChangedEventArgs e) => Object.Call("DictionaryChanged");
     }
 }

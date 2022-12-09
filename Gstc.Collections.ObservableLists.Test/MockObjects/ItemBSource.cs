@@ -1,6 +1,4 @@
-﻿using Gstc.Collections.ObservableLists.Notify;
-
-namespace Gstc.Collections.ObservableLists.Test.MockObjects {
+﻿namespace Gstc.Collections.ObservableLists.Test.MockObjects {
     public class ItemBSource : NotifyPropertySyncChanged {
         public static ObservableList<ItemBSource> GetSampleSourceBList() {
             return new ObservableList<ItemBSource> {

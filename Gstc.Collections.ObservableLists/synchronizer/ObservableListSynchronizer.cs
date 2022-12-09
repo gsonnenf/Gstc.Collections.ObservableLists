@@ -229,7 +229,7 @@ namespace Gstc.Collections.ObservableLists {
 
             //TODO: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
             if (!(sourceItem is INotifyPropertyChanged && destItem is INotifyPropertyChanged)) return;
-            if (!(sourceItem is INotifyPropertySyncChanged || destItem is INotifyPropertySyncChanged)) return;
+            if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 
             var propertySyncNotifer = new NotifyPropertySync(
                 sourceItem as INotifyPropertyChanged,

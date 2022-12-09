@@ -1,44 +1,23 @@
-﻿using Gstc.Collections.ObservableLists.ComponentModel;
-using Gstc.Collections.ObservableLists.Interface;
+﻿/*
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
+
+using Gstc.Collections.ObservableLists.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Abstract {
-    /// <summary>
-    /// An observable generic for collections of type IList{T}, that has collection changed and property changed events.
-    /// It implements base collection interfaces: IList, IList{T}, ICollection, ICollection{T}, INotifyCollectionChanged, 
-    /// and implements observable interfaces: INotifyCollectionChanged and INotifyPropertyChanged. 
-    /// This IList triggers notify events when downcast to its interfaces. Using ObservableIList may be preferred
-    /// over the .NET ObservableCollection for its compatiblity with existing collection types and interface.
-    /// </summary>
-    /// <typeparam name="TItem">The type of list.</typeparam>
-    /// /// <typeparam name="TIList">The type of internal list that implements IList{T}.</typeparam>
-    /// <typeparam name="TNotify">A class implementing INotifyCollection for IPropertyChanged, ICollectionChanged notifications.</typeparam>
-    public abstract class AbstractObservableIListLock<TItem, TIList, TNotify> :
-        AbstractListAdapter<TItem>,
-        IObservableList<TItem>
-        where TNotify : INotifyCollectionLock, new()
-        where TIList : IList<TItem>, new() {
 
-        #region Events
-        public event NotifyCollectionChangedEventHandler CollectionChanged {
-            add => Notify.CollectionChanged += value;
-            remove => Notify.CollectionChanged -= value;
-        }
 
-        public event PropertyChangedEventHandler PropertyChanged {
-            add => Notify.PropertyChanged += value;
-            remove => Notify.PropertyChanged -= value;
-        }
-        #endregion
+    public abstract class AbstractListAspect<TItem, TList, TAspect> :
+        AbstractListUpcast<TItem>
+        where TAspect : IListChangedHooks, IListChangingHooks, IListReadHooks, new()
+        where TList : IList<TItem>, new() {
 
         #region Properties
         /// <summary>
         /// Notification handler for INotifyPropertyChanged and INotifyCollectionChanged events and callbacks.
         /// </summary>
-        protected readonly TNotify Notify = new TNotify();
+        protected readonly TAspect Aspect = new TAspect();
 
         /// <summary>
         /// A reference to internal list for use by base classes.
@@ -49,23 +28,19 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <summary>
         /// Gets internal list and allows replacement of internal list with notify observable events.
         /// </summary>
-        public TIList List {
-            get => _list;
+        public TList List {
+            get {
+                Aspect.OnListRead();
+                    return _list;
+            }
+            
             set {
-                using (Notify.Lock()) {
-                    _list = value;
-                    Notify.OnPropertyChangedCountAndIndex();
-                    Notify.OnCollectionChangedReset();
-                }
+                Aspect.OnListReseting();
+                _list = value;
+                Aspect.OnListReset();
             }
         }
-        private TIList _list = new TIList();
-        #endregion
-
-        #region Constructor
-        protected AbstractObservableIListLock() {
-            Notify.Sender = this;
-        }
+        private TList _list = new TList();
         #endregion
 
         #region overrides
@@ -75,13 +50,20 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="index"></param>
         /// <returns></returns>
         public override TItem this[int index] {
-            get => _list[index];
+            get {
+                Aspect.OnIndexRead();
+                return _list[index];
+            }
             set {
-                using (Notify.Lock()) {
+                try {
                     var oldItem = _list[index];
+                    Aspect.OnListReplacing(oldItem, value, index);
                     _list[index] = value;
-                    Notify.OnPropertyChangedIndex();
-                    Notify.OnCollectionChangedReplace(oldItem, value, index);
+                    Aspect.OnListReplace(oldItem, value, index);
+                } catch {
+                    Aspect.Catch(nameof(Aspect.OnListReplace));
+                } finally {
+                    Aspect.Finally();
                 }
             }
         }
@@ -91,10 +73,14 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="item">Item to add</param>
         public override void Add(TItem item) {
-            using (Notify.Lock()) {
+            try {
+                Aspect.OnListAdding(item, _list.IndexOf(item));
                 _list.Add(item);
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedAdd(item, _list.IndexOf(item));
+                Aspect.OnListAdd(item, _list.IndexOf(item));
+            } catch {
+                Aspect.Catch(nameof(Aspect.OnListAdd));
+            } finally {
+                Aspect.Finally();
             }
         }
 
@@ -103,12 +89,15 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
         public void AddRange(IList<TItem> items) {
-            using (Notify.Lock()) {
-                var count = _list.Count;
-                //_list.AddRange(items);
+            try {
+                int count = _list.Count;
+                Aspect.OnListRangeAdding((IList)items, count);
                 foreach (var item in items) _list.Add(item);
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedAddMany((IList)items, count);
+                Aspect.OnListRangeAdd((IList)items, count);
+            } catch {
+                Aspect.Catch(nameof(Aspect.OnListRangeAdd));
+            } finally {
+                Aspect.Finally();
             }
         }
 
@@ -116,10 +105,14 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// Clears all item from the list. CollectionChanged and Reset event are triggered.
         /// </summary>
         public override void Clear() {
-            using (Notify.Lock()) {
+            try {
+                Aspect.OnListReseting();
                 _list.Clear();
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedReset();
+                Aspect.OnListReset();
+            } catch {
+                Aspect.Catch(nameof(Aspect.OnListReset));
+            } finally {
+                Aspect.Finally();
             }
         }
 
@@ -129,10 +122,14 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="index"></param>
         /// <param name="item"></param>
         public override void Insert(int index, TItem item) {
-            using (Notify.Lock()) {
+            try {
+                Aspect.OnListAdding(item, index);
                 _list.Insert(index, item);
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedAdd(item, index);
+                Aspect.OnListAdd(item, index);
+            } catch {
+                Aspect.Catch(nameof(Aspect.OnListAdd));
+            } finally {
+                Aspect.Finally();
             }
         }
 
@@ -142,12 +139,16 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="oldIndex"></param>
         /// <param name="newIndex"></param>
         public override void Move(int oldIndex, int newIndex) {
-            using (Notify.Lock()) {
+            try {
                 var removedItem = this[oldIndex];
+                Aspect.OnListMoving(removedItem, oldIndex, newIndex);
                 _list.RemoveAt(oldIndex);
                 _list.Insert(newIndex, removedItem);
-                Notify.OnPropertyChangedIndex();
-                Notify.OnCollectionChangedMove(removedItem, oldIndex, newIndex);
+                Aspect.OnListMove(removedItem, oldIndex, newIndex);
+            } catch {
+                Aspect.Catch(nameof(Aspect.OnListMove));
+            } finally {
+                Aspect.Finally();
             }
         }
 
@@ -158,13 +159,19 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
         //TODO: Consider and benchmark aggressive inlining. [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Remove(TItem item) {
-            using (Notify.Lock()) {
-                var index = _list.IndexOf(item);
+            try {
+                int index = _list.IndexOf(item);
                 if (index == -1) return false;
+                Aspect.OnListRemoving(item, index);
                 _list.RemoveAt(index);
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedRemove(item, index);
+                Aspect.OnListRemove(item, index);
                 return true;
+            } catch {
+                var e = Aspect.Catch(nameof(Aspect.OnListRemove));
+                if (e == null) return false;
+                throw e;
+            } finally {
+                Aspect.Finally();
             }
         }
 
@@ -173,15 +180,19 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         /// <param name="index"></param>
         public override void RemoveAt(int index) {
-            using (Notify.Lock()) {
+            try {
                 var item = _list[index];
+                Aspect.OnListRemoving(item, index);
                 _list.RemoveAt(index);
-                Notify.OnPropertyChangedCountAndIndex();
-                Notify.OnCollectionChangedRemove(item, index);
+                Aspect.OnListRemove(item, index);
+            } catch(Exception e) {
+                Aspect.Catch(nameof(Aspect.OnListRemove));
+            } finally {
+                Aspect.Finally();
             }
         }
         #endregion
 
     }
 }
-
+*/

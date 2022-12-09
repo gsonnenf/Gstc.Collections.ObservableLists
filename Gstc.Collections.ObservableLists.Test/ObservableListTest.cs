@@ -129,9 +129,7 @@ namespace Gstc.Collections.ObservableLists.Test {
             Assert.That(ObvList[1] == Item3);
         }
 
-        /// <summary>
-        /// Utility stuff
-        /// </summary>
+        #region Event Utilities      
         private void AddMockNotifiers() {
             //Sets up event testers
             ObvList.PropertyChanged += (sender, args) => AssertEvent.Call("PropertyChanged");
@@ -142,5 +140,6 @@ namespace Gstc.Collections.ObservableLists.Test {
             MockEvent.Verify(m => m.Call("PropertyChanged"), Times.Exactly(timesPropertyCalled));
             MockEvent.Verify(m => m.Call("CollectionChanged"), Times.Exactly(timesCollectionCalled));
         }
+        #endregion
     }
 }

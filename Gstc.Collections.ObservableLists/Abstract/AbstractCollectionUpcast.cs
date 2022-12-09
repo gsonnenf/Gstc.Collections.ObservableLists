@@ -8,7 +8,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
     /// A base class to assist in the down casting of observable collections to its base interfaces and still provide notification.
     /// </summary>
     /// <typeparam name="TItem"></typeparam>
-    public abstract class AbstractCollectionAdapter<TItem> :
+    public abstract class AbstractCollectionUpcast<TItem> :
         ICollection,
         ICollection<TItem> {
 

@@ -1,5 +1,4 @@
-﻿using Gstc.Collections.ObservableLists.Notify;
-using System;
+﻿using System;
 
 
 namespace Gstc.Collections.ObservableLists.Examples {

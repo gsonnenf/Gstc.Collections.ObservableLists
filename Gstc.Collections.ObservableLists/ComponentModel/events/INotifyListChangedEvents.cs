@@ -1,10 +1,12 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Gstc.Collections.ObservableLists.ComponentModel {
     /// <summary>
     /// Provides a set of events that will be triggered by changes to a List.
     /// </summary>
-    public interface INotifyCollectionChangedExtended {
+    public interface INotifyListChangedEvents : INotifyCollectionChanged {
 
         /// <summary>
         /// Triggers events when an item or items are added. 
@@ -27,7 +29,7 @@ namespace Gstc.Collections.ObservableLists.ComponentModel {
         event NotifyCollectionChangedEventHandler Replaced;
 
         /// <summary>
-        /// Triggers events when an the list has changed substantially such as a Clear(). 
+        /// Triggers events when the list has changed substantially such as a Clear(). 
         /// </summary>
         event NotifyCollectionChangedEventHandler Reset;
     }
