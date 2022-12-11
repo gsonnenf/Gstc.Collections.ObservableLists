@@ -11,14 +11,15 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+using Gstc.Collections.ObservableLists.Abstract;
 using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
-namespace Gstc.Collections.ObservableLists.Abstract {
+namespace Gstc.Collections.ObservableLists {
 
 
     /// <summary>
-    /// AbstractObservableList{TItem, TList{TItem}} is an observable list wrapper which has an internal TList{TItem} that serves as 
+    /// ObservableIList{TItem, TList{TItem}} is an observable list wrapper which has an internal TList{TItem} that serves as 
     /// the internal collection and is specified by the user. The list triggers observable events before and after write operations, and 
     /// triggers events even when upcast to its interfaces: IList, IList{T}, ICollection, ICollection{T}. The list implements:INotifyCollectionChanged, INotifyPropertyChanged.
     /// 
@@ -28,7 +29,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
     /// </summary>
     /// <typeparam name="TItem">The type of item used in the list.</typeparam>
     /// <typeparam name="TList">The type of internal list.</typeparam>
-    public abstract class AbstractObservableList<TItem, TList> :
+    public class ObservableIList<TItem, TList> :
         AbstractListUpcast<TItem>,
         IObservableList<TItem>,
         INotifyListChangingEvents,
@@ -106,7 +107,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <summary>
         /// Creates an observable list. The observable list is backed internally by a new TList{T}.
         /// </summary>
-        public AbstractObservableList() {
+        public ObservableIList() {
             _list = new TList();
         }
 
@@ -116,7 +117,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// triggered if using your provided list directly.
         /// </summary>
         /// <param name="list">List to wrap with observable list.</param>
-        public AbstractObservableList(TList list) {
+        public ObservableIList(TList list) {
             List = list;
         }
         #endregion
@@ -334,8 +335,8 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         }
 
         private class SimpleMonitor : IDisposable {
-            private readonly AbstractObservableList<TItem, TList> _list;
-            public SimpleMonitor(AbstractObservableList<TItem, TList> list) => _list = list;
+            private readonly ObservableIList<TItem, TList> _list;
+            public SimpleMonitor(ObservableIList<TItem, TList> list) => _list = list;
             public void Dispose() => _list._blockReentrancyCount--;
         }
         #endregion

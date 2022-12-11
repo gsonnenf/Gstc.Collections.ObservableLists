@@ -3,7 +3,6 @@
 /// Copyright 2019 - 2023
 ///
 
-//TODO: Fix events for list types where add may not append to the end of the list.
 
 using System;
 using System.Collections.Concurrent;
@@ -12,25 +11,30 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
+
+using Gstc.Collections.ObservableLists.Abstract;
 using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
-namespace Gstc.Collections.ObservableLists.Abstract {
+namespace Gstc.Collections.ObservableLists {
 
 
     /// <summary>
-    /// AbstractObservableList{TItem, TList{TItem}} is an observable list wrapper which has an internal TList{TItem} that serves as 
+    /// ObservableIListLocking{TItem, TList{TItem}} is an observable locking list wrapper which has an internal TList{TItem} that serves as 
     /// the internal collection and is specified by the user. The list triggers observable events before and after write operations, and 
-    ///  triggers events even when upcast to its interfaces: IList, IList{T}, ICollection, ICollection{T}. The list implements:INotifyCollectionChanged, INotifyPropertyChanged.
+    /// triggers events even when upcast to its interfaces: IList, IList{T}, ICollection, ICollection{T}. The list implements:INotifyCollectionChanged, INotifyPropertyChanged.
+    ///  
+    /// The internal list may be created on instantiation, provided by the user on instantiation, or added by the user after instantiation.
+    /// In many cases using ObservableList may be preferred over using the .NET ObservableCollection for its compatiblity with existing collection types and interface.
     /// 
     /// All read and write operations are protected by a lock on the protected _syncRoot object. It is not exposed by default, but can be exposed on a derived class.
     /// 
-    /// The internal list may be created on instantiation, provided by the user on instantiation, or added by the user after instantiation.
-    ///  In many cases using ObservableList may be preferred over using the .NET ObservableCollection for its compatiblity with existing collection types and interface.
+    /// Reentrancy is only allowed from seperate threads to prevent deadlock. Threads are tracked via ManagedThreadId. Becautious with creating
+    /// new threads in onChange events that write to the list. This can result in infinite onChange events or a stackoverflow.
     /// </summary>
     /// <typeparam name="TItem">The type of item used in the list.</typeparam>
     /// <typeparam name="TList">The type of internal list.</typeparam>
-    public abstract class AbstractObservableListLocking<TItem, TList> :
+    public class ObservableIListLocking<TItem, TList> :
         AbstractListUpcastLocking<TItem>,
         IObservableList<TItem>,
         INotifyListChangingEvents,
@@ -75,13 +79,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// The internal {TList} wrapped by the observable class.
         /// </summary>
         private TList _list;
-
-        /// <summary>
-        /// Monitor that prevents reentrancy from individual threads. Does not protect against rentrancy
-        /// from threads created in events.
-        /// </summary>
-        private readonly MultithreadMonitor _monitor = new();
-
+  
         /// <summary>
         /// A reference to internal {TList} for use by base classes.
         /// </summary>
@@ -93,17 +91,20 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <summary>
         /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
         /// </summary>
+ 
         public TList List {
             get {
-                lock (_syncRoot) { return _list; }
+                using (ReadLock()) return _list; 
             }
             set {
                 using (_monitor.CheckReentrancy()) {
-                    lock (_syncRoot) {
+                    lock (_syncRootOnChange) {
                         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                         CollectionChanging?.Invoke(this, eventArgs);
                         Reseting?.Invoke(this, eventArgs);
-                        _list = value;
+                        
+                        using (WriteLock()) _list = value;
+                        
                         OnPropertyChangedCountAndIndex();
                         CollectionChanged?.Invoke(this, eventArgs);
                         Reset?.Invoke(this, eventArgs);
@@ -112,14 +113,13 @@ namespace Gstc.Collections.ObservableLists.Abstract {
             }
         }
 
-        public bool AllowReentrancy { set => throw new NotSupportedException("Single thread Reenatrancy not permitted as it would cause a deadlock."); }
-        #endregion
+            #endregion
 
         #region Constructor
         /// <summary>
         /// Creates an observable list. The observable list is backed internally by a new TList{T}.
         /// </summary>
-        public AbstractObservableListLocking() {
+        public ObservableIListLocking() {
             _list = new TList();
         }
 
@@ -129,7 +129,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// triggered if using your provided list directly.
         /// </summary>
         /// <param name="list">List to wrap with observable list.</param>
-        public AbstractObservableListLocking(TList list) {
+        public ObservableIListLocking(TList list) {
             List = list;
         }
         #endregion
@@ -141,18 +141,15 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="index"></param>
         /// <returns></returns>
         public override TItem this[int index] {
-            get {
-                lock (_syncRoot) {
-                    return _list[index];
-                }
-            }
+            get { using (ReadLock() ) return _list[index]; }
             set {
                 using (_monitor.CheckReentrancy()) {
-                    lock (_syncRoot) {
+                    
+                    lock (_syncRootOnChange) {
                         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, _list[index], index);
                         CollectionChanging?.Invoke(this, eventArgs);
                         Replacing?.Invoke(this, eventArgs);
-                        _list[index] = value;
+                        using (WriteLock()) _list[index] = value;
                         OnPropertyChangedIndex();
                         CollectionChanged?.Invoke(this, eventArgs);
                         Replaced?.Invoke(this, eventArgs);
@@ -167,11 +164,12 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="item">Item to add</param>
         public override void Add(TItem item) {
             using (_monitor.CheckReentrancy()) {
-                lock (_syncRoot) {
+                lock (_syncRootOnChange) {
+                    //TODO: Fix add event args for list types that may not append added element to the end of the list.
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Adding?.Invoke(this, eventArgs);
-                    _list.Add(item);
+                    using (WriteLock()) { _list.Add(item); }
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Added?.Invoke(this, eventArgs);
@@ -184,11 +182,11 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         public override void Clear() {
             using (_monitor.CheckReentrancy()) {
-                lock (_syncRoot) {
+                lock (_syncRootOnChange) {
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Reseting?.Invoke(this, eventArgs);
-                    _list.Clear();
+                    using (WriteLock()) _list.Clear();
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Reset?.Invoke(this, eventArgs);
@@ -203,11 +201,11 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="item"></param>
         public override void Insert(int index, TItem item) {
             using (_monitor.CheckReentrancy()) {
-                lock (_syncRoot) {
+                lock (_syncRootOnChange) {
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Adding?.Invoke(this, eventArgs);
-                    _list.Insert(index, item);
+                    using (WriteLock()) _list.Insert(index, item);
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Added?.Invoke(this, eventArgs);
@@ -222,13 +220,15 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="newIndex"></param>
         public override void Move(int oldIndex, int newIndex) {
             using (_monitor.CheckReentrancy()) {
-                lock (_syncRoot) {
+                lock (_syncRootOnChange) {
                     var removedItem = this[oldIndex];
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex], newIndex, oldIndex);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Moving?.Invoke(this, eventArgs);
-                    _list.RemoveAt(oldIndex);
-                    _list.Insert(newIndex, removedItem);
+                    using (WriteLock()) {
+                        _list.RemoveAt(oldIndex);
+                        _list.Insert(newIndex, removedItem);
+                    }
                     OnPropertyChangedIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Moved?.Invoke(this, eventArgs);
@@ -243,13 +243,13 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
         public override bool Remove(TItem item) {
             using (_monitor.CheckReentrancy()) {
-                lock (_syncRoot) {
+                lock (_syncRootOnChange) {
                     int index = _list.IndexOf(item);
                     if (index == -1) return false;
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Removing?.Invoke(this, eventArgs);
-                    _list.RemoveAt(index);
+                    using (WriteLock()) _list.RemoveAt(index);
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Removed?.Invoke(this, eventArgs);
@@ -264,12 +264,12 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// <param name="index"></param>
         public override void RemoveAt(int index) {
             using (_monitor.CheckReentrancy()) {
-                lock (_syncRoot) {
+                lock (_syncRootOnChange) {
                     var item = _list[index];
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Removing?.Invoke(this, eventArgs);
-                    _list.RemoveAt(index);
+                    using (WriteLock()) _list.RemoveAt(index);
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Removed?.Invoke(this, eventArgs);
@@ -295,18 +295,33 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         }
         #endregion
 
-        #region Reentrancy Monitor
+        #region Reentrancy Monitor and threading
         /// <summary>
         /// Monitor that allows each thread to access with single entrancy using a dictionary of threadId to keep 
         /// track of accessing threads. Reentrancy will be permitted if an event runs a write operation on a seperate 
         /// thread, so it is recommended to not do this without careful consideration.
         /// </summary>
+
+        /// <summary>
+        /// Monitor that prevents reentrancy from individual threads. Does not protect against rentrancy
+        /// from threads created in events.
+        /// </summary>
+        private readonly MultithreadMonitor _monitor = new();
+
+        protected object _syncRootOnChange = new();
+
+        public bool AllowReentrancy {
+            set {
+                if (value == true) throw new NotSupportedException("Single thread Reenatrancy not permitted as it would cause a deadlock.");
+            }
+        }
+
         private class MultithreadMonitor : IDisposable {
             private ConcurrentDictionary<int, int> ReentrancyDictionary = new ConcurrentDictionary<int, int>();
 
             public MultithreadMonitor CheckReentrancy() {
                 var threadId = Thread.CurrentThread.ManagedThreadId;
-                if (!ReentrancyDictionary.TryAdd(threadId, threadId)) throw new InvalidOperationException("Reentrancy not allowed to avoid deadlock.");
+                if (!ReentrancyDictionary.TryAdd(threadId, threadId)) throw new InvalidOperationException("Single thread Reenatrancy not permitted as it would cause a deadlock.");
                 return this;
             }
 
