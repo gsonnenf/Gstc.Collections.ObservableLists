@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace Gstc.Collections.ObservableLists.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.ComponentModel {
-    public interface IListReadHooks {
-        void OnListRead();
-        void OnIndexRead();
-    }
+public interface IListReadHooks {
+    void OnListRead();
+    void OnIndexRead();
 }

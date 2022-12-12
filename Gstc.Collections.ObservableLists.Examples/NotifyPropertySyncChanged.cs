@@ -1,5 +1,4 @@
-﻿using Gstc.Collections.ObservableLists.ComponentModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Gstc.Collections.ObservableLists.Synchronizer;
 
 namespace Gstc.Collections.ObservableLists.Examples {

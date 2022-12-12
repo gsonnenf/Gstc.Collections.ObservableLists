@@ -62,4 +62,3 @@ namespace Gstc.Collections.ObservableLists.Examples {
         };
     }
 }
-
