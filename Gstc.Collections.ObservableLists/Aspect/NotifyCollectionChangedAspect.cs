@@ -25,7 +25,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
 
         public event NotifyCollectionChangedEventHandler Replacing;
 
-        public event NotifyCollectionChangedEventHandler Reseting;
+        public event NotifyCollectionChangedEventHandler Resetting;
         #endregion
 
         #region Events Changed
@@ -103,7 +103,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(Sender, eventArgs);
-                Reseting?.Invoke(Sender, eventArgs);
+                Resetting?.Invoke(Sender, eventArgs);
             }
         }
 

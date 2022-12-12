@@ -51,7 +51,7 @@ namespace Gstc.Collections.ObservableLists.Multithread {
 
         public event NotifyCollectionChangedEventHandler Replacing;
 
-        public event NotifyCollectionChangedEventHandler Reseting;
+        public event NotifyCollectionChangedEventHandler Resetting;
 
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
@@ -103,7 +103,7 @@ namespace Gstc.Collections.ObservableLists.Multithread {
                     lock (_syncRootOnChange) {
                         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                         CollectionChanging?.Invoke(this, eventArgs);
-                        Reseting?.Invoke(this, eventArgs);
+                        Resetting?.Invoke(this, eventArgs);
 
                         using (WriteLock()) _list = value;
 
@@ -189,7 +189,7 @@ namespace Gstc.Collections.ObservableLists.Multithread {
                 lock (_syncRootOnChange) {
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                     CollectionChanging?.Invoke(this, eventArgs);
-                    Reseting?.Invoke(this, eventArgs);
+                    Resetting?.Invoke(this, eventArgs);
                     using (WriteLock()) _list.Clear();
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);

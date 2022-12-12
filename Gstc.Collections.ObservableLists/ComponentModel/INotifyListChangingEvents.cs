@@ -29,6 +29,6 @@ namespace Gstc.Collections.ObservableLists.ComponentModel {
         /// <summary>
         /// Triggers events before the list has changed substantially such as a Clear(). 
         /// </summary>
-        event NotifyCollectionChangedEventHandler Reseting;
+        event NotifyCollectionChangedEventHandler Resetting;
     }
 }

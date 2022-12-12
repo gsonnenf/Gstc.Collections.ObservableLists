@@ -1,7 +1,8 @@
-﻿using AutoFixture;
-using Gstc.Collections.ObservableLists.Test.MockObjects;
+﻿using System.Collections.Specialized;
+using AutoFixture;
 using NUnit.Framework;
-using System.Collections.Specialized;
+
+using Gstc.Collections.ObservableLists.Test.MockObjects;
 
 namespace Gstc.Collections.ObservableLists.Test.Tools {
     public class CollectionTestBase<TItem> {

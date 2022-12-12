@@ -48,7 +48,7 @@ namespace Gstc.Collections.ObservableLists {
 
         public event NotifyCollectionChangedEventHandler Replacing;
 
-        public event NotifyCollectionChangedEventHandler Reseting;
+        public event NotifyCollectionChangedEventHandler Resetting;
 
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
@@ -89,7 +89,7 @@ namespace Gstc.Collections.ObservableLists {
 
                 using (BlockReentrancy()) {
                     CollectionChanging?.Invoke(this, eventArgs);
-                    Reseting?.Invoke(this, eventArgs);
+                    Resetting?.Invoke(this, eventArgs);
                 }
 
                 _list = value;
@@ -180,7 +180,7 @@ namespace Gstc.Collections.ObservableLists {
 
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(this, eventArgs);
-                Reseting?.Invoke(this, eventArgs);
+                Resetting?.Invoke(this, eventArgs);
             }
 
             _list.Clear();

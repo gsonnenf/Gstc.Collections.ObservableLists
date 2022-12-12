@@ -13,8 +13,6 @@ using Gstc.Collections.ObservableLists.Abstract;
 using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
-
-
 namespace Gstc.Collections.ObservableLists {
 
     /// <summary>
@@ -43,18 +41,18 @@ namespace Gstc.Collections.ObservableLists {
 
         public event NotifyCollectionChangedEventHandler Replacing;
 
-        public event NotifyCollectionChangedEventHandler Reseting;
+        public event NotifyCollectionChangedEventHandler Resetting;
         #endregion
 
         #region Events Collection Changed 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        
+
         public event NotifyCollectionChangedEventHandler Added;
-       
+
         public event NotifyCollectionChangedEventHandler Removed;
-       
+
         public event NotifyCollectionChangedEventHandler Moved;
-       
+
         public event NotifyCollectionChangedEventHandler Replaced;
 
         public event NotifyCollectionChangedEventHandler Reset;
@@ -81,21 +79,21 @@ namespace Gstc.Collections.ObservableLists {
         public List<TItem> List {
             get => _list;
             set {
-                CheckReentrancy();                
-                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);            
-                
+                CheckReentrancy();
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+
                 using (BlockReentrancy()) {
                     CollectionChanging?.Invoke(this, eventArgs);
-                    Reseting?.Invoke(this, eventArgs);
+                    Resetting?.Invoke(this, eventArgs);
                 }
-                
+
                 _list = value;
 
                 using (BlockReentrancy()) {
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Reset?.Invoke(this, eventArgs);
-                }  
+                }
             }
         }
         #endregion
@@ -105,7 +103,7 @@ namespace Gstc.Collections.ObservableLists {
         /// Creates an observable list. The observable list is backed internally by a new List{T}.
         /// </summary>
         public ObservableList() {
-             _list = new List<TItem>();
+            _list = new List<TItem>();
         }
 
         /// <summary>
@@ -129,7 +127,7 @@ namespace Gstc.Collections.ObservableLists {
         public void AddRange(IList<TItem> items) {
             CheckReentrancy();
 
-            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList) items, _list.Count);
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
 
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -157,14 +155,14 @@ namespace Gstc.Collections.ObservableLists {
             set {
                 CheckReentrancy();
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, _list[index], index);
-                
+
                 using (BlockReentrancy()) {
                     CollectionChanging?.Invoke(this, eventArgs);
-                    Replacing?.Invoke(this, eventArgs); 
+                    Replacing?.Invoke(this, eventArgs);
                 }
-                
+
                 _list[index] = value;
-                
+
                 using (BlockReentrancy()) {
                     OnPropertyChangedIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
@@ -184,12 +182,12 @@ namespace Gstc.Collections.ObservableLists {
 
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(this, eventArgs);
-                Adding?.Invoke(this, eventArgs); 
+                Adding?.Invoke(this, eventArgs);
             }
 
             _list.Add(item);
-     
-            using (BlockReentrancy()) {      
+
+            using (BlockReentrancy()) {
                 OnPropertyChangedCountAndIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
                 Added?.Invoke(this, eventArgs);
@@ -201,11 +199,11 @@ namespace Gstc.Collections.ObservableLists {
         /// </summary>
         public override void Clear() {
             CheckReentrancy();
-            
+
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(this, eventArgs);
-                Reseting?.Invoke(this, eventArgs);
+                Resetting?.Invoke(this, eventArgs);
             }
 
             _list.Clear();
@@ -233,7 +231,7 @@ namespace Gstc.Collections.ObservableLists {
 
             _list.Insert(index, item);
 
-            using (BlockReentrancy()) {      
+            using (BlockReentrancy()) {
                 OnPropertyChangedCountAndIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
                 Added?.Invoke(this, eventArgs);
@@ -277,13 +275,13 @@ namespace Gstc.Collections.ObservableLists {
             if (index == -1) return false;
 
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
-            
+
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(this, eventArgs);
                 Removing?.Invoke(this, eventArgs); //TODO: FIX
             }
             _list.RemoveAt(index);
-            
+
             using (BlockReentrancy()) {
                 OnPropertyChangedCountAndIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
@@ -303,8 +301,8 @@ namespace Gstc.Collections.ObservableLists {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
 
             using (BlockReentrancy()) {
-                    CollectionChanging?.Invoke(this, eventArgs);
-                    Removing?.Invoke(this, eventArgs);
+                CollectionChanging?.Invoke(this, eventArgs);
+                Removing?.Invoke(this, eventArgs);
             }
 
             _list.RemoveAt(index);

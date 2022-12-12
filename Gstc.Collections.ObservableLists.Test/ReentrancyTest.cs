@@ -1,13 +1,10 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Specialized;
 using System.Collections.Generic;
-
 using NUnit.Framework;
 
 using Gstc.Collections.ObservableLists.Interface;
-using System.Threading;
-using System.Collections.Concurrent;
-using System.Reflection.Metadata.Ecma335;
 using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists.Test {
