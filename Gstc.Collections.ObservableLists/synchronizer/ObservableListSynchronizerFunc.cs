@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Gstc.Collections.ObservableLists {
+namespace Gstc.Collections.ObservableLists.Synchronizer {
 
 
     /// <summary>

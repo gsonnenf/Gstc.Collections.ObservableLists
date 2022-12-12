@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Gstc.Collections.ObservableLists.Abstract {
+namespace Gstc.Collections.ObservableLists.Multithread {
 
     /// <summary>
     /// A base class to assist in the down casting of ObservableList{T} to its base interfaces and still provide notification.
@@ -30,7 +30,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         #region IList
         int IList.Add(object value) { 
             Add((TItem)value); 
-            return Count - 1; //TODO: Count behavior isn't threadsafe.
+            return Count - 1; //TODO: Count behavior isn't thread safe.
         }
         bool IList.Contains(object value) => Contains((TItem)value);
         int IList.IndexOf(object value) => IndexOf((TItem)value);
@@ -42,16 +42,12 @@ namespace Gstc.Collections.ObservableLists.Abstract {
 
         bool IList.IsFixedSize => false;
         object IList.this[int index] {
-            get { using (ReadLock()) return this[index];}
-            set { using (WriteLock()) this[index] = (TItem)value;}
+            get => this[index];
+            set => this[index] = (TItem)value;
         }
         #endregion
 
         #region IList<>
-        TItem IList<TItem>.this[int index] {
-            get { using (ReadLock()) return this[index]; }
-            set { using (WriteLock()) this[index] = value;}
-        }
         public int Count {
             get { using (ReadLock()) return InternalList.Count; }
         }
@@ -85,7 +81,6 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         void ICollection.CopyTo(Array array, int arrayIndex) {
             using (ReadLock()) ((ICollection)InternalList).CopyTo(array, arrayIndex);
         }
-
         bool ICollection.IsSynchronized => true;
         object ICollection.SyncRoot => _syncRoot;
         #endregion
@@ -138,10 +133,6 @@ namespace Gstc.Collections.ObservableLists.Abstract {
                 return this;
             }
         }
-
-
-
         #endregion
-
     }
 }

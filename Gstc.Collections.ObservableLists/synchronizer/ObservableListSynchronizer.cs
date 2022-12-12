@@ -3,13 +3,11 @@
 /// Copyright 2019
 ///
 
-using Gstc.Collections.ObservableLists.ComponentModel;
-using Gstc.Collections.ObservableLists.Notify;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists {
+namespace Gstc.Collections.ObservableLists.Synchronizer {
 
     /// <summary>
     /// The ObservableListSyncronizer provides syncronization between two ObservableLists of different types 

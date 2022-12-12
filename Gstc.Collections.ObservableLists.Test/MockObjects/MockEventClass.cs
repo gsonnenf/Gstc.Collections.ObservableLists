@@ -22,23 +22,16 @@ namespace Gstc.Collections.ObservableLists.Test.MockObjects {
             obvList.CollectionChanged += OnCollectionChanged;
         }
 
-        /*
-        public void AddNotifiersDictionary(INotifyDictionaryChanged obvDict) {
-            //Sets up event testers
-            obvDict.PropertyChanged += OnPropertyChanged;
-            obvDict.DictionaryChanged += OnDictionaryChanged;
-        }
-        */
-        public void AssertMockNotifiersCollection(int timesPropertyCalled, int timesCollectionCalled) {
-            _timesPropertyCalled += timesPropertyCalled;
-            _timesCollectionCalled += timesCollectionCalled;
+        public void AssertMockNotifiersCollection(int expectedTimesPropertyCalled, int expectedTimesCollectionCalled) {
+            _timesPropertyCalled += expectedTimesPropertyCalled;
+            _timesCollectionCalled += expectedTimesCollectionCalled;
             Verify(m => m.Call("PropertyChanged"), Times.Exactly(_timesPropertyCalled));
             Verify(m => m.Call("CollectionChanged"), Times.Exactly(_timesCollectionCalled));
         }
 
-        public void AssertMockNotifiersDictionary(int timesPropertyCalled, int timesDictionaryCalled) {
-            _timesPropertyCalled += timesPropertyCalled;
-            _timesDictionaryCalled += timesDictionaryCalled;
+        public void AssertMockNotifiersDictionary(int expectedTimesPropertyCalled, int expectedTimesDictionaryCalled) {
+            _timesPropertyCalled += expectedTimesPropertyCalled;
+            _timesDictionaryCalled += expectedTimesDictionaryCalled;
             Verify(m => m.Call("DictionaryChanged"), Times.Exactly(_timesDictionaryCalled));
             Verify(m => m.Call("PropertyChanged"), Times.Exactly(_timesPropertyCalled));
         }
@@ -47,16 +40,11 @@ namespace Gstc.Collections.ObservableLists.Test.MockObjects {
             obvList.PropertyChanged -= OnPropertyChanged;
             obvList.CollectionChanged -= OnCollectionChanged;
         }
-        /*
-        public void RemoveDictionaryNotifiers(IObservableDictionary<string, TestItem> obvDict) {
-            obvDict.PropertyChanged -= OnPropertyChanged;
-            obvDict.DictionaryChanged -= OnDictionaryChanged;
-        }
-        */
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => Object.Call("CollectionChanged");
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
+            Object.Call("CollectionChanged");
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) => Object.Call("PropertyChanged");
-
-        //private void OnDictionaryChanged(object sender, NotifyDictionaryChangedEventArgs e) => Object.Call("DictionaryChanged");
     }
 }
+

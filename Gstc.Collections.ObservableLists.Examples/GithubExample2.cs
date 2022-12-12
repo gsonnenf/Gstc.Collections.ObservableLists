@@ -1,4 +1,5 @@
 ﻿using System;
+using Gstc.Collections.ObservableLists.Synchronizer;
 
 
 namespace Gstc.Collections.ObservableLists.Examples {

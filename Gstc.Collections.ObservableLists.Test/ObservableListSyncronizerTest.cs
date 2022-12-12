@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Gstc.Collections.ObservableLists.Synchronizer;
 
 namespace Gstc.Collections.ObservableLists.Test {
 

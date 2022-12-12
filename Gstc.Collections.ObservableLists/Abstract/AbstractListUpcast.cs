@@ -38,10 +38,6 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         #endregion
 
         #region IList<>
-        TItem IList<TItem>.this[int index] {
-            get => this[index]; //TODO: Does this trigger the observable by calling the higher level indexer?
-            set => this[index] = value;
-        }
         public virtual int Count => InternalList.Count;
         public virtual bool Contains(TItem item) => InternalList.Contains(item);
         public virtual void CopyTo(TItem[] array, int arrayIndex) => InternalList.CopyTo(array, arrayIndex);
@@ -56,6 +52,5 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         bool ICollection.IsSynchronized => ((ICollection)InternalList).IsSynchronized;
         object ICollection.SyncRoot => ((ICollection)InternalList).SyncRoot;
         #endregion
-
     }
 }

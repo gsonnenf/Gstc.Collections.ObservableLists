@@ -1,4 +1,5 @@
-﻿using Gstc.Collections.ObservableLists.Test.MockObjects;
+﻿using Gstc.Collections.ObservableLists.Synchronizer;
+using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Moq;
 using NUnit.Framework;
 

@@ -3,7 +3,6 @@
 /// Copyright 2019 - 2023
 ///
 
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,11 +11,10 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-using Gstc.Collections.ObservableLists.Abstract;
 using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
-namespace Gstc.Collections.ObservableLists {
+namespace Gstc.Collections.ObservableLists.Multithread {
 
 
     /// <summary>
@@ -79,22 +77,26 @@ namespace Gstc.Collections.ObservableLists {
         /// The internal {TList} wrapped by the observable class.
         /// </summary>
         private TList _list;
-  
+
         /// <summary>
         /// A reference to internal {TList} for use by base classes.
         /// </summary>
         protected override IList<TItem> InternalList => _list;
+
         /// <summary>
         /// List is not readonly.
         /// </summary>
-        public bool IsReadOnly => _list.IsReadOnly;
+        public bool IsReadOnly {
+            get { using (ReadLock()) return _list.IsReadOnly; }
+        }
+
         /// <summary>
         /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
         /// </summary>
- 
+
         public TList List {
             get {
-                using (ReadLock()) return _list; 
+                using (ReadLock()) return _list;
             }
             set {
                 using (_monitor.CheckReentrancy()) {
@@ -102,9 +104,9 @@ namespace Gstc.Collections.ObservableLists {
                         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                         CollectionChanging?.Invoke(this, eventArgs);
                         Reseting?.Invoke(this, eventArgs);
-                        
+
                         using (WriteLock()) _list = value;
-                        
+
                         OnPropertyChangedCountAndIndex();
                         CollectionChanged?.Invoke(this, eventArgs);
                         Reset?.Invoke(this, eventArgs);
@@ -113,7 +115,7 @@ namespace Gstc.Collections.ObservableLists {
             }
         }
 
-            #endregion
+        #endregion
 
         #region Constructor
         /// <summary>
@@ -130,7 +132,7 @@ namespace Gstc.Collections.ObservableLists {
         /// </summary>
         /// <param name="list">List to wrap with observable list.</param>
         public ObservableIListLocking(TList list) {
-            List = list;
+            _list = list;
         }
         #endregion
 
@@ -141,10 +143,12 @@ namespace Gstc.Collections.ObservableLists {
         /// <param name="index"></param>
         /// <returns></returns>
         public override TItem this[int index] {
-            get { using (ReadLock() ) return _list[index]; }
+            get {
+                using (ReadLock()) return _list[index];
+            }
             set {
                 using (_monitor.CheckReentrancy()) {
-                    
+
                     lock (_syncRootOnChange) {
                         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, _list[index], index);
                         CollectionChanging?.Invoke(this, eventArgs);
@@ -169,7 +173,7 @@ namespace Gstc.Collections.ObservableLists {
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
                     CollectionChanging?.Invoke(this, eventArgs);
                     Adding?.Invoke(this, eventArgs);
-                    using (WriteLock()) { _list.Add(item); }
+                    using (WriteLock()) _list.Add(item);
                     OnPropertyChangedCountAndIndex();
                     CollectionChanged?.Invoke(this, eventArgs);
                     Added?.Invoke(this, eventArgs);

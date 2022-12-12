@@ -115,7 +115,7 @@ namespace Gstc.Collections.ObservableLists {
         /// </summary>
         /// <param name="list">List to wrap with observable list.</param>
         public ObservableList(List<TItem> list) {
-            List = list;
+            _list = list;
         }
         #endregion
 
