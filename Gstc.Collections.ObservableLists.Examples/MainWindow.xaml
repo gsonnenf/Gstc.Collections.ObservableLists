@@ -4,15 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gstc.Collections.ObservableLists.Examples"
+        xmlns:observableListSync="clr-namespace:Gstc.Collections.ObservableLists.Examples.ObservableListSync"
+        xmlns:observableList="clr-namespace:Gstc.Collections.ObservableLists.Examples.ObservableList"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <TabControl TabStripPlacement="Bottom">
             <TabItem Header="Observable List Control">
-                <local:ObservableListControl></local:ObservableListControl>
+                <observableList:ObservableListControl></observableList:ObservableListControl>
             </TabItem>
             <TabItem Header="Observable List Sync">
-                <local:ObservableListSyncControl x:Name="ObvListSync"></local:ObservableListSyncControl>
+                <observableListSync:ObservableListSyncControl x:Name="ObvListSync"></observableListSync:ObservableListSyncControl>
             </TabItem>
         </TabControl>
     </Grid>

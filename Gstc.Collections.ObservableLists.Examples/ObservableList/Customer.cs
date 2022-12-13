@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Gstc.Collections.ObservableLists.Examples {
+namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
     public class Customer {
         public string FirstName { get; set; }
         public string LastName { get; set; }

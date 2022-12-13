@@ -2,16 +2,16 @@
 using System.Windows.Controls;
 using Gstc.Collections.ObservableLists.Synchronizer;
 
-namespace Gstc.Collections.ObservableLists.Examples {
+namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
     /// <summary>
     /// Interaction logic for ObservableListSyncControl.xaml
     /// </summary>
     public partial class ObservableListSyncControl : UserControl {
 
         /// <summary>
-        /// The syncronized observable list for viewmodel.
+        /// The synchronized observable list for viewmodel.
         /// </summary>       
-        private ObservableListSynchronizer<TestModel, TestViewModel> ObvListSync =
+        private ObservableListSynchronizer<TestModel, TestViewModel> _obvListSync =
            new ObservableListSynchronizerFunc<TestModel, TestViewModel>(
                (sourceItem) => new TestViewModel(sourceItem),
                (destItem) => destItem.TestModel
@@ -25,13 +25,11 @@ namespace Gstc.Collections.ObservableLists.Examples {
             InitializeComponent();
             //Initializes example data
 
-            ObvListSync.SourceObservableList = SourceObvList;
-            ObvListSync.DestinationObservableList = DestObvList;
+            _obvListSync.SourceObservableList = SourceObvList;
+            _obvListSync.DestinationObservableList = DestObvList;
 
             SourceGrid.ItemsSource = SourceObvList;
             DestGrid.ItemsSource = DestObvList;
-
-
 
             SourceObvList.Add(new TestModel { Num1 = 1, Num2 = 2 });
             SourceObvList.Add(new TestModel { Num1 = 10, Num2 = 20 });
@@ -47,13 +45,8 @@ namespace Gstc.Collections.ObservableLists.Examples {
             */
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-            SourceObvList[0].Num1 += 100;
-        }
+        private void Button_Click(object sender, RoutedEventArgs e) => SourceObvList[0].Num1 += 100;
 
-        private void Button_Click_1(object sender, RoutedEventArgs e) {
-            DestObvList[0].Num2 += 40;
-        }
-
+        private void Button_Click_1(object sender, RoutedEventArgs e) => DestObvList[0].Num2 += 40;
     }
 }

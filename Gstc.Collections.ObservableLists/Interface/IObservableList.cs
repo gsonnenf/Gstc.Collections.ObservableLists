@@ -5,6 +5,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Gstc.Collections.ObservableLists.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Interface;
 
@@ -14,6 +15,8 @@ namespace Gstc.Collections.ObservableLists.Interface;
 /// <typeparam name="TItem"></typeparam>
 public interface IObservableList<TItem> :
     IObservableCollection<TItem>,
+    INotifyListChangedEvents,
+    INotifyListChangingEvents,
     IList<TItem>,
     IList {
     //These new members fix ambiguity between IList and ICollection{T}

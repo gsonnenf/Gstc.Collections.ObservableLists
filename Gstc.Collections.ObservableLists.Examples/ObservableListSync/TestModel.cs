@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Examples {
+namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
     public class TestModel : INotifyPropertyChanged {
 
         private int num1 = 5;

@@ -1,11 +1,4 @@
-﻿///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019 - 2023
-///
-
-//TODO: Fix events for list types where add may not append to the end of the list.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -33,6 +26,8 @@ public class ObservableIList<TItem, TList> :
     INotifyListChangingEvents,
     INotifyListChangedEvents
     where TList : IList<TItem>, new() {
+
+    //TODO: Fix events for list types where add may not append to the end of the list.
 
     #region Events Collection Changing
     public event NotifyCollectionChangedEventHandler CollectionChanging;

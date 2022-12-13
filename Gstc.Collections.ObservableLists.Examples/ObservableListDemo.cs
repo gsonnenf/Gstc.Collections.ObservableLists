@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Gstc.Collections.ObservableLists.Examples.ObservableList;
 
 
 namespace Gstc.Collections.ObservableLists.Examples {

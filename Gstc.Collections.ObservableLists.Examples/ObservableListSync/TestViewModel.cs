@@ -1,4 +1,4 @@
-﻿namespace Gstc.Collections.ObservableLists.Examples {
+﻿namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
     public class TestViewModel : NotifyPropertySyncChanged {
         public TestModel TestModel;
 

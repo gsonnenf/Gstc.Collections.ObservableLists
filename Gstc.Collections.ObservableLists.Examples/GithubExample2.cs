@@ -1,5 +1,6 @@
 ﻿using System;
 using Gstc.Collections.ObservableLists.Synchronizer;
+using NotifyPropertySyncChanged = Gstc.Collections.ObservableLists.Examples.ObservableListSync.NotifyPropertySyncChanged;
 
 
 namespace Gstc.Collections.ObservableLists.Examples {
@@ -8,7 +9,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
             ObservableList<Model> sourceList = new ObservableList<Model>();
             ObservableList<ViewModel> destList = new ObservableList<ViewModel>();
 
-            //Syncronizes our lists
+            //Synchronizes our lists
             ObservableListSynchronizer<Model, ViewModel> ObvListSync =
                        new ObservableListSynchronizerFunc<Model, ViewModel>(
                            (sourceItem) => new ViewModel(sourceItem),
@@ -17,7 +18,7 @@ namespace Gstc.Collections.ObservableLists.Examples {
                            destList
                        );
 
-            //Thats it for setup.
+            //That's it for setup.
 
             //Example functionality
             sourceList.Add(new Model { MyNum = 10, MyStringLower = "x" });

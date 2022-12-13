@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Gstc.Collections.ObservableLists.Synchronizer;
 
-namespace Gstc.Collections.ObservableLists.Examples {
+namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
 
     /// <summary>
     /// A reference class for implementation of INotifyPropertySyncChanged. This can be inherited directly for simple objects,
