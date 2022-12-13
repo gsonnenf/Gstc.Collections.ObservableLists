@@ -54,7 +54,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             "Jackson",
             "Lee",
             "Mercado",
-            "Sonnenberg",
+            "Sonnenfeld",
             "Valdez",
             "Johnson",
             "Parker",

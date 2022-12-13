@@ -1,23 +1,21 @@
-﻿///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019
-///
-
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Synchronizer;
 
 /// <summary>
-/// The ObservableListSyncronizer provides syncronization between two ObservableLists of different types 
-/// {TSource} and {TDestination}. Add, Remove, clear, etc on one list is propogated to the other.
+/// The ObservableListSynchronizer provides synchronization between two ObservableLists of different types 
+/// {TSource} and {TDestination}. Add, Remove, clear, etc on one list is propagated to the other.
 /// The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) 
 /// that provide two way conversion between {TSource} and {TDestination}. Used in conjunction with the 
-/// INotifyPropertySyncChanged interace, this class can also provide syncronization for notify events properties
+/// INotifyPropertySyncChanged interface, this class can also provide synchronization for notify events properties
 /// within an item of {TSource} and {TDestination}. If a PropertyChanged event is triggered on an item in {TSource}
 /// the class can trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
 /// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
+///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
 /// </summary>
 /// <typeparam name="TSource">The source or model list type.</typeparam>
 /// <typeparam name="TDestination">The destination or viewmodel list type.</typeparam>
@@ -53,8 +51,8 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
 
     /// <summary>
     /// A destination observable collection of type {TDestination} that will be synchronized to a source collection of type {TSource}.
-    /// On assignment, the destination list is cleared, and items from the source list are converted anded added to the destination 
-    /// using your provided ConvertSourceToDestination(...) method. After assignment changes to the destination list are propogated to
+    /// On assignment, the destination list is cleared, and items from the source list are converted and added to the destination 
+    /// using your provided ConvertSourceToDestination(...) method. After assignment changes to the destination list are propagated to
     /// the source list.
     /// 
     /// If you wish to propagate items from the destination list to the source list on assignment, use the ReplaceDestinationCopyToSource(...) method.
@@ -65,26 +63,26 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     }
 
     /// <summary>
-    /// If true, add, remove, and replace from source collection is propogated to the destination collection.  This is always true in the current version.
+    /// If true, add, remove, and replace from source collection is propagated to the destination collection.  This is always true in the current version.
     /// </summary>
     public bool IsSyncSourceToDestCollection { get; set; } = true;
     //TODO: Fix events that use RemoveAt or other indexing methods with one-way sync, updating a non-synced list breaks the index map between lists. You may end up removing the wrong object.
 
     /// <summary>
-    /// If true, add, remove, and replace from destination collection is propogated to the source collection.  This is always true in the current version.
+    /// If true, add, remove, and replace from destination collection is propagated to the source collection.  This is always true in the current version.
     /// </summary>
     public bool IsSyncDestToSourceCollection { get; set; } = true;
 
     /// <summary>
-    /// If true, an PropertyChanged event triggered on an source item will also trigger a PropertyChanged event on the coorelated desitination item.
-    /// This is primarly used to ensure change notifications are triggered for destination items that are mapped to the source item instead of copied.
+    /// If true, an PropertyChanged event triggered on an source item will also trigger a PropertyChanged event on the correlated destination item.
+    /// This is primarily used to ensure change notifications are triggered for destination items that are mapped to the source item instead of copied.
     /// True by default.
     /// </summary>
     public bool IsPropertyNotifySourceToDest { get; private set; }
 
     /// <summary>
-    /// If true, an PropertyChanged event triggered on an desitination item will also trigger a PropertyChanged event on the coorelated source item.
-    /// This is primarly used to ensure change notifications are triggered for source items that are mapped to the desitination item instead of copied.
+    /// If true, an PropertyChanged event triggered on an destination item will also trigger a PropertyChanged event on the correlated source item.
+    /// This is primarily used to ensure change notifications are triggered for source items that are mapped to the destination item instead of copied.
     /// This is not very common. False by default.
     /// </summary>
     public bool IsPropertyNotifyDestToSource { get; private set; }
@@ -125,7 +123,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
 
     #region Replace Source or destination
     /// <summary>
-    /// Replaces the source collection, then clears and syncronizes the destination collection with the newly added source collection.
+    /// Replaces the source collection, then clears and synchronizes the destination collection with the newly added source collection.
     /// </summary>
     /// <param name="sourceObvList"></param>
     public void ReplaceSource_SyncToDestination(ObservableList<TSource> sourceObvList) {
@@ -149,7 +147,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         _destinationObservableList.CollectionChanged += DestinationCollectionChanged;
     }
     /// <summary>
-    /// Replaces the source collection, then clears and syncronizes the newly added source collection with the destination collection.
+    /// Replaces the source collection, then clears and synchronizes the newly added source collection with the destination collection.
     /// </summary>
     /// <param name="sourceObvList"></param>
     public void ReplaceSource_SyncFromDestination(ObservableList<TSource> sourceObvList) {
@@ -174,7 +172,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     }
 
     /// <summary>
-    /// Replaces the destination collection, then clears and syncronizes the source collection with the newly added destination collection. 
+    /// Replaces the destination collection, then clears and synchronizes the source collection with the newly added destination collection. 
     /// </summary>
     /// <param name="destObvList"></param>
     public void ReplaceDestination_SyncToSource(ObservableList<TDestination> destObvList) {
@@ -198,7 +196,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     }
 
     /// <summary>
-    /// Replaces the destination collection, then clears and syncronizes the newly added destination collection with the source collection. 
+    /// Replaces the destination collection, then clears and synchronizes the newly added destination collection with the source collection. 
     /// </summary>
     /// <param name="destObvList"></param>
     public void ReplaceDestination_SyncFromSource(ObservableList<TDestination> destObvList) {
@@ -229,12 +227,12 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         if (!(sourceItem is INotifyPropertyChanged && destItem is INotifyPropertyChanged)) return;
         if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 
-        var propertySyncNotifer = new NotifyPropertySync(
+        var propertySyncNotifier = new NotifyPropertySync(
             sourceItem as INotifyPropertyChanged,
             destItem as INotifyPropertyChanged,
             IsPropertyNotifySourceToDest,
             IsPropertyNotifyDestToSource);
-        //propertySyncNotifierList.Add(propertySyncNotifer);
+        //propertySyncNotifierList.Add(propertySyncNotifier);
     }
 
     //TODO: Add an optional dispatcher method to execute update code on a UI thread.

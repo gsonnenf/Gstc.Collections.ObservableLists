@@ -6,7 +6,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
 
     /// <summary>
     /// Provides functionality for generating Property changed events on collections.
-    /// When reentrancy is enabled (it is not currently enabled) it will create a threadsafe list.
+    /// When reentrancy is enabled (it is not currently enabled) it will create a thread safe list.
     /// </summary>
     public class NotifyPropertyChangedExtended : IListPropertyChangedHooks {
 

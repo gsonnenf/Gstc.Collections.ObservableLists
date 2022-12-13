@@ -105,14 +105,14 @@ public class ObservableListSynchronizerTest {
         actionList[firstCommand].Invoke();
         actionList[secondCommand].Invoke();
 
-        ///Both lists are cleared
+        //Both lists are cleared
         if (result == "Clear") {
             Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
             Assert.AreEqual(0, SourceObvListA.Count);
             return;
         }
 
-        ///Test that lists are synced
+        //Test that lists are synced
         Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
         for (var index = 0; index < 3; index++) {
             Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);

@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Gstc.Collections.ObservableLists.Abstract;
-using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
 namespace Gstc.Collections.ObservableLists;
@@ -17,14 +16,15 @@ namespace Gstc.Collections.ObservableLists;
 /// The internal list may be created on instantiation, provided by the user on instantiation, or added by the user after instantiation.
 /// 
 /// The AbstractObservableList prevents event reentrancy by default, but reentrancy can be enabled by setting the AllowReentrancy flag.
+///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
 /// </summary>
 /// <typeparam name="TItem">The type of item used in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
 public class ObservableIList<TItem, TList> :
     AbstractListUpcast<TItem>,
-    IObservableList<TItem>,
-    INotifyListChangingEvents,
-    INotifyListChangedEvents
+    IObservableList<TItem>
     where TList : IList<TItem>, new() {
 
     //TODO: Fix events for list types where add may not append to the end of the list.
@@ -234,7 +234,7 @@ public class ObservableIList<TItem, TList> :
     }
 
     /// <summary>
-    /// Searches for the specified object and removes the first occurance if it exists. CollectionChanged and Moved events are triggered.
+    /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
     /// </summary>
     /// <param name="item">Item to remove.</param>
     /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
@@ -303,7 +303,7 @@ public class ObservableIList<TItem, TList> :
 
     #region Reentrancy Monitor
     /// <summary>
-    /// Allows onChange events reentrancy when set to true. Becareful when allowing reentrancy, as it can cause stackoverflow
+    /// Allows onChange events reentrancy when set to true. Be careful when allowing reentrancy, as it can cause stack overflow
     /// from infinite calls due to conflicting callbacks.
     /// </summary>
     public bool AllowReentrancy { get; set; } = false;

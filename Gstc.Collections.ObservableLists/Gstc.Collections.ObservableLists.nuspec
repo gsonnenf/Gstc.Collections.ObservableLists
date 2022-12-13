@@ -15,7 +15,7 @@
     <description>
       This library implements an extendable ObservableList&lt;T&gt;, which generates INotifyCollectionChanged events, works when downcast, and can wrap IList&lt;T&gt;, and ObservableListSynchronizer&lt;TSource,TDestination&gt; which synchronizes two related ObservableLists&lt;T&gt;.
 
-      The ObservableList implmenents IList, IList&lt;T&gt;, ICollection, ICollection&lt;T&gt;, INotifyCollectionChanged, INotifyPropertyChanged and generates CollectionChanged events even when downcast to its interfaces. The base functionality of the ObservableList&lt;T&gt; is backed by a standard List&lt;T&gt;. The ObservableList can thus serve as a wrapper for a pre-existing List&lt;T&gt;.
+      The ObservableList implements IList, IList&lt;T&gt;, ICollection, ICollection&lt;T&gt;, INotifyCollectionChanged, INotifyPropertyChanged and generates CollectionChanged events even when downcast to its interfaces. The base functionality of the ObservableList&lt;T&gt; is backed by a standard List&lt;T&gt;. The ObservableList can thus serve as a wrapper for a pre-existing List&lt;T&gt;.
 
       The ObservableListSynchronizer&lt;TSource,TDestination&gt; provides synchronization between two ObservableList&lt;T&gt; of different but related types &lt;TSource&gt; and &lt;TDestination&gt;. When an item is added, moved or removed from one list, the change will be propagated to the other list.
     </description>

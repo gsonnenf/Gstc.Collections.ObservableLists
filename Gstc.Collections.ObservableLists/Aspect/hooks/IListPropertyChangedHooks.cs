@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿/*
+using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.ComponentModel;
 
@@ -9,3 +10,4 @@ public interface IListPropertyChangedHooks : INotifyPropertyChanged {
     void OnPropertyChangedCountAndIndex();
     void OnPropertyChangedIndex();
 }
+*/

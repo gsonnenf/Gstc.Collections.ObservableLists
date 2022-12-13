@@ -44,7 +44,7 @@ public class ObservableListTestInterface : CollectionTestBase<TestItem> {
             Assert.IsNotNull(collection.SyncRoot);
         }
         catch (NotSupportedException e) {
-            Console.WriteLine(e.Message); //Concurrent Collections will not support syncroot.
+            Console.WriteLine(e.Message); //Concurrent Collections will not support sync root.
         }
 
         //isSynchronized Test
@@ -100,7 +100,7 @@ public class ObservableListTestInterface : CollectionTestBase<TestItem> {
         Assert.IsTrue(collection.Contains(Item1));
         Assert.IsFalse(collection.Contains(Item2));
 
-        //Syncroot Test
+        //SyncRoot Test
         Assert.IsFalse(collection.IsReadOnly);
 
         //IEnumerator/ EnumeratorGeneric test

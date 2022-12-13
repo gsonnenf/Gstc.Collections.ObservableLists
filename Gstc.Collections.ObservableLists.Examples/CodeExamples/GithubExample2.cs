@@ -3,14 +3,14 @@ using Gstc.Collections.ObservableLists.Synchronizer;
 using NotifyPropertySyncChanged = Gstc.Collections.ObservableLists.Examples.ObservableListSync.NotifyPropertySyncChanged;
 
 
-namespace Gstc.Collections.ObservableLists.Examples {
+namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
     public class GithubExample2 {
         public static void Start() {
             ObservableList<Model> sourceList = new ObservableList<Model>();
             ObservableList<ViewModel> destList = new ObservableList<ViewModel>();
 
             //Synchronizes our lists
-            ObservableListSynchronizer<Model, ViewModel> ObvListSync =
+            ObservableListSynchronizer<Model, ViewModel> obvListSync =
                        new ObservableListSynchronizerFunc<Model, ViewModel>(
                            (sourceItem) => new ViewModel(sourceItem),
                            (destItem) => destItem.SourceItem,
@@ -60,11 +60,11 @@ namespace Gstc.Collections.ObservableLists.Examples {
 
         }
         public class Model : NotifyPropertySyncChanged {
-            private int myNum;
-            private string myStringLower;
+            private int _myNum;
+            private string _myStringLower;
 
-            public int MyNum { get => myNum; set { myNum = value; OnPropertyChanged(null); } }
-            public string MyStringLower { get => myStringLower; set { myStringLower = value; OnPropertyChanged(null); } }
+            public int MyNum { get => _myNum; set { _myNum = value; OnPropertyChanged(null); } }
+            public string MyStringLower { get => _myStringLower; set { _myStringLower = value; OnPropertyChanged(null); } }
         }
 
         public class ViewModel : NotifyPropertySyncChanged {

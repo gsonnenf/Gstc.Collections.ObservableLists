@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace Gstc.Collections.ObservableLists.Synchronizer;
 
 /// <summary>
-/// This class provides change notifications between two cooresponding objects when using the Observable List sync.
+/// This class provides change notifications between two corresponding objects when using the Observable List sync.
 /// </summary>
 public class NotifyPropertySync {
 
@@ -20,7 +20,7 @@ public class NotifyPropertySync {
         SourceSync = sourceItem as IPropertyChangedSyncHook;
         DestSync = destItem as IPropertyChangedSyncHook;
 
-        if (sourceItem == null && destItem == null) throw new System.ArgumentException("One of the objects must implement INotifyPropertySyncChanged."); ;
+        if (sourceItem == null && destItem == null) throw new System.ArgumentException("One of the objects must implement INotifyPropertySyncChanged.");
 
         if (DestSync != null && sourceToDest) SourceNotify.PropertyChanged += DestTrigger;
         if (SourceSync != null && destToSource) DestNotify.PropertyChanged += SourceTrigger;

@@ -25,7 +25,7 @@ public class ObservableListSynchronizerPropertyTest {
     }
 
     //TODO: Find a test situation where a two way notify might be used. It seems that any user written mapping between objects would trigger INotifyProperty without needing this.
-    [Test, NUnit.Framework.Description("Test notification between a Source object, and a pass through destination object")]
+    [Test, Description("Test notification between a Source object, and a pass through destination object")]
     public void TestMethod_PropertyNotify() {
         SourceObvListB = new ObservableList<ItemBSource>();
         DestObvListB = new ObservableList<ItemBDest>();

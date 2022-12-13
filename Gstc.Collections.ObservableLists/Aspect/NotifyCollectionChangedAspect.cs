@@ -99,7 +99,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
         #endregion
 
         #region Method Changing
-        public void OnListReseting() {
+        public void OnListResetting() {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             using (BlockReentrancy()) {
                 CollectionChanging?.Invoke(Sender, eventArgs);

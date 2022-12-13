@@ -9,8 +9,7 @@
         public string Num1 {
             get => TestModel.Num1.ToString();
             set {
-                int num = 0;
-                var isParsed = int.TryParse(value, out num);
+                var isParsed = int.TryParse(value, out var num);
                 if (!isParsed) return;
                 TestModel.Num1 = num;
                 OnPropertyChanged(null);

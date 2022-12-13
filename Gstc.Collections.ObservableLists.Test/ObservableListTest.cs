@@ -76,31 +76,21 @@ public class ObservableListTest : CollectionTestBase<object> {
         Assert.That(ObvList[1], Is.EqualTo(Item1));
         Assert.That(ObvList[2], Is.EqualTo(Item2));
         Assert.That(ObvList[3], Is.EqualTo(Item3));
-        //TODO: Test addranged with the isEventForEachItem
+        //TODO: Test addRanged with the isEventForEachItem
     }
 
-    [Test, Description("Tests the one event per add feature of the AddRange method")]
+    [Test, Description("Tests the reset event for WPF databinding")]
     public void TestMethod_AddRange2() {
-        var obvList = new ObservableList<int>();
-        var list = new List<int>();
-        var queue = new Queue<int>();
+        var list = new List<object>();
 
-        for (var i = 0; i < 5; i++) {
-            list.Add(i);
-            queue.Enqueue(i);
-        }
-
-        obvList.CollectionChanged += (sender, args) => {
-            var index = queue.Dequeue();
-            Assert.That(args.NewItems[0], Is.EqualTo(index));
-            Assert.That(args.NewStartingIndex, Is.EqualTo(index));
-        };
-
+        for (var i = 0; i < 5; i++) list.Add(i);
+ 
+        ObvList.CollectionChanged += AssertCollectionEventReset;
         AddMockNotifiers();
-        //Tests that onChanged is called 4 times when adding a range of 4 items if flag is set to true.
-        obvList.IsWpfDataBinding = true;
-        obvList.AddRange(list);
-        AssertMockNotifiers(1, 4);
+        //Tests that onChanged triggers a reset.
+        ObvList.IsWpfDataBinding = true;
+        ObvList.AddRange(list);
+        AssertMockNotifiers(2, 1);
     }
 
 

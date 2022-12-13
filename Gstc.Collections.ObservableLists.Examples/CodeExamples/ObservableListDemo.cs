@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Examples.ObservableList;
 
-
-namespace Gstc.Collections.ObservableLists.Examples {
+namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
     public class ObservableListDemo {
         public List<Customer> CustomerList { get; set; }
         public ObservableList<Customer> CustomerObservableListWrapper { get; set; }

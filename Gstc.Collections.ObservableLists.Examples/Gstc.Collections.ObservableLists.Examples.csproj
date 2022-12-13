@@ -56,7 +56,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="ObservableList\Customer.cs" />
-    <Compile Include="GithubExample2.cs" />
+    <Compile Include="CodeExamples\GithubExample2.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -67,7 +67,7 @@
     <Compile Include="ObservableListSync\ObservableListSyncControl.xaml.cs">
       <DependentUpon>ObservableListSyncControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ObservableListDemo.cs" />
+    <Compile Include="CodeExamples\ObservableListDemo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -119,8 +119,6 @@
       <Name>Gstc.Collections.ObservableLists</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Examples\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

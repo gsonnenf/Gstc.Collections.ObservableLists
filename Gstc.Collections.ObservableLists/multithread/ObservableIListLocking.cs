@@ -1,17 +1,10 @@
-﻿///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019 - 2023
-///
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
-
-using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
 namespace Gstc.Collections.ObservableLists.Multithread;
@@ -22,20 +15,21 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// triggers events even when upcast to its interfaces: IList, IList{T}, ICollection, ICollection{T}. The list implements:INotifyCollectionChanged, INotifyPropertyChanged.
 ///  
 /// The internal list may be created on instantiation, provided by the user on instantiation, or added by the user after instantiation.
-/// In many cases using ObservableList may be preferred over using the .NET ObservableCollection for its compatiblity with existing collection types and interface.
+/// In many cases using ObservableList may be preferred over using the .NET ObservableCollection for its compatibility with existing collection types and interface.
 /// 
 /// All read and write operations are protected by a lock on the protected _syncRoot object. It is not exposed by default, but can be exposed on a derived class.
 /// 
-/// Reentrancy is only allowed from seperate threads to prevent deadlock. Threads are tracked via ManagedThreadId. Becautious with creating
-/// new threads in onChange events that write to the list. This can result in infinite onChange events or a stackoverflow.
+/// Reentrancy is only allowed from separate threads to prevent deadlock. Threads are tracked via ManagedThreadId. Be cautious with creating
+/// new threads in onChange events that write to the list. This can result in infinite onChange events or a stack overflow.
+///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
 /// </summary>
 /// <typeparam name="TItem">The type of item used in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
 public class ObservableIListLocking<TItem, TList> :
     AbstractListUpcastLocking<TItem>,
-    IObservableList<TItem>,
-    INotifyListChangingEvents,
-    INotifyListChangedEvents
+    IObservableList<TItem>
     where TList : IList<TItem>, new() {
 
 
@@ -240,7 +234,7 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// Searches for the specified object and removes the first occurance if it exists. CollectionChanged and Moved events are triggered.
+    /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
     /// </summary>
     /// <param name="item">Item to remove.</param>
     /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
@@ -300,13 +294,13 @@ public class ObservableIListLocking<TItem, TList> :
 
     #region Reentrancy Monitor and threading
     /// <summary>
-    /// Monitor that allows each thread to access with single entrancy using a dictionary of threadId to keep 
-    /// track of accessing threads. Reentrancy will be permitted if an event runs a write operation on a seperate 
+    /// Monitor that allows each thread to access with single entrance using a dictionary of threadId to keep 
+    /// track of accessing threads. Reentrancy will be permitted if an event runs a write operation on a separate 
     /// thread, so it is recommended to not do this without careful consideration.
     /// </summary>
 
     /// <summary>
-    /// Monitor that prevents reentrancy from individual threads. Does not protect against rentrancy
+    /// Monitor that prevents reentrancy from individual threads. Does not protect against reentrancy
     /// from threads created in events.
     /// </summary>
     private readonly MultithreadMonitor _monitor = new();
@@ -315,22 +309,22 @@ public class ObservableIListLocking<TItem, TList> :
 
     public bool AllowReentrancy {
         set {
-            if (value == true) throw new NotSupportedException("Single thread Reenatrancy not permitted as it would cause a deadlock.");
+            if (value) throw new NotSupportedException("Single thread reentrancy not permitted as it would cause a deadlock.");
         }
     }
 
     private class MultithreadMonitor : IDisposable {
-        private ConcurrentDictionary<int, int> ReentrancyDictionary = new ConcurrentDictionary<int, int>();
+        private readonly ConcurrentDictionary<int, int> _reentrancyDictionary = new ConcurrentDictionary<int, int>();
 
         public MultithreadMonitor CheckReentrancy() {
             var threadId = Thread.CurrentThread.ManagedThreadId;
-            if (!ReentrancyDictionary.TryAdd(threadId, threadId)) throw new InvalidOperationException("Single thread Reenatrancy not permitted as it would cause a deadlock.");
+            if (!_reentrancyDictionary.TryAdd(threadId, threadId)) throw new InvalidOperationException("Single thread Reentrancy not permitted as it would cause a deadlock.");
             return this;
         }
 
         public void Dispose() {
             var threadId = Thread.CurrentThread.ManagedThreadId;
-            ReentrancyDictionary.TryRemove(threadId, out _);
+            _reentrancyDictionary.TryRemove(threadId, out _);
         }
     }
     #endregion

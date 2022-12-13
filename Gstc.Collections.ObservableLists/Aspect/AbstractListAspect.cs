@@ -35,7 +35,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
             }
             
             set {
-                Aspect.OnListReseting();
+                Aspect.OnListResetting();
                 _list = value;
                 Aspect.OnListReset();
             }
@@ -106,7 +106,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         /// </summary>
         public override void Clear() {
             try {
-                Aspect.OnListReseting();
+                Aspect.OnListResetting();
                 _list.Clear();
                 Aspect.OnListReset();
             } catch {
@@ -153,7 +153,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         }
 
         /// <summary>
-        /// Searches for the specified object and removes the first occurance if it exists. CollectionChanged and Moved events are triggered.
+        /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
         /// </summary>
         /// <param name="item">Item to remove.</param>
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿/*
+using System.Collections;
 
 namespace Gstc.Collections.ObservableLists.ComponentModel;
 
@@ -6,10 +7,11 @@ namespace Gstc.Collections.ObservableLists.ComponentModel;
 /// Callbacks that occur before the list is changed.
 /// </summary>
 public interface IListChangingHooks {
-    void OnListReseting();
+    void OnListResetting();
     void OnListAdding(object value, int index);
     void OnListRangeAdding(IList valueList, int index);
     void OnListRemoving(object value, int index);
     void OnListMoving(object value, int index, int oldIndex);
     void OnListReplacing(object oldValue, object newValue, int index);
 }
+*/

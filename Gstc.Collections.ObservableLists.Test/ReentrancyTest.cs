@@ -37,7 +37,7 @@ public class ReentrancyTest {
             };
             list.Add("My reentrancy trigger");
         }
-        catch (NotSupportedException e) { Console.WriteLine(e.Message); }; //allows not supported exception for Allow Reentrancy
+        catch (NotSupportedException e) { Console.WriteLine(e.Message); } //allows not supported exception for Allow Reentrancy
         Console.WriteLine(reentrancyCounter);
     }
 

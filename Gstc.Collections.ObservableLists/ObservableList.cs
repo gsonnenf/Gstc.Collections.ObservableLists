@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Gstc.Collections.ObservableLists.Abstract;
-using Gstc.Collections.ObservableLists.ComponentModel;
 using Gstc.Collections.ObservableLists.Interface;
 
 namespace Gstc.Collections.ObservableLists;
@@ -17,13 +16,14 @@ namespace Gstc.Collections.ObservableLists;
 /// The ObservableList{T} has an internal List{T} that serves as the base collection. This is generated on instantiation, 
 /// or you can provide your own list and use this class as a wrapper. In many cases using ObservableList may be preferred
 /// over using the .NET ObservableCollection for its compatibility with existing collection types and interface.
+///
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
 /// </summary>
 /// <typeparam name="TItem">The type of list.</typeparam>
 public class ObservableList<TItem> :
     AbstractListUpcast<TItem>,
-    IObservableList<TItem>,
-    INotifyListChangedEvents,
-    INotifyListChangingEvents {
+    IObservableList<TItem> {
     #region Events Collection Changing
 
     public event NotifyCollectionChangedEventHandler CollectionChanging;

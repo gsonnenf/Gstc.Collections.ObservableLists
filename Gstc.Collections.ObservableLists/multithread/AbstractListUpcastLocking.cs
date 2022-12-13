@@ -87,19 +87,19 @@ public abstract class AbstractListUpcastLocking<TItem> :
 
     #region Locking
 
-    protected RWLockWrapper RWLock { get; set; } = new();
+    protected RwLockWrapper RwLock { get; set; } = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected ReadLockClass ReadLock() => RWLock.ReadLock.Lock();
+    protected ReadLockClass ReadLock() => RwLock.ReadLock.Lock();
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected WriteLockClass WriteLock() => RWLock.WriteLock.Lock();
+    protected WriteLockClass WriteLock() => RwLock.WriteLock.Lock();
 
-    protected class RWLockWrapper {
-        private ReaderWriterLockSlim _listLock;
+    protected class RwLockWrapper {
+        private readonly ReaderWriterLockSlim _listLock;
         public ReadLockClass ReadLock { get; }
         public WriteLockClass WriteLock { get; }
 
-        public RWLockWrapper() {
+        public RwLockWrapper() {
             _listLock = new();
             ReadLock = new(_listLock);
             WriteLock = new(_listLock);
@@ -107,7 +107,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
     }
 
     protected class ReadLockClass : IDisposable {
-        private ReaderWriterLockSlim _rwLock;
+        private readonly ReaderWriterLockSlim _rwLock;
         public ReadLockClass(ReaderWriterLockSlim rwLock) {
             _rwLock = rwLock;
         }
@@ -120,7 +120,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
         }
     }
     protected class WriteLockClass : IDisposable {
-        private ReaderWriterLockSlim _rwLock;
+        private readonly ReaderWriterLockSlim _rwLock;
         public WriteLockClass(ReaderWriterLockSlim rwLock) {
             _rwLock = rwLock;
         }

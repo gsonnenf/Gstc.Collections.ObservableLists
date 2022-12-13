@@ -12,7 +12,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
     public partial class ObservableListControl : UserControl {
 
         /// <summary>
-        /// Dependency property for databinding to the ItemsSource of the list view to allow swapping of list types.
+        /// Dependency property for data binding to the ItemsSource of the list view to allow swapping of list types.
         /// </summary>
         public static readonly DependencyProperty BindingListProperty =
             DependencyProperty.Register(nameof(BindingList), typeof(IObservableList<Customer>),
@@ -45,7 +45,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         /// <summary>
         /// Demonstrates the observable list upcast to the IList{} interface and still generating OnChange events.
         /// </summary>
-        public IList<Customer> UpcastList => (IList<Customer>)BindingList;
+        public IList<Customer> UpcastList => BindingList;
 
         public ObservableListControl() {
             InitializeComponent();
@@ -62,10 +62,10 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         }
 
         #region events
-        private void Button_Click_Add(object sender, System.Windows.RoutedEventArgs args)
+        private void Button_Click_Add(object sender, RoutedEventArgs args)
             => UpcastList.Add(Customer.GenerateCustomer());
 
-        private void Button_Click_AddRange(object sender, System.Windows.RoutedEventArgs args) {
+        private void Button_Click_AddRange(object sender, RoutedEventArgs args) {
 
             if (UpcastList is ObservableList<Customer> list)
                 list.AddRange(Customer.GenerateCustomerList());
@@ -79,7 +79,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
                     list3.Add(customer);
         }
 
-        private void Button_Click_New(object sender, System.Windows.RoutedEventArgs e) {
+        private void Button_Click_New(object sender, RoutedEventArgs e) {
 
             if (UpcastList is ObservableList<Customer> list)
                 list.List = Customer.GenerateCustomerList();
@@ -91,7 +91,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
                 list3.List = Customer.GenerateCustomerList();
         }
 
-        private void Button_Click_Remove(object sender, System.Windows.RoutedEventArgs args) {
+        private void Button_Click_Remove(object sender, RoutedEventArgs args) {
             var index = CustomerListView.SelectedIndex;
             if (index < 0 || index >= BindingList.Count) {
                 AddToTextBox("Customer not selected.\n");

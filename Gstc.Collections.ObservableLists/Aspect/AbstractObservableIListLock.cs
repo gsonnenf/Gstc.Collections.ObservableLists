@@ -12,7 +12,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
     /// It implements base collection interfaces: IList, IList{T}, ICollection, ICollection{T}, INotifyCollectionChanged, 
     /// and implements observable interfaces: INotifyCollectionChanged and INotifyPropertyChanged. 
     /// This IList triggers notify events when downcast to its interfaces. Using ObservableIList may be preferred
-    /// over the .NET ObservableCollection for its compatiblity with existing collection types and interface.
+    /// over the .NET ObservableCollection for its compatibility with existing collection types and interface.
     /// </summary>
     /// <typeparam name="TItem">The type of list.</typeparam>
     /// /// <typeparam name="TIList">The type of internal list that implements IList{T}.</typeparam>
@@ -153,7 +153,7 @@ namespace Gstc.Collections.ObservableLists.Abstract {
         }
 
         /// <summary>
-        /// Searches for the specified object and removes the first occurance if it exists. CollectionChanged and Moved events are triggered.
+        /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
         /// </summary>
         /// <param name="item">Item to remove.</param>
         /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>

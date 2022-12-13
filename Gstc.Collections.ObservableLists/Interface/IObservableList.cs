@@ -1,9 +1,4 @@
-﻿///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019
-///
-
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.ComponentModel;
 
@@ -11,6 +6,8 @@ namespace Gstc.Collections.ObservableLists.Interface;
 
 /// <summary>
 /// An interface containing IList, IList{T}, and also IObservableCollection{T}.
+/// Author: Greg Sonnenfeld
+/// Copyright 2019
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
 public interface IObservableList<TItem> :

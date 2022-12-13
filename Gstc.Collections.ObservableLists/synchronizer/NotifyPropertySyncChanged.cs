@@ -14,6 +14,6 @@ public abstract class NotifyPropertySyncChanged : IPropertyChangedSyncHook {
     //Sync Fields 
     public void OnPropertyChanged(object sender, PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
 
-    //Convience Fields
+    //Convenience Fields
     public void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

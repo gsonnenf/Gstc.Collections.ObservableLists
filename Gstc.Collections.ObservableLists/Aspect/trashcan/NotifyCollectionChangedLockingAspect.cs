@@ -50,7 +50,7 @@ namespace Gstc.Collections.ObservableLists.Notify {
         #endregion
 
         #region Method Changing
-        public void OnListReseting() {
+        public void OnListResetting() {
             LockMonitor.GetLock();
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             CollectionChanging?.Invoke(Sender, eventArgs);

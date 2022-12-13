@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿/*
+using System.Collections;
 
 namespace Gstc.Collections.ObservableLists.ComponentModel;
 
@@ -13,3 +14,4 @@ public interface IListChangedHooks {
     void OnListMove(object value, int index, int oldIndex);
     void OnListReplace(object oldValue, object newValue, int index);
 }
+*/
