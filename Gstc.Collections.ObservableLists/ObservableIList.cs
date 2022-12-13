@@ -27,8 +27,6 @@ public class ObservableIList<TItem, TList> :
     IObservableList<TItem>
     where TList : IList<TItem>, new() {
 
-    //TODO: Fix events for list types where add may not append to the end of the list.
-
     #region Events Collection Changing
     public event NotifyCollectionChangedEventHandler CollectionChanging;
 
@@ -146,6 +144,7 @@ public class ObservableIList<TItem, TList> :
     /// </summary>
     /// <param name="item">Item to add</param>
     public override void Add(TItem item) {
+        //TODO: Fix add event args for list types that may not append added element to the end of the list.
         CheckReentrancy();
         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
 

@@ -72,7 +72,7 @@ public class ReentrancyTest {
         ThreadFunc();
     }
 
-    //TODO: File a bug report with NUnit for Assert.Inconclusive() not working correctly in child threads.
+    //Bug: File a bug report with NUnit for Assert.Inconclusive() not working correctly in child threads.
     [Test]
     [Description("Test for locking on multithread reentrancy.")]
     public void ReentrancyMultithreadTest() {

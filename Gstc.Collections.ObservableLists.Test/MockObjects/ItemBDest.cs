@@ -31,5 +31,5 @@ public class ItemBDest : NotifyPropertySyncChanged {
         if (temp.MyNum == MyNum && temp.MyStringUpper == MyStringUpper) return true;
         return false;
     }
-    public override int GetHashCode() => throw new NotImplementedException();
+    public override int GetHashCode() => throw new NotSupportedException();
 }

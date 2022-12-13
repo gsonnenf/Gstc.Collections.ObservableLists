@@ -65,7 +65,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
     }
 
     public IEnumerator<TItem> GetEnumerator() {
-        using (ReadLock()) return InternalList.GetEnumerator(); //TODO: Do we need to make a snapshot of list for enumeration
+        using (ReadLock()) return InternalList.GetEnumerator(); //TODO: Do we need to make a snapshot of list for threadsafe enumeration
     }
 
     IEnumerator IEnumerable.GetEnumerator() {

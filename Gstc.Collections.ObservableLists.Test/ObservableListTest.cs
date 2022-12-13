@@ -8,6 +8,9 @@ namespace Gstc.Collections.ObservableLists.Test;
 [TestFixture]
 public class ObservableListTest : CollectionTestBase<object> {
 
+
+    //TODO: Change this test so it uses StaticDataSource instead of initialization of lists in the setup.
+
     private ObservableList<object> ObvList { get; set; }
 
     [SetUp]
