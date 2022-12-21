@@ -1,19 +1,21 @@
 ﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using AutoFixture;
-using Gstc.Collections.ObservableLists.Test.MockObjects;
+using Gstc.Collections.ObservableLists.Interface;
+using Gstc.UnitTest.Events;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test.Tools;
 
 public class CollectionTestBase<TItem> {
 
-    #region Default Test Tools
-    protected static Fixture Fixture { get; } = new Fixture();
-    protected MockEventClass MockEvent { get; set; }
-    protected AssertEventClass AssertEvent { get; set; }
-    #endregion
+    #region Test Assets
+    protected AssertEvent<NotifyCollectionChangedEventArgs> CollectionTest { get; set; }
+    protected AssertNotifyProperty PropertyTest { get; set; }
 
-    #region Default test items
+    protected AssertEventArgs<TItem> AssertArgs = new();
+
+    protected static Fixture Fixture { get; } = new();
 
     protected TItem DefaultTestItem { get; set; }
     protected TItem UpdateTestItem { get; set; }
@@ -22,14 +24,10 @@ public class CollectionTestBase<TItem> {
     protected TItem Item2 { get; set; }
     protected TItem Item3 { get; set; }
 
-    protected TItem DefaultValue { get; set; }
-    protected TItem UpdateValue { get; set; }
-
     #endregion
 
+    #region ctor
     public void TestInit() {
-        MockEvent = new MockEventClass();
-        AssertEvent = MockEvent.Object;
 
         //Generalize mock data
         DefaultTestItem = Fixture.Create<TItem>();
@@ -38,51 +36,67 @@ public class CollectionTestBase<TItem> {
         Item1 = Fixture.Create<TItem>();
         Item2 = Fixture.Create<TItem>();
         Item3 = Fixture.Create<TItem>();
-
-        DefaultValue = Fixture.Create<TItem>();
-        UpdateValue = Fixture.Create<TItem>();
-    }
-
-    #region Collection Event Args Tests
-    protected void AssertCollectionEventReset(object sender, NotifyCollectionChangedEventArgs args) {
-        Assert.That(args.Action, Is.EqualTo(NotifyCollectionChangedAction.Reset));
-        Assert.That(args.OldItems, Is.Null);
-        Assert.That(args.NewItems, Is.Null);
-        Assert.That(args.OldStartingIndex == -1);
-        Assert.That(args.NewStartingIndex == -1);
-    }
-
-    protected NotifyCollectionChangedEventHandler GenerateAssertCollectionEventAddOne(int index, TItem item) {
-        return (sender, args) => {
-            Assert.That(args.Action, Is.EqualTo(NotifyCollectionChangedAction.Add));
-            Assert.That(args.OldStartingIndex == -1);
-            Assert.That(args.NewStartingIndex == index);
-            Assert.That(args.OldItems, Is.Null);
-            Assert.That(args.NewItems[0], Is.EqualTo(item));
-        };
-    }
-
-    protected NotifyCollectionChangedEventHandler GenerateAssertCollectionEventAddThree(int index, TItem item1, TItem item2, TItem item3) {
-        return (sender, args) => {
-            Assert.That(args.Action, Is.EqualTo(NotifyCollectionChangedAction.Add));
-            Assert.That(args.OldStartingIndex, Is.EqualTo(-1));
-            Assert.That(args.NewStartingIndex, Is.EqualTo(index));
-            Assert.That(args.OldItems, Is.Null);
-            Assert.That(args.NewItems[0], Is.EqualTo(item1));
-            Assert.That(args.NewItems[1], Is.EqualTo(item2));
-            Assert.That(args.NewItems[2], Is.EqualTo(item3));
-        };
-    }
-
-    protected NotifyCollectionChangedEventHandler GenerateAssertCollectionEventRemoveOne(int index, TItem item) {
-        return (sender, args) => {
-            Assert.That(args.Action, Is.EqualTo(NotifyCollectionChangedAction.Remove));
-            Assert.That(args.OldStartingIndex == index);
-            Assert.That(args.NewStartingIndex == -1);
-            Assert.That(args.OldItems[0], Is.EqualTo(item));
-            Assert.That(args.NewItems, Is.Null);
-        };
     }
     #endregion
+
+    #region Event tools
+
+    /// <summary>
+    /// Initializes watchers on the CollectionChanged and PropertyChanged events of the observable object.
+    /// The number of times called is tracked. Callbacks can also be assigned to the events which can assert
+    /// on the NotifyCollectionChangedEvent.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="obvList"></param>
+    /// <param name="eventHandler"></param>
+    public void InitPropertyCollectionTest<T>(T obvList, NotifyCollectionChangedEventHandler eventHandler = null) where T : INotifyPropertyChanged, INotifyCollectionChanged {
+        InitPropertyTest_Collection(obvList);
+        InitCollectionTest(obvList, eventHandler);
+    }
+    public void InitCollectionTest(INotifyCollectionChanged obvList, NotifyCollectionChangedEventHandler eventHandler) {
+        CollectionTest = new AssertEvent<NotifyCollectionChangedEventArgs>(obvList, nameof(obvList.CollectionChanged));
+        if (eventHandler != null) CollectionTest.AddCallback(
+            description: "Provides a callback to test collection changed events.",
+            callback: (sender, args) => eventHandler?.Invoke(sender, args)
+        );
+    }
+    public void InitPropertyTest_Collection(INotifyPropertyChanged obvList) => PropertyTest = new AssertNotifyProperty(obvList);
+
+
+    /// <summary>
+    /// Asserts that the callbacks have been triggered/invoked, all counters and callback triggers are reset.
+    /// </summary>
+    /// <param name="timesItemCalled"></param>
+    /// <param name="timesCountCalled"></param>
+    /// <param name="timesCollectionChangedCalled"></param>
+    public void AssertPropertyCollectionTest(int timesItemCalled = 1, int timesCountCalled = 1, int timesCollectionChangedCalled = 1) {
+        AssertPropertyTestForCollection(timesItemCalled, timesCountCalled);
+        AssertCollectionTest(timesCollectionChangedCalled);
+    }
+    public void AssertPropertyTestForCollection(int timesItemCalled, int timesCountCalled) {
+        Assert.True(PropertyTest.TestPropertyCalled(timesItemCalled, "Item[]"), PropertyTest.ErrorMessages);
+        Assert.True(PropertyTest.TestPropertyCalled(timesCountCalled, "Count"), PropertyTest.ErrorMessages);
+        Assert.True(PropertyTest.TestOnChangedAll(timesItemCalled + timesCountCalled), PropertyTest.ErrorMessages);
+    }
+    public void AssertCollectionTest(int expectedTimesCalled)
+        => Assert.True(CollectionTest.TestAll(expectedTimesCalled), CollectionTest.ErrorMessages);
+    #endregion
+
+
+    #region Event Utilities      
+    public void AddNotifiers<T>(IObservableList<T> obvList) {
+        //Sets up event testers
+        //obvList.Adding += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
+        //obvList.Moving += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
+        //obvList.Removing += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
+        //obvList.Replacing += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
+        //obvList.Resetting += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
+
+    }
+
+
+
+    #endregion
+
 
 }

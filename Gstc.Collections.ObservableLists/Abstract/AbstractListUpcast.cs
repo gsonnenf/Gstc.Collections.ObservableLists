@@ -20,12 +20,11 @@ public abstract class AbstractListUpcast<TItem> :
     public abstract void Add(TItem item);
     public abstract void Clear();
     public abstract bool Remove(TItem item);
-    public abstract void Move(int oldIndex, int newIndex);
     #endregion
 
     #region IList
-    int IList.Add(object value) { Add((TItem)value); return Count - 1; }
-    bool IList.Contains(object value) => Contains((TItem)value);
+    int IList.Add(object? value) { Add((TItem)value); return Count - 1; }
+    bool IList.Contains(object? value) => Contains((TItem)value);
     int IList.IndexOf(object value) => IndexOf((TItem)value);
     void IList.Insert(int index, object value) => Insert(index, (TItem)value);
     void IList.Remove(object value) => Remove((TItem)value);

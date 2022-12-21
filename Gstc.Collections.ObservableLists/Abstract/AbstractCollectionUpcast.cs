@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace Gstc.Collections.ObservableLists.Abstract;
 
+//TODO: Delete for release version
+
 /// <summary>
 /// A base class to assist in the down casting of observable collections to its base interfaces and still provide notification.
 /// </summary>
@@ -11,7 +13,6 @@ namespace Gstc.Collections.ObservableLists.Abstract;
 public abstract class AbstractCollectionUpcast<TItem> :
     ICollection,
     ICollection<TItem> {
-
     protected abstract ICollection<TItem> InternalCollection { get; }
     //public abstract TItem this[int index] { get; set; }
 

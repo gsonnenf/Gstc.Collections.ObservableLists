@@ -1,67 +1,56 @@
 ﻿using Gstc.Collections.ObservableLists.Synchronizer;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
-using Moq;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;
 
-/// <summary>
-/// Test the ObservableListSynchronizer for synchronizing properties within items.
-/// </summary>
 [TestFixture]
 public class ObservableListSynchronizerPropertyTest {
 
-    public ObservableList<ItemBSource> SourceObvListB;
-    public ObservableList<ItemBDest> DestObvListB;
-    public ObservableListSynchronizer<ItemBSource, ItemBDest> ObvListSyncB;
-
-    protected MockEventClass MockEvent { get; set; }
-    protected AssertEventClass AssertEvent { get; set; }
-
-    [SetUp]
-    public void TestInit() {
-        MockEvent = new MockEventClass();
-        AssertEvent = MockEvent.Object;
-    }
-
     //TODO: Find a test situation where a two way notify might be used. It seems that any user written mapping between objects would trigger INotifyProperty without needing this.
-    [Test, Description("Test notification between a Source object, and a pass through destination object")]
+    [Test, Description("Test that changes in item properties of one list propagate to the other if INotifyPropertyChanged is implemented on the TItem")]
     public void TestMethod_PropertyNotify() {
-        SourceObvListB = new ObservableList<ItemBSource>();
-        DestObvListB = new ObservableList<ItemBDest>();
-
-        ObvListSyncB = new ObservableListSynchronizerFunc<ItemBSource, ItemBDest>(
+        //Arrange
+        var sourceObvListB = new ObservableList<ItemBSource>();
+        var destObvListB = new ObservableList<ItemBDest>();
+        var obvListSyncB = new ObservableListSynchronizerFunc<ItemBSource, ItemBDest>(
             (sourceItem) => new ItemBDest(sourceItem),
             (destItem) => destItem.ItemBSourceItem,
-            SourceObvListB,
-            DestObvListB,
+            sourceObvListB,
+            destObvListB,
             true,
             true
         );
 
-        var item1 = new ItemBSource { MyNum = 10, MyStringLower = "x" };
-        var item2 = new ItemBDest { MyNum = "1000", MyStringUpper = "A" };
+        sourceObvListB.Add(new ItemBSource { MyNum = 10, MyStringLower = "x" });
+        destObvListB.Add(new ItemBDest { MyNum = "1000", MyStringUpper = "A" });
+        var string0 = "First Synchronized String";
+        var string1 = "Second Synchronized String";
 
-        SourceObvListB.Add(item1);
-        DestObvListB.Add(item2);
+        //Add event checks
+        var sourceEventCount0 = 0;
+        var destEventCount0 = 0;
+        var sourceEventCount1 = 0;
+        var destEventCount1 = 0;
 
-        SourceObvListB[0].PropertyChanged += (sender, args) => AssertEvent.Call("source[0] event");
-        DestObvListB[0].PropertyChanged += (sender, args) => AssertEvent.Call("dest[0] event");
-        SourceObvListB[1].PropertyChanged += (sender, args) => AssertEvent.Call("source[1] event");
-        DestObvListB[1].PropertyChanged += (sender, args) => AssertEvent.Call("dest[1] event");
+        sourceObvListB[0].PropertyChanged += (sender, args) => sourceEventCount0++;
+        destObvListB[0].PropertyChanged += (sender, args) => destEventCount0++;
+        sourceObvListB[1].PropertyChanged += (sender, args) => sourceEventCount1++;
+        destObvListB[1].PropertyChanged += (sender, args) => destEventCount1++;
 
-        var string1 = "TEST STRING";
-        var string2 = "TEST STRING AGAIN";
-        SourceObvListB[0].MyNum = -1;
-        DestObvListB[1].MyStringUpper = string1;
-        DestObvListB[1].MyStringUpper = string2;
+        //Act
+        sourceObvListB[0].MyNum = -1;
+        sourceObvListB[0].MyStringLower = string0.ToLower();
+        destObvListB[1].MyStringUpper = string1.ToUpper();
 
-        Assert.AreEqual(string2, DestObvListB[1].MyStringUpper);
-        Assert.AreEqual(string2.ToLower(), SourceObvListB[1].MyStringLower);
+        //Assert
+        Assert.That(destObvListB[0].MyNum, Is.EqualTo("-1"));
+        Assert.That(destObvListB[0].MyStringUpper, Is.EqualTo(string0.ToUpper()));
+        Assert.That(sourceObvListB[1].MyStringLower, Is.EqualTo(string1.ToLower()));
 
-        MockEvent.Verify(m => m.Call("source[0] event"), Times.Exactly(1));
-        MockEvent.Verify(m => m.Call("dest[0] event"), Times.Exactly(1));
-        MockEvent.Verify(m => m.Call("source[1] event"), Times.Exactly(2));
-        MockEvent.Verify(m => m.Call("dest[1] event"), Times.Exactly(2));
+        Assert.That(sourceEventCount0, Is.EqualTo(2));
+        Assert.That(destEventCount0, Is.EqualTo(2));
+        Assert.That(sourceEventCount1, Is.EqualTo(1));
+        Assert.That(destEventCount1, Is.EqualTo(1));
     }
 }

@@ -15,11 +15,15 @@ public interface IObservableList<TItem> :
     INotifyListChangedEvents,
     INotifyListChangingEvents,
     IList<TItem>,
-    IList {
+    IList //TODO - BUG: IList here exposes the IList interface which is meant to be hidden behind an explicit implementation
+{
     //These new members fix ambiguity between IList and ICollection{T}
     new int Count { get; }
     new bool IsReadOnly { get; }
     new void Clear();
     new void RemoveAt(int index);
     new TItem this[int index] { get; set; }
+
+    //Todo - Features: AddRange
+    //todo - Feature: Move
 }

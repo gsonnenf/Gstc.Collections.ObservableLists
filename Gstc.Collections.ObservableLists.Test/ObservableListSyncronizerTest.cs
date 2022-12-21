@@ -4,12 +4,8 @@ using Gstc.Collections.ObservableLists.Synchronizer;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using NUnit.Framework;
 
-
 namespace Gstc.Collections.ObservableLists.Test;
 
-/// <summary>
-/// Test the ObservableListSynchronizer class.
-/// </summary>
 [TestFixture]
 public class ObservableListSynchronizerTest {
 
@@ -17,10 +13,6 @@ public class ObservableListSynchronizerTest {
     public ObservableList<ItemADest> DestObvListA;
     public ObservableListSynchronizer<ItemASource, ItemADest> ObvListSyncA;
 
-    [SetUp]
-    public void TestInit() {
-
-    }
 
     [Test, Description("Creates a sync and tests initialization copying from source item to dest item.")]
     public void TestMethod_CopyOnInitialize() {

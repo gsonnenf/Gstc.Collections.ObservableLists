@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
-public class ReentrancyTest {
+public class ObservableListReentrancyTest {
 
     /// <summary>
     /// An array of lists that will be tested 
@@ -100,6 +100,7 @@ public class ReentrancyTest {
 
         AddList();
         Console.WriteLine("Count of Threads: " + callCount);
-
     }
+
+    //TODO: Add unit test for Task instead similar to Thread.
 }

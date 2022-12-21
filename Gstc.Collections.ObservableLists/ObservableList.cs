@@ -30,9 +30,9 @@ public class ObservableList<TItem> :
 
     public event NotifyCollectionChangedEventHandler Adding;
 
-    public event NotifyCollectionChangedEventHandler Removing;
-
     public event NotifyCollectionChangedEventHandler Moving;
+
+    public event NotifyCollectionChangedEventHandler Removing;
 
     public event NotifyCollectionChangedEventHandler Replacing;
 
@@ -44,11 +44,13 @@ public class ObservableList<TItem> :
 
     public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
     public event NotifyCollectionChangedEventHandler Added;
 
-    public event NotifyCollectionChangedEventHandler Removed;
-
     public event NotifyCollectionChangedEventHandler Moved;
+
+    public event NotifyCollectionChangedEventHandler Removed;
 
     public event NotifyCollectionChangedEventHandler Replaced;
 
@@ -56,7 +58,7 @@ public class ObservableList<TItem> :
 
     #endregion
 
-    public event PropertyChangedEventHandler PropertyChanged;
+
 
     #region Fields and Properties
 
@@ -145,6 +147,28 @@ public class ObservableList<TItem> :
             Added?.Invoke(this, eventArgs);
         }
     }
+
+    /// <summary>
+    /// Moves an item to a new index. CollectionChanged and Moved event are triggered.
+    /// </summary>
+    /// <param name="oldIndex"></param>
+    /// <param name="newIndex"></param>
+    public void Move(int oldIndex, int newIndex) {
+        CheckReentrancy();
+        var removedItem = this[oldIndex];
+        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex],
+            newIndex, oldIndex);
+
+        using (BlockReentrancy()) {
+            CollectionChanging?.Invoke(this, eventArgs);
+            Moving?.Invoke(this, eventArgs);
+            _list.RemoveAt(oldIndex);
+            _list.Insert(newIndex, removedItem);
+            OnPropertyChangedIndex();
+            CollectionChanged?.Invoke(this, eventArgs);
+            Moved?.Invoke(this, eventArgs);
+        }
+    }
     #endregion
 
     #region Method Overrides
@@ -228,28 +252,6 @@ public class ObservableList<TItem> :
     }
 
     /// <summary>
-    /// Moves an item to a new index. CollectionChanged and Moved event are triggered.
-    /// </summary>
-    /// <param name="oldIndex"></param>
-    /// <param name="newIndex"></param>
-    public override void Move(int oldIndex, int newIndex) {
-        CheckReentrancy();
-        var removedItem = this[oldIndex];
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex],
-            newIndex, oldIndex);
-
-        using (BlockReentrancy()) {
-            CollectionChanging?.Invoke(this, eventArgs);
-            Moving?.Invoke(this, eventArgs);
-            _list.RemoveAt(oldIndex);
-            _list.Insert(newIndex, removedItem);
-            OnPropertyChangedIndex();
-            CollectionChanged?.Invoke(this, eventArgs);
-            Moved?.Invoke(this, eventArgs);
-        }
-    }
-
-    /// <summary>
     /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
     /// </summary>
     /// <param name="item">Item to remove.</param>
@@ -295,7 +297,7 @@ public class ObservableList<TItem> :
 
     #region Property Methods
 
-    protected const string CountString = "Count";
+    protected const string CountString = nameof(Count);
     protected const string IndexerName = "Item[]";
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

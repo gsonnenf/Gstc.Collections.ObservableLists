@@ -24,13 +24,12 @@ public abstract class AbstractListUpcastLocking<TItem> :
     public abstract void Add(TItem item);
     public abstract void Clear();
     public abstract bool Remove(TItem item);
-    public abstract void Move(int oldIndex, int newIndex);
     #endregion
 
     #region IList
     int IList.Add(object value) {
         Add((TItem)value);
-        return Count - 1; //TODO: Count behavior isn't thread safe.
+        return Count - 1; //TODO - Bug: Count behavior isn't thread safe. Wrapping it in the WriteLock() would cause a deadlock. Consider removing Ilist or using a locked intermediate variable.
     }
     bool IList.Contains(object value) => Contains((TItem)value);
     int IList.IndexOf(object value) => IndexOf((TItem)value);
@@ -65,7 +64,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
     }
 
     public IEnumerator<TItem> GetEnumerator() {
-        using (ReadLock()) return InternalList.GetEnumerator(); //TODO: Do we need to make a snapshot of list for threadsafe enumeration
+        using (ReadLock()) return InternalList.GetEnumerator(); //TODO - Feature: Do we need to make a snapshot of list for thread safe enumeration
     }
 
     IEnumerator IEnumerable.GetEnumerator() {

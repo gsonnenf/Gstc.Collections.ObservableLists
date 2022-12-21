@@ -63,7 +63,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     }
 
     /// <summary>
-    /// If true, add, remove, and replace from source collection is propagated to the destination collection.  This is always true in the current version.
+    /// If true, add, remove, and replace from source collection is propagated to the destination collection. This is always true in the current version.
     /// </summary>
     public bool IsSyncSourceToDestCollection { get; set; } = true;
     //TODO: Fix events that use RemoveAt or other indexing methods with one-way sync, updating a non-synced list breaks the index map between lists. You may end up removing the wrong object.
@@ -223,7 +223,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
 
     private void CreatePropertySync(TSource sourceItem, TDestination destItem) {
 
-        //TODO: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
+        //TODO - bug: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
         if (!(sourceItem is INotifyPropertyChanged && destItem is INotifyPropertyChanged)) return;
         if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 

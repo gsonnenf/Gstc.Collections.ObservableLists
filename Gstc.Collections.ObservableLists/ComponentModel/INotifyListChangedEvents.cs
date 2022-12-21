@@ -13,14 +13,14 @@ public interface INotifyListChangedEvents : INotifyCollectionChanged {
     event NotifyCollectionChangedEventHandler Added;
 
     /// <summary>
-    /// Triggers events when an item or items are removed. 
-    /// </summary>
-    event NotifyCollectionChangedEventHandler Removed;
-
-    /// <summary>
     /// Triggers events when an item has changed position. 
     /// </summary>
     event NotifyCollectionChangedEventHandler Moved;
+
+    /// <summary>
+    /// Triggers events when an item or items are removed. 
+    /// </summary>
+    event NotifyCollectionChangedEventHandler Removed;
 
     /// <summary>
     /// Triggers events when an item has been replaced. 

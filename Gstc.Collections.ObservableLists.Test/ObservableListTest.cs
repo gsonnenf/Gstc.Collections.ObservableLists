@@ -1,164 +1,115 @@
 ﻿using System.Collections.Generic;
+using Gstc.Collections.ObservableLists.Multithread;
+using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Gstc.Collections.ObservableLists.Test.Tools;
-using Moq;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
-public class ObservableListTest : CollectionTestBase<object> {
-
-
-    //TODO: Change this test so it uses StaticDataSource instead of initialization of lists in the setup.
-
-    private ObservableList<object> ObvList { get; set; }
+public class ObservableListTest : CollectionTestBase<TestItem> {
 
     [SetUp]
-    public new void TestInit() {
-        base.TestInit();
-        ObvList = new ObservableList<object>();
+    public new void TestInit() => base.TestInit();
+
+    [Test]
+    [Description("Test constructor initialization with list")]
+    public void TestMethod_Constructor() {
+        var list = new List<TestItem> { Item1, Item2 };
+
+        var obvList = new ObservableList<TestItem>(list);
+        Assert.That(obvList.Count == 2);
+        Assert.That(obvList[0] == Item1);
+        Assert.That(obvList[1] == Item2);
+
+        var obvList2 = new ObservableIList<TestItem, List<TestItem>>(list);
+        Assert.That(obvList2.Count == 2);
+        Assert.That(obvList2[0] == Item1);
+        Assert.That(obvList2[1] == Item2);
+
+        var obvList3 = new ObservableIListLocking<TestItem, List<TestItem>>(list);
+        Assert.That(obvList3.Count == 2);
+        Assert.That(obvList3[0] == Item1);
+        Assert.That(obvList3[1] == Item2);
     }
 
-    [Test, Description("")]
-    public void TestMethod_InitList() {
-        List<object> list = new List<object> { Item1, Item2, Item3 };
+    [Test]
+    [Description("Tests event triggers on replace list.")]
+    public void TestMethod_InternalList_Replace() {
+        var list = new List<TestItem> { Item1, Item2 };
 
-        ObvList = new ObservableList<object>(list);
+        //Tests ObservableList
+        var obvList = new ObservableList<TestItem>();
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
+        obvList.List = list;
+        Assert.That(obvList.Count == 2);
+        Assert.That(obvList[0] == Item1);
+        Assert.That(obvList[1] == Item2);
+        AssertPropertyCollectionTest();
 
-        Assert.That(ObvList.Count == 3);
-        Assert.That(ObvList[0] == Item1);
-        Assert.That(ObvList[1] == Item2);
-        Assert.That(ObvList[2] == Item3);
+        //Tests ObservableIList
+        var obvList2 = new ObservableIList<TestItem, List<TestItem>>();
+        InitPropertyCollectionTest(obvList2, AssertArgs.OnCollectionChanged_Reset);
+        obvList2.List = list;
+        Assert.That(obvList2.Count == 2);
+        Assert.That(obvList2[0] == Item1);
+        Assert.That(obvList2[1] == Item2);
+        AssertPropertyCollectionTest();
+
+        //Tests ObservableIListLocking
+        var obvList3 = new ObservableIListLocking<TestItem, List<TestItem>>();
+        InitPropertyCollectionTest(obvList3, AssertArgs.OnCollectionChanged_Reset);
+        obvList3.List = list;
+        Assert.That(obvList3.Count == 2);
+        Assert.That(obvList3[0] == Item1);
+        Assert.That(obvList3[1] == Item2);
+        AssertPropertyCollectionTest();
     }
 
-    [Test, Description("")]
-    public void TestMethod_ListAdd() {
-
-        List<object> list = new List<object> { Item1, Item2, Item3 };
-
-        ObvList.CollectionChanged += AssertCollectionEventReset;
-        AddMockNotifiers();
-
-        ObvList.List = list;
-
-        AssertMockNotifiers(2, 1);
-        Assert.That(ObvList.Count == 3);
-        Assert.That(ObvList[0] == Item1);
-        Assert.That(ObvList[1] == Item2);
-        Assert.That(ObvList[2] == Item3);
-
-    }
-
-    [Test, Description("")]
-    public void TestMethod_Add() {
-
-        ObvList.CollectionChanged += GenerateAssertCollectionEventAddOne(0, DefaultTestItem);
-        AddMockNotifiers();
-
-        ObvList.Add(DefaultTestItem);
-
-        AssertMockNotifiers(2, 1);
-        Assert.That(ObvList.Count == 1);
-        Assert.That(ObvList[0] == DefaultTestItem);
-
-    }
-
-    [Test, Description("")]
+    [Test, Description("Test AddRange only on the ObservableList<>")]
     public void TestMethod_AddRange() {
+        var obvList = new ObservableList<TestItem>();
+        obvList.Add(DefaultTestItem);
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
 
-        ObvList.Add(DefaultTestItem);
+        obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
 
-        ObvList.CollectionChanged += GenerateAssertCollectionEventAddThree(1, Item1, Item2, Item3);
-        AddMockNotifiers();
-
-        ObvList.AddRange(new List<object>() { Item1, Item2, Item3 });
-
-        AssertMockNotifiers(2, 1);
-        Assert.That(ObvList.Count, Is.EqualTo(4));
-        Assert.That(ObvList[0], Is.EqualTo(DefaultTestItem));
-        Assert.That(ObvList[1], Is.EqualTo(Item1));
-        Assert.That(ObvList[2], Is.EqualTo(Item2));
-        Assert.That(ObvList[3], Is.EqualTo(Item3));
-        //TODO: Test addRanged with the isEventForEachItem
+        AssertPropertyCollectionTest();
+        Assert.That(obvList.Count, Is.EqualTo(4));
+        Assert.That(obvList[0], Is.EqualTo(DefaultTestItem));
+        Assert.That(obvList[1], Is.EqualTo(Item1));
+        Assert.That(obvList[2], Is.EqualTo(Item2));
+        Assert.That(obvList[3], Is.EqualTo(Item3));
     }
 
-    [Test, Description("Tests the reset event for WPF databinding")]
+    [Test, Description("Tests the reset event for WPF data binding")]
     public void TestMethod_AddRange2() {
-        var list = new List<object>();
-
-        for (var i = 0; i < 5; i++) list.Add(i);
- 
-        ObvList.CollectionChanged += AssertCollectionEventReset;
-        AddMockNotifiers();
-        //Tests that onChanged triggers a reset.
-        ObvList.IsWpfDataBinding = true;
-        ObvList.AddRange(list);
-        AssertMockNotifiers(2, 1);
+        var obvList = new ObservableList<TestItem>();
+        obvList.IsWpfDataBinding = true;
+        obvList.Add(DefaultTestItem);
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
+        obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
+        AssertPropertyCollectionTest();
     }
 
+    [Test, Description("Tests that move generated the appropriate events.")]
+    public void TestMethod_Move() {
+        var obvList = new ObservableList<TestItem>() { Item1, Item2, Item3 };
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
+        obvList.Move(1, 2);
+        AssertPropertyCollectionTest(1, 0, 1);
+        Assert.That(obvList[2], Is.EqualTo(Item2));
 
-    [Test, Description("")]
-    public void TestMethod_ReplaceList() {
+        var obvList2 = new ObservableIList<TestItem, List<TestItem>> { Item1, Item2, Item3 };
+        InitPropertyCollectionTest(obvList2, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
+        obvList2.Move(1, 2);
+        AssertPropertyCollectionTest(1, 0, 1);
+        Assert.That(obvList[2], Is.EqualTo(Item2));
 
-        ObvList.Add(DefaultTestItem);
-        ObvList.Add(UpdateTestItem);
-
-        List<object> list = new List<object> { Item1, Item2, Item3 };
-
-        ObvList.CollectionChanged += AssertCollectionEventReset;
-        AddMockNotifiers();
-
-        ObvList.List = list;
-
-        AssertMockNotifiers(2, 1);
-        Assert.That(ObvList.Count == 3);
-        Assert.That(ObvList[0] == Item1);
-        Assert.That(ObvList[1] == Item2);
-        Assert.That(ObvList[2] == Item3);
+        var obvList3 = new ObservableIListLocking<TestItem, List<TestItem>>() { Item1, Item2, Item3 };
+        InitPropertyCollectionTest(obvList3, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
+        obvList3.Move(1, 2);
+        AssertPropertyCollectionTest(1, 0, 1);
+        Assert.That(obvList[2], Is.EqualTo(Item2));
     }
-
-    [Test, Description("")]
-    public void TestMethod_Remove() {
-
-        ObvList.List = new List<object> { Item1, Item2, Item3 };
-
-        ObvList.CollectionChanged += GenerateAssertCollectionEventRemoveOne(1, Item2);
-        AddMockNotifiers();
-
-        ObvList.Remove(Item2);
-
-        AssertMockNotifiers(2, 1);
-        Assert.That(ObvList.Count == 2);
-        Assert.That(ObvList[0] == Item1);
-        Assert.That(ObvList[1] == Item3);
-    }
-
-    [Test, Description("")]
-    public void TestMethod_RemoveAt() {
-
-        ObvList.List = new List<object> { Item1, Item2, Item3 };
-
-        ObvList.CollectionChanged += GenerateAssertCollectionEventRemoveOne(1, Item2);
-        AddMockNotifiers();
-
-        ObvList.RemoveAt(1);
-
-        AssertMockNotifiers(2, 1);
-        Assert.That(ObvList.Count == 2);
-        Assert.That(ObvList[0] == Item1);
-        Assert.That(ObvList[1] == Item3);
-    }
-
-    #region Event Utilities      
-    private void AddMockNotifiers() {
-        //Sets up event testers
-        ObvList.PropertyChanged += (sender, args) => AssertEvent.Call("PropertyChanged");
-        ObvList.CollectionChanged += (sender, args) => AssertEvent.Call("CollectionChanged");
-    }
-
-    private void AssertMockNotifiers(int timesPropertyCalled, int timesCollectionCalled) {
-        MockEvent.Verify(m => m.Call("PropertyChanged"), Times.Exactly(timesPropertyCalled));
-        MockEvent.Verify(m => m.Call("CollectionChanged"), Times.Exactly(timesCollectionCalled));
-    }
-    #endregion
 }

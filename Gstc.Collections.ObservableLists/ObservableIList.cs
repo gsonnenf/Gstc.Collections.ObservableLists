@@ -22,6 +22,8 @@ namespace Gstc.Collections.ObservableLists;
 /// </summary>
 /// <typeparam name="TItem">The type of item used in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
+///
+//TODO - feature: We likely only need one reentrancy block. Two different blocks doesn't add any usefulness?
 public class ObservableIList<TItem, TList> :
     AbstractListUpcast<TItem>,
     IObservableList<TItem>
@@ -32,9 +34,9 @@ public class ObservableIList<TItem, TList> :
 
     public event NotifyCollectionChangedEventHandler Adding;
 
-    public event NotifyCollectionChangedEventHandler Removing;
-
     public event NotifyCollectionChangedEventHandler Moving;
+
+    public event NotifyCollectionChangedEventHandler Removing;
 
     public event NotifyCollectionChangedEventHandler Replacing;
 
@@ -48,9 +50,9 @@ public class ObservableIList<TItem, TList> :
 
     public event NotifyCollectionChangedEventHandler Added;
 
-    public event NotifyCollectionChangedEventHandler Removed;
-
     public event NotifyCollectionChangedEventHandler Moved;
+
+    public event NotifyCollectionChangedEventHandler Removed;
 
     public event NotifyCollectionChangedEventHandler Replaced;
 
@@ -109,6 +111,36 @@ public class ObservableIList<TItem, TList> :
     /// <param name="list">List to wrap with observable list.</param>
     public ObservableIList(TList list) {
         _list = list;
+    }
+    #endregion
+
+
+    #region Methods
+
+    /// <summary>
+    /// Moves an item to a new index. CollectionChanged and Moved event are triggered.
+    /// </summary>
+    /// <param name="oldIndex"></param>
+    /// <param name="newIndex"></param>
+    public void Move(int oldIndex, int newIndex) {
+        CheckReentrancy();
+        var removedItem = this[oldIndex];
+        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex], newIndex, oldIndex);
+
+        using (BlockReentrancy()) {
+            CollectionChanging?.Invoke(this, eventArgs);
+            Moving?.Invoke(this, eventArgs);
+        }
+
+        //TODO: Can we make this atomic without locks on the entire list? Using just one Block reentrancy might be ok.
+        _list.RemoveAt(oldIndex);
+        _list.Insert(newIndex, removedItem);
+
+        using (BlockReentrancy()) {
+            OnPropertyChangedIndex();
+            CollectionChanged?.Invoke(this, eventArgs);
+            Moved?.Invoke(this, eventArgs);
+        }
     }
     #endregion
 
@@ -207,32 +239,6 @@ public class ObservableIList<TItem, TList> :
     }
 
     /// <summary>
-    /// Moves an item to a new index. CollectionChanged and Moved event are triggered.
-    /// </summary>
-    /// <param name="oldIndex"></param>
-    /// <param name="newIndex"></param>
-    public override void Move(int oldIndex, int newIndex) {
-        CheckReentrancy();
-        var removedItem = this[oldIndex];
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex], newIndex, oldIndex);
-
-        using (BlockReentrancy()) {
-            CollectionChanging?.Invoke(this, eventArgs);
-            Moving?.Invoke(this, eventArgs);
-        }
-
-        //TODO: Can we make this atomic without locks on the entire list?
-        _list.RemoveAt(oldIndex);
-        _list.Insert(newIndex, removedItem);
-
-        using (BlockReentrancy()) {
-            OnPropertyChangedIndex();
-            CollectionChanged?.Invoke(this, eventArgs);
-            Moved?.Invoke(this, eventArgs);
-        }
-    }
-
-    /// <summary>
     /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
     /// </summary>
     /// <param name="item">Item to remove.</param>
@@ -288,13 +294,13 @@ public class ObservableIList<TItem, TList> :
     protected const string IndexerName = "Item[]";
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void OnPropertyChangedIndex() => OnPropertyChanged(IndexerName);
+    private void OnPropertyChangedIndex() => OnPropertyChanged(IndexerName);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void OnPropertyChangedCountAndIndex() {
+    private void OnPropertyChangedCountAndIndex() {
         OnPropertyChanged(CountString);
         OnPropertyChanged(IndexerName);
     }
