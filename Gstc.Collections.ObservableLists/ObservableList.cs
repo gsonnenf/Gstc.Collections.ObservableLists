@@ -142,6 +142,7 @@ public class ObservableList<TItem> :
             Adding?.Invoke(this, eventArgs);
             _list.AddRange(items);
             OnPropertyChangedCountAndIndex();
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (IsWpfDataBinding) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             else CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);

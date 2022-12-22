@@ -1,13 +1,14 @@
 ﻿using System;
+using Gstc.Collections.ObservableLists.Test.Tools;
 
 namespace Gstc.Collections.ObservableLists.Test.MockObjects;
 
 public class ItemBSource : NotifyPropertySyncChanged {
     public static ObservableList<ItemBSource> GetSampleSourceBList() {
         return new ObservableList<ItemBSource> {
-            new ItemBSource { MyNum = 10, MyStringLower = "x" },
-            new ItemBSource { MyNum = 15, MyStringLower = "y" },
-            new ItemBSource { MyNum = 20, MyStringLower = "z" },
+            new() { MyNum = 10, MyStringLower = "x" },
+            new() { MyNum = 15, MyStringLower = "y" },
+            new() { MyNum = 20, MyStringLower = "z" },
         };
     }
 

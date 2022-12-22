@@ -68,8 +68,7 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
 
     [Test, Description("Test AddRange only on the ObservableList<>")]
     public void TestMethod_AddRange() {
-        var obvList = new ObservableList<TestItem>();
-        obvList.Add(DefaultTestItem);
+        var obvList = new ObservableList<TestItem> {DefaultTestItem};
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
 
         obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
@@ -84,8 +83,7 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
 
     [Test, Description("Tests the reset event for WPF data binding")]
     public void TestMethod_AddRange2() {
-        var obvList = new ObservableList<TestItem>();
-        obvList.IsWpfDataBinding = true;
+        var obvList = new ObservableList<TestItem> { IsWpfDataBinding = true };
         obvList.Add(DefaultTestItem);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
         obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });

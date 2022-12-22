@@ -10,12 +10,11 @@ namespace Gstc.Collections.ObservableLists.Test.Tools;
 public class CollectionTestBase<TItem> {
 
     #region Test Assets
-    protected AssertEvent<NotifyCollectionChangedEventArgs> CollectionTest { get; set; }
-    protected AssertNotifyProperty PropertyTest { get; set; }
-
-    protected AssertEventArgs<TItem> AssertArgs = new();
-
     protected static Fixture Fixture { get; } = new();
+    protected AssertEvent<NotifyCollectionChangedEventArgs> CollectionTest { get; set; }
+    protected AssertNotifyProperty PropertyTest { get; private set; }
+
+    protected AssertEventArgs<TItem> AssertArgs { get; }= new();
 
     protected TItem DefaultTestItem { get; set; }
     protected TItem UpdateTestItem { get; set; }
@@ -27,7 +26,8 @@ public class CollectionTestBase<TItem> {
     #endregion
 
     #region ctor
-    public void TestInit() {
+
+    protected void TestInit() {
 
         //Generalize mock data
         DefaultTestItem = Fixture.Create<TItem>();
@@ -49,18 +49,20 @@ public class CollectionTestBase<TItem> {
     /// <typeparam name="T"></typeparam>
     /// <param name="obvList"></param>
     /// <param name="eventHandler"></param>
-    public void InitPropertyCollectionTest<T>(T obvList, NotifyCollectionChangedEventHandler eventHandler = null) where T : INotifyPropertyChanged, INotifyCollectionChanged {
+    protected void InitPropertyCollectionTest<T>(T obvList, NotifyCollectionChangedEventHandler eventHandler = null) where T : INotifyPropertyChanged, INotifyCollectionChanged {
         InitPropertyTest_Collection(obvList);
         InitCollectionTest(obvList, eventHandler);
     }
-    public void InitCollectionTest(INotifyCollectionChanged obvList, NotifyCollectionChangedEventHandler eventHandler) {
+
+    protected void InitCollectionTest(INotifyCollectionChanged obvList, NotifyCollectionChangedEventHandler eventHandler) {
         CollectionTest = new AssertEvent<NotifyCollectionChangedEventArgs>(obvList, nameof(obvList.CollectionChanged));
         if (eventHandler != null) CollectionTest.AddCallback(
             description: "Provides a callback to test collection changed events.",
-            callback: (sender, args) => eventHandler?.Invoke(sender, args)
+            callback: eventHandler.Invoke
         );
     }
-    public void InitPropertyTest_Collection(INotifyPropertyChanged obvList) => PropertyTest = new AssertNotifyProperty(obvList);
+
+    protected void InitPropertyTest_Collection(INotifyPropertyChanged obvList) => PropertyTest = new AssertNotifyProperty(obvList);
 
 
     /// <summary>
@@ -69,16 +71,18 @@ public class CollectionTestBase<TItem> {
     /// <param name="timesItemCalled"></param>
     /// <param name="timesCountCalled"></param>
     /// <param name="timesCollectionChangedCalled"></param>
-    public void AssertPropertyCollectionTest(int timesItemCalled = 1, int timesCountCalled = 1, int timesCollectionChangedCalled = 1) {
+    protected void AssertPropertyCollectionTest(int timesItemCalled = 1, int timesCountCalled = 1, int timesCollectionChangedCalled = 1) {
         AssertPropertyTestForCollection(timesItemCalled, timesCountCalled);
         AssertCollectionTest(timesCollectionChangedCalled);
     }
-    public void AssertPropertyTestForCollection(int timesItemCalled, int timesCountCalled) {
+
+    protected void AssertPropertyTestForCollection(int timesItemCalled, int timesCountCalled) {
         Assert.True(PropertyTest.TestPropertyCalled(timesItemCalled, "Item[]"), PropertyTest.ErrorMessages);
         Assert.True(PropertyTest.TestPropertyCalled(timesCountCalled, "Count"), PropertyTest.ErrorMessages);
         Assert.True(PropertyTest.TestOnChangedAll(timesItemCalled + timesCountCalled), PropertyTest.ErrorMessages);
     }
-    public void AssertCollectionTest(int expectedTimesCalled)
+
+    protected void AssertCollectionTest(int expectedTimesCalled)
         => Assert.True(CollectionTest.TestAll(expectedTimesCalled), CollectionTest.ErrorMessages);
     #endregion
 

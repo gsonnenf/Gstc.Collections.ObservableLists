@@ -13,7 +13,7 @@ public class AssertEventArgs<TItem> {
     }
 
     public NotifyCollectionChangedEventHandler OnCollectionChanged_Add(int index, TItem item) =>
-        (sender, args) => {
+        (_, args) => {
             Assert.That(args.Action, Is.EqualTo(NotifyCollectionChangedAction.Add));
             Assert.That(args.OldStartingIndex == -1);
             Assert.That(args.NewStartingIndex == index);

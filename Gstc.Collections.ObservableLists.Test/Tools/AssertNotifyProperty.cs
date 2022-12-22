@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 
+// ReSharper disable once CheckNamespace
 namespace Gstc.Utility.UnitTest.Event;
 
 /// <summary>

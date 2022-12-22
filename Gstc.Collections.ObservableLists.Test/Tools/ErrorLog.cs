@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq;
 
+// ReSharper disable once CheckNamespace
 namespace Gstc.Utility.UnitTest.Event;
 /// <summary>
 /// The ErrorLog class is a thread safe collection where error messages are stored individually in the collection.

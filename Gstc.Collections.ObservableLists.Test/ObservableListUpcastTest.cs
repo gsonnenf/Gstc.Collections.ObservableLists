@@ -24,7 +24,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     #region generic interface
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
-    [NUnit.Framework.Description("Tests functionality when upcast to ICollection<> interface.")]
+    [Description("Tests functionality when upcast to ICollection<> interface.")]
     public void CollectionInterfaceGenericTest(ICollection<TestItem> collection) {
         //Staging
         if (collection is not IObservableList<TestItem> obvList) throw new InvalidCastException("Collection does not support the IObservableList<TestItem> Interface");
@@ -33,13 +33,13 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         //Add and count Test
         collection.Add(Item1);
         Assert.AreEqual(1, collection.Count);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
 
         var a = PropertyTest;
         //Remove Test
         collection.Remove(Item1);
         Assert.AreEqual(0, collection.Count);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
 
         //Clear Test
         collection.Add(Item1);
@@ -50,7 +50,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
         collection.Clear();
         Assert.AreEqual(0, collection.Count);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
 
         //Contains Test
         collection.Add(Item1);
@@ -88,13 +88,13 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
-    [NUnit.Framework.Description("Tests functionality when upcast to IList<> interface (those methods not found in ICollection<>)")]
+    [Description("Tests functionality when upcast to IList<> interface (those methods not found in ICollection<>)")]
     public void ListInterfaceGenericTest(IList<TestItem> list) {
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");
         InitPropertyCollectionTest(obvCollection);
 
         list.Add(Item1);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
 
         //Index
         list[0] = Item2;
@@ -113,7 +113,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     #region Non-generic interface
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
-    [NUnit.Framework.Description("Tests functionality when upcast to ICollection interface.")]
+    [Description("Tests functionality when upcast to ICollection interface.")]
     public void CollectionInterfaceTest(ICollection collection) {
         if (collection is not IObservableList<TestItem> obvList) throw new InvalidCastException("Collection does not support the IObservable Interface");
         obvList.Add(Item1);
@@ -150,7 +150,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
-    [NUnit.Framework.Description("Tests functionality when upcast to IList interface.")]
+    [Description("Tests functionality when upcast to IList interface.")]
     public void ListInterfaceTest(IList list) {
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");
 
@@ -158,7 +158,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         InitPropertyCollectionTest(obvCollection);
         list.Add(Item1);
         Assert.AreEqual(Item1, list[0]);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
 
         //Contains test
         Assert.IsTrue(list.Contains(Item1));
@@ -176,12 +176,12 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         //Insert(,)
         list.Insert(0, Item3);
         Assert.AreEqual(Item3, list[0]);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
 
         //RemoveAt()
         list.RemoveAt(0);
         Assert.AreEqual(Item2, list[0]);
-        AssertPropertyCollectionTest(1, 1, 1);
+        AssertPropertyCollectionTest();
     }
     #endregion
 

@@ -20,9 +20,8 @@ namespace Gstc.Collections.ObservableLists.Synchronizer;
 /// <typeparam name="TSource">The source or model list type.</typeparam>
 /// <typeparam name="TDestination">The destination or viewmodel list type.</typeparam>
 public abstract class ObservableListSynchronizer<TSource, TDestination> {
-
-    protected ObservableList<TSource> _sourceObservableList;
-    protected ObservableList<TDestination> _destinationObservableList;
+    private ObservableList<TSource> _sourceObservableList;
+    private ObservableList<TDestination> _destinationObservableList;
 
     /// <summary>
     /// Converts an item of type {TSource} to {TDestination}.
@@ -228,8 +227,8 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 
         var propertySyncNotifier = new NotifyPropertySync(
-            sourceItem as INotifyPropertyChanged,
-            destItem as INotifyPropertyChanged,
+            (INotifyPropertyChanged) sourceItem,
+            (INotifyPropertyChanged) destItem,
             IsPropertyNotifySourceToDest,
             IsPropertyNotifyDestToSource);
         //propertySyncNotifierList.Add(propertySyncNotifier);
@@ -288,7 +287,9 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     private void DestinationCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (!IsSyncDestToSourceCollection) return;
         if (_sourceObservableList == null) return;
+        
         _sourceObservableList.CollectionChanged -= SourceCollectionChanged;
+
         switch (args.Action) {
             case NotifyCollectionChangedAction.Add:
                 for (var index = 0; index < args.NewItems.Count; index++) {
@@ -329,9 +330,8 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
             default:
                 _sourceObservableList.CollectionChanged += SourceCollectionChanged;
                 throw new ArgumentOutOfRangeException();
-
         }
-        _sourceObservableList.CollectionChanged += SourceCollectionChanged;
+        _sourceObservableList!.CollectionChanged += SourceCollectionChanged;
     }
 
 }

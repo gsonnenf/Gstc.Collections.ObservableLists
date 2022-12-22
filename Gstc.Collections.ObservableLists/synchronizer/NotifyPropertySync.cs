@@ -8,7 +8,7 @@ namespace Gstc.Collections.ObservableLists.Synchronizer;
 /// </summary>
 public class NotifyPropertySync {
 
-    public List<PropertyChangedEventArgs> LastArgs = new List<PropertyChangedEventArgs>();
+    public List<PropertyChangedEventArgs> LastArgs = new();
     public IPropertyChangedSyncHook SourceSync { get; set; }
     public IPropertyChangedSyncHook DestSync { get; set; }
     public INotifyPropertyChanged SourceNotify { get; set; }

@@ -14,7 +14,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
     IList<TItem>,
     IList {
 
-    protected readonly object _syncRoot = new();
+    //protected readonly object _syncRoot = new();
 
     #region abstract methods
     protected abstract IList<TItem> InternalList { get; }
@@ -29,7 +29,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
     #region IList
     int IList.Add(object value) {
         Add((TItem)value);
-        return Count - 1; //TODO - Bug: Count behavior isn't thread safe. Wrapping it in the WriteLock() would cause a deadlock. Consider removing Ilist or using a locked intermediate variable.
+        return Count - 1; //TODO - Bug: Count behavior isn't thread safe. Wrapping it in the WriteLock() would cause a deadlock. Consider removing IList or using a locked intermediate variable.
     }
     bool IList.Contains(object value) => Contains((TItem)value);
     int IList.IndexOf(object value) => IndexOf((TItem)value);
@@ -81,7 +81,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
         using (ReadLock()) ((ICollection)InternalList).CopyTo(array, arrayIndex);
     }
     bool ICollection.IsSynchronized => true;
-    object ICollection.SyncRoot => _syncRoot;
+    object ICollection.SyncRoot => throw new NotSupportedException("This list uses the RwLockWrapper instead of SyncRoot for locking.");
     #endregion
 
     #region Locking
@@ -94,14 +94,13 @@ public abstract class AbstractListUpcastLocking<TItem> :
     protected WriteLockClass WriteLock() => RwLock.WriteLock.Lock();
 
     protected class RwLockWrapper {
-        private readonly ReaderWriterLockSlim _listLock;
         public ReadLockClass ReadLock { get; }
         public WriteLockClass WriteLock { get; }
 
         public RwLockWrapper() {
-            _listLock = new();
-            ReadLock = new(_listLock);
-            WriteLock = new(_listLock);
+            ReaderWriterLockSlim listLock = new();
+            ReadLock = new(listLock);
+            WriteLock = new(listLock);
         }
     }
 
@@ -110,9 +109,8 @@ public abstract class AbstractListUpcastLocking<TItem> :
         public ReadLockClass(ReaderWriterLockSlim rwLock) {
             _rwLock = rwLock;
         }
-        public void Dispose() {
-            _rwLock.ExitReadLock();
-        }
+        public void Dispose() => _rwLock.ExitReadLock();
+
         public ReadLockClass Lock() {
             _rwLock.EnterReadLock();
             return this;
@@ -123,9 +121,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
         public WriteLockClass(ReaderWriterLockSlim rwLock) {
             _rwLock = rwLock;
         }
-        public void Dispose() {
-            _rwLock.ExitWriteLock();
-        }
+        public void Dispose() => _rwLock.ExitWriteLock();
 
         public WriteLockClass Lock() {
             _rwLock.EnterWriteLock();

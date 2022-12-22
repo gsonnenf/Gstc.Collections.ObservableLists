@@ -9,7 +9,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         public double PurchaseAmount { get; set; }
         public string Id { get; set; }
 
-        private static Random RandomGenerator { get; set; } = new Random();
+        private static Random RandomGenerator { get; } = new Random();
 
         private static int _idCounter = 0;
 
@@ -17,8 +17,8 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
 
         public static Customer GenerateCustomer() {
             return new Customer() {
-                FirstName = _firstNameList[RandomGenerator.Next(10)],
-                LastName = _lastNameList[RandomGenerator.Next(10)],
+                FirstName = FirstNameList[RandomGenerator.Next(10)],
+                LastName = LastNameList[RandomGenerator.Next(10)],
                 BirthDate = DateTime.Now.AddDays(-1 * RandomGenerator.Next(30000) - 3000),
                 PurchaseAmount = 1 + RandomGenerator.Next(10000) * 0.01,
                 Id = GenerateId()
@@ -35,7 +35,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             };
         }
 
-        private static List<string> _firstNameList = new List<string>() {
+        private readonly static List<string> FirstNameList = new List<string>() {
             "Emma",
             "Sophia",
             "Olivia",
@@ -48,7 +48,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             "Jack"
         };
 
-        private static List<string> _lastNameList = new List<string>() {
+        private readonly static List<string> LastNameList = new List<string>() {
             "Smith",
             "Trujillo",
             "Jackson",

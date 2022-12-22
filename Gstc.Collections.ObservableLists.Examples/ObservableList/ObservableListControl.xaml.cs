@@ -14,7 +14,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         /// <summary>
         /// Dependency property for data binding to the ItemsSource of the list view to allow swapping of list types.
         /// </summary>
-        public static readonly DependencyProperty BindingListProperty =
+        public readonly static DependencyProperty BindingListProperty =
             DependencyProperty.Register(nameof(BindingList), typeof(IObservableList<Customer>),
                 typeof(ObservableListControl), new PropertyMetadata(new ObservableList<Customer>()));
 
@@ -29,23 +29,23 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         /// <summary>
         /// Demo for ObservableList{}
         /// </summary>
-        public ObservableList<Customer> CustomerObservableList { get; set; } = new ObservableList<Customer>();
+        private ObservableList<Customer> CustomerObservableList { get; set; } = new ObservableList<Customer>();
 
         /// <summary>
         /// Demo for ObservableIList{}
         /// </summary>
-        public ObservableIList<Customer, List<Customer>> CustomerObservableIList { get; set; } = new ObservableIList<Customer, List<Customer>>();
+        private ObservableIList<Customer, List<Customer>> CustomerObservableIList { get; set; } = new ObservableIList<Customer, List<Customer>>();
 
         /// <summary>
         /// Demo for ObservableIListLocking{}
         /// </summary>
-        public ObservableIListLocking<Customer, List<Customer>> CustomerObservableIListLocking { get; set; } = new ObservableIListLocking<Customer, List<Customer>>();
+        private ObservableIListLocking<Customer, List<Customer>> CustomerObservableIListLocking { get; set; } = new ObservableIListLocking<Customer, List<Customer>>();
 
 
         /// <summary>
         /// Demonstrates the observable list upcast to the IList{} interface and still generating OnChange events.
         /// </summary>
-        public IList<Customer> UpcastList => BindingList;
+        private IList<Customer> UpcastList => BindingList;
 
         public ObservableListControl() {
             InitializeComponent();
@@ -96,7 +96,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             if (index < 0 || index >= BindingList.Count) {
                 AddToTextBox("Customer not selected.\n");
                 return;
-            };
+            }
             try { BindingList.RemoveAt(index); }
             catch (InvalidOperationException e) { AddToTextBox(e.Message); }
         }
@@ -112,7 +112,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             EventTextBox.ScrollToEnd();
         }
 
-        public void AddEvents(IObservableList<Customer> list) {
+        private void AddEvents(IObservableList<Customer> list) {
             list.CollectionChanged += (sender, args) => {
 
                 var message = "Collection Changed - ";

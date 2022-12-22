@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 
+// ReSharper disable once CheckNamespace
 namespace Gstc.Utility.UnitTest.Event;
 /// <summary>
 /// The AssertNotifyProperty class provides a test tool for determining the number of times an event was
@@ -39,7 +40,7 @@ public class AssertEvent<TEventArgs> : IDisposable
 
         //Casts our method group EventHandler to the proper EventHandler type
         _eventInfo = eventInfo ?? throw new NullReferenceException("Event was not found in the parent object.");
-        _delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, this, methodInfo!);
+        _delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType!, this, methodInfo!);
 
         eventInfo.AddEventHandler(parent, _delegate);
     }
@@ -127,7 +128,7 @@ public class AssertEvent<TEventArgs> : IDisposable
     /// Contains status of a callback that are used to run asserts on event arguments. 
     /// </summary>
     public class AssertCallback {
-        public EventHandler<TEventArgs> Callback;
+        public readonly EventHandler<TEventArgs> Callback;
         public readonly int InvokeOrder;
         public readonly string Description;
         public bool IsInvoked = false;

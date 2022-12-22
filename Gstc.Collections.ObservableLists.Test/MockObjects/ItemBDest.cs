@@ -1,21 +1,24 @@
 ﻿using System;
+using Gstc.Collections.ObservableLists.Test.Tools;
 
 namespace Gstc.Collections.ObservableLists.Test.MockObjects;
 
 public class ItemBDest : NotifyPropertySyncChanged {
 
-    public static ObservableList<ItemBDest> GetSampleDestBList() {
-        return new ObservableList<ItemBDest> {
-            new ItemBDest { MyNum = "1000", MyStringUpper = "A" },
-            new ItemBDest { MyNum = "1500", MyStringUpper = "B" },
-            new ItemBDest { MyNum = "2000", MyStringUpper = "C" },
-            new ItemBDest { MyNum = "3000", MyStringUpper = "D" },
+    public static ObservableList<ItemBDest> GetSampleDestBList() =>
+        new() {
+            new() { MyNum = "1000", MyStringUpper = "A" },
+            new() { MyNum = "1500", MyStringUpper = "B" },
+            new() { MyNum = "2000", MyStringUpper = "C" },
+            new() { MyNum = "3000", MyStringUpper = "D" },
         };
-    }
 
     public ItemBSource ItemBSourceItem { get; set; }
-    public ItemBDest() => ItemBSourceItem = new ItemBSource();
-    public ItemBDest(ItemBSource itemBSourceItem) => ItemBSourceItem = itemBSourceItem;
+    public ItemBDest() { ItemBSourceItem = new ItemBSource(); }
+
+    public ItemBDest(ItemBSource itemBSourceItem) {
+        ItemBSourceItem = itemBSourceItem;
+    }
 
     public string MyNum {
         get => ItemBSourceItem.MyNum.ToString();

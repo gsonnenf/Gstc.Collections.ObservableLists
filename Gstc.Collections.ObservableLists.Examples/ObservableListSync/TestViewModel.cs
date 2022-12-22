@@ -1,6 +1,6 @@
 ﻿namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
     public class TestViewModel : NotifyPropertySyncChanged {
-        public TestModel TestModel;
+        public readonly TestModel TestModel;
 
         public TestViewModel() => TestModel = new TestModel();
 
