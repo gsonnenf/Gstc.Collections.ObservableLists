@@ -3,8 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Gstc.UnitTest.Events;
+namespace Gstc.Utility.UnitTest.Event;
 
+/// <summary>
+/// The AssertNotifyProperty class provides a test tool for determining the number of times NotifyPropertyChanged was
+/// called in total and for each individual property. It also provides an interface for binding callbacks to properties
+/// and reports if callbacks were invoked.
+/// </summary>
+//TODO - Feature: Add a AddCallback feature for the more general OnPropertyChanged event.
 public class AssertNotifyProperty : IDisposable {
 
     #region Fields and Properties
@@ -13,6 +19,11 @@ public class AssertNotifyProperty : IDisposable {
     public INotifyPropertyChanged Observable { get; protected set; }
     public ConcurrentDictionary<string, CountAndCallbackList> PropertyDictionary { get; protected set; } = new();
     public int TimesCalled { get; protected set; } = 0;
+
+    /// <summary>
+    /// Specifies if count and callback invoked flags reset on assert. Default is true.
+    /// </summary>
+    public bool IsResetCountOnAssert { get; set; } = true;
     #endregion
 
     #region ctor
@@ -22,7 +33,7 @@ public class AssertNotifyProperty : IDisposable {
     }
     #endregion
 
-    public void Dispose() { //todo: UnitTest Dispose
+    public void Dispose() {
         Observable.PropertyChanged -= PropertyChangedHandler;
         PropertyDictionary.Clear();
         PropertyDictionary = null;
@@ -50,6 +61,7 @@ public class AssertNotifyProperty : IDisposable {
         => AddCallback(propertyName, invokeOrder, null, callback);
     public void AddCallback(string propertyName, string description, Action callback)
         => AddCallback(propertyName, -1, description, callback);
+    //TODO - Feature: Callbacks should probably have the same signature as the OnPropertyChanged event. Update this in a new version.
 
     /// <summary>
     /// 
@@ -82,8 +94,7 @@ public class AssertNotifyProperty : IDisposable {
         if (timesCalled != expectedTimesCalled) ErrorLog += "PropertyChanged:" + propertyName +
                                                             " was called " + timesCalled +
                                                             " times, but " + expectedTimesCalled + " calls were expected.";
-        ResetTimesPropertyCalled(propertyName); //Todo: unit test this in main library.
-        var timesCalled2 = TimesPropertyCalled(propertyName);
+        if (IsResetCountOnAssert) ResetTimesPropertyCalled(propertyName);
         return ErrorLog.IsSuccess();
     }
 
@@ -98,11 +109,12 @@ public class AssertNotifyProperty : IDisposable {
             return ErrorLog.IsSuccess();
         }
         foreach (var item in countAndCallbackList.CallbackList) {
-            if (item.Triggered == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
+            if (item.IsInvoked == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
+                                                     "\nProperty Name: " + propertyName +
                                                      "\nCallback Description:" + item.Description +
-                                                     "\nCallback Triggered: " + item.Triggered +
+                                                     "\nCallback IsInvoked: " + item.IsInvoked +
                                                      "\n" + item.CallInfo() + "\n";
-            item.ResetTrigger();//Todo: unit test this in main library.
+            if (IsResetCountOnAssert) item.ResetIsInvoked();
         }
         return ErrorLog.IsSuccess();
     }
@@ -129,7 +141,7 @@ public class AssertNotifyProperty : IDisposable {
 
         if (TimesCalled != expectedTimesCalled) ErrorLog += "PropertyChanged event was called " + TimesCalled +
                                                             " times, but " + expectedTimesCalled + " calls were expected.";
-        TimesCalled = 0;//Todo: unit test this in main library.
+        if (IsResetCountOnAssert) TimesCalled = 0;
         return ErrorLog.IsSuccess();
     }
 
@@ -140,11 +152,11 @@ public class AssertNotifyProperty : IDisposable {
     public bool TestAllCallbacksInvoked() {
         foreach (var kvp in PropertyDictionary) {
             foreach (var item in kvp.Value.CallbackList) {
-                if (item.Triggered == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
+                if (item.IsInvoked == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
                                                          "\nCallback Description:" + item.Description +
-                                                         "\nCallback Triggered: " + item.Triggered +
+                                                         "\nCallback IsInvoked: " + item.IsInvoked +
                                                          "\n" + item.CallInfo() + "\n";
-                item.ResetTrigger(); //Todo: unit test this in main library.
+                if (IsResetCountOnAssert) item.ResetIsInvoked();
             }
         }
         return ErrorLog.IsSuccess();
@@ -189,7 +201,7 @@ public class AssertNotifyProperty : IDisposable {
         public readonly int InvokeOrder;
         public readonly string Description;
         public readonly string PropertyName;
-        public bool Triggered = false;
+        public bool IsInvoked = false;
 
         public AssertCallback(string propertyName, int invokeOrder, string description, Action callback) {
             PropertyName = propertyName;
@@ -201,15 +213,15 @@ public class AssertNotifyProperty : IDisposable {
         public string CallInfo() =>
             "Callback Order: " +
             ((InvokeOrder != -1) ? "Callback on invocation number " + InvokeOrder : "Every invocation") +
-            "\nCallback:" + Callback.ToString();
+            "\nCallback:" + Callback;
 
         public void Invoke(int callOrder) {
             if (InvokeOrder != -1 && InvokeOrder != callOrder) return;
             Callback?.Invoke();
-            Triggered = true;
+            IsInvoked = true;
         }
 
-        public void ResetTrigger() => Triggered = false;
+        public void ResetIsInvoked() => IsInvoked = false;
     }
 
 }

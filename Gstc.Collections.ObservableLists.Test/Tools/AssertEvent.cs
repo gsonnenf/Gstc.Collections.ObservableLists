@@ -2,45 +2,49 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Gstc.UnitTest.Events;
+
+namespace Gstc.Utility.UnitTest.Event;
+/// <summary>
+/// The AssertNotifyProperty class provides a test tool for determining the number of times an event was
+/// called. It also provides an interface for binding callbacks to events and reports if callbacks were invoked.
+/// </summary>
+/// <typeparam name="TEventArgs">The type of event under test.</typeparam>
 public class AssertEvent<TEventArgs> : IDisposable
     where TEventArgs : EventArgs {
 
-    //TODO: Add flag for reset on Assert. Default to true.
-
     private object _parent;
-    private string _eventName;
 
-    private EventInfo _eventInfo;
-    private MethodInfo _methodInfo;
-    private Delegate _delegate;
+    private readonly EventInfo _eventInfo;
+    private readonly Delegate _delegate;
 
     #region Fields and Properties
     public ErrorLog ErrorLog { get; protected set; } = new();
     public string ErrorMessages => ErrorLog.ErrorMessages();
     public int TimesCalled { get; protected set; }
     public List<AssertCallback> AssertCallbackList { get; protected set; } = new();
+
+    /// <summary>
+    /// Specifies if count and callback invoked flags reset on assert. Default is true.
+    /// </summary>
+    public bool IsResetCountOnAssert { get; set; } = true;
     #endregion
 
     #region ctor
     public AssertEvent(object parent, string eventName) {
         _parent = parent;
-        _eventName = eventName;
 
         //Uses reflection to get event handler type, and a reflection reference to our method.
-        var methodInfo = typeof(AssertEvent<TEventArgs>).GetMethod(nameof(EventHandler));
+        var methodInfo = typeof(AssertEvent<TEventArgs>).GetMethod(nameof(EventHandler), BindingFlags.NonPublic | BindingFlags.Instance);
         var eventInfo = parent.GetType().GetEvent(eventName);
-        if (eventInfo == null) throw new NullReferenceException("Event was not found in the parent object.");
 
         //Casts our method group EventHandler to the proper EventHandler type
-        _methodInfo = methodInfo;
-        _eventInfo = eventInfo;
+        _eventInfo = eventInfo ?? throw new NullReferenceException("Event was not found in the parent object.");
         _delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, this, methodInfo!);
 
         eventInfo.AddEventHandler(parent, _delegate);
     }
 
-    public void Dispose() { //TODO: UnitTest Dispose
+    public void Dispose() {
         _eventInfo.RemoveEventHandler(_parent, _delegate);
         AssertCallbackList.Clear();
         AssertCallbackList = null;
@@ -70,7 +74,7 @@ public class AssertEvent<TEventArgs> : IDisposable
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="args"></param>
-    public void EventHandler(object sender, TEventArgs args) {
+    protected void EventHandler(object sender, TEventArgs args) {
         foreach (var item in AssertCallbackList) item.Invoke(TimesCalled, sender, args);
         TimesCalled++;
     }
@@ -84,11 +88,9 @@ public class AssertEvent<TEventArgs> : IDisposable
     /// <param name="expectedTimesCalled">Expected number of times called.</param>
     /// <returns>True if number of calls is equal to expected number of calls.</returns>
     public bool TestTimesCalled(int expectedTimesCalled) {
-        if (expectedTimesCalled != TimesCalled) {
-            ErrorLog += "Event was called " + TimesCalled +
-            " times, but " + expectedTimesCalled + " calls were expected.";
-        }
-        TimesCalled = 0; //TODO: Add Event unittest for times called. Add flag for reset on test. Remove after transferring over to specific project.
+        if (expectedTimesCalled != TimesCalled) ErrorLog += "Event was called " + TimesCalled +
+                                                            " times, but " + expectedTimesCalled + " calls were expected.";
+        if (IsResetCountOnAssert) TimesCalled = 0;
         return ErrorLog.IsSuccess();
     }
 
@@ -99,18 +101,18 @@ public class AssertEvent<TEventArgs> : IDisposable
     public bool TestAllCallbacksInvoked() {
         for (var index = 0; index < AssertCallbackList.Count; index++) {
             var item = AssertCallbackList[index];
-            if (!item.Triggered) ErrorLog += "A callback was expected to be invoked but was not invoked." +
+            if (!item.IsInvoked) ErrorLog += "A callback was expected to be invoked but was not invoked." +
                                              "\nCallback Description:" + item.Description +
                                              "\nCallback Number:" + index +
-                                             "\nCallback Triggered: " + item.Triggered +
+                                             "\nCallback IsInvoked: " + item.IsInvoked +
                                              item.CallInfo() + "\n";
-            item.ResetTrigger();//Todo: Needs AssertEvent unit test.
-        };
+            if (IsResetCountOnAssert) item.ResetIsInvoked();
+        }
         return ErrorLog.IsSuccess();
     }
 
     /// <summary>
-    /// 
+    /// Tests for the the expected number of calls and that all callbacks were invoked.
     /// </summary>
     /// <param name="expectedTimesCalled"></param>
     /// <returns></returns>
@@ -125,10 +127,10 @@ public class AssertEvent<TEventArgs> : IDisposable
     /// Contains status of a callback that are used to run asserts on event arguments. 
     /// </summary>
     public class AssertCallback {
-        public EventHandler<TEventArgs> Callback; //Todo: Add unit test for EventHandler<> casting
+        public EventHandler<TEventArgs> Callback;
         public readonly int InvokeOrder;
         public readonly string Description;
-        public bool Triggered = false;
+        public bool IsInvoked = false;
 
         public AssertCallback(int invokeOrder, EventHandler<TEventArgs> callback, string description) {
             Callback = callback;
@@ -139,15 +141,15 @@ public class AssertEvent<TEventArgs> : IDisposable
         public string CallInfo() =>
             "\nCallback Order: " +
             ((InvokeOrder != -1) ? "Callback on invocation number " + InvokeOrder : "Every invocation") +
-            "\nCallback:" + Callback.ToString();
+            "\nCallback:" + Callback;
 
         public void Invoke(int callOrder, object sender, TEventArgs args) {
             if (InvokeOrder != -1 && InvokeOrder != callOrder) return;
             Callback?.Invoke(sender, args);
-            Triggered = true;
+            IsInvoked = true;
         }
 
-        public void ResetTrigger() => Triggered = false;
+        public void ResetIsInvoked() => IsInvoked = false;
     }
 
 };

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using AutoFixture;
 using Gstc.Collections.ObservableLists.Interface;
-using Gstc.UnitTest.Events;
+using Gstc.Utility.UnitTest.Event;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test.Tools;

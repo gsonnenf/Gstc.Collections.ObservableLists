@@ -23,8 +23,8 @@ public abstract class AbstractListUpcast<TItem> :
     #endregion
 
     #region IList
-    int IList.Add(object? value) { Add((TItem)value); return Count - 1; }
-    bool IList.Contains(object? value) => Contains((TItem)value);
+    int IList.Add(object value) { Add((TItem)value); return Count - 1; }
+    bool IList.Contains(object value) => Contains((TItem)value);
     int IList.IndexOf(object value) => IndexOf((TItem)value);
     void IList.Insert(int index, object value) => Insert(index, (TItem)value);
     void IList.Remove(object value) => Remove((TItem)value);
