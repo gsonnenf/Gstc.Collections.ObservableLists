@@ -222,7 +222,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
 
     private void CreatePropertySync(TSource sourceItem, TDestination destItem) {
 
-        //TODO - bug: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
+        //bug: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
         if (!(sourceItem is INotifyPropertyChanged && destItem is INotifyPropertyChanged)) return;
         if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 

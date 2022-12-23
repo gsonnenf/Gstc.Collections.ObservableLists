@@ -211,7 +211,7 @@ public class ObservableIListLocking<TItem, TList> :
     public override void Add(TItem item) {
         using (_monitor.CheckReentrancy()) {
             lock (SyncRootEvents) {
-                //TODO: Fix add event args for list types that may not append added element to the end of the list.
+                //bug: Fix add event args for list types that may not append added element to the end of the list.
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
                 CollectionChanging?.Invoke(this, eventArgs);
                 Adding?.Invoke(this, eventArgs);

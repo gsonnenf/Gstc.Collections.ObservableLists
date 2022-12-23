@@ -205,7 +205,7 @@ public class ObservableIList<TItem, TList> :
     /// </summary>
     /// <param name="item">Item to add</param>
     public override void Add(TItem item) {
-        //TODO: Fix add event args for list types that may not append added element to the end of the list.
+        //bug: Fix add event args for list types that may not append added element to the end of the list.
         CheckReentrancy();
         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
 

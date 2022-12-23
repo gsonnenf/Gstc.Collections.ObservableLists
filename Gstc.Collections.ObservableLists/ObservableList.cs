@@ -201,7 +201,7 @@ public class ObservableList<TItem> :
     /// <param name="item">Item to add</param>
     public override void Add(TItem item) {
         CheckReentrancy();
-
+        //bug: Fix add event args for list types that may not append added element to the end of the list.
         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
 
         using (BlockReentrancy()) {
