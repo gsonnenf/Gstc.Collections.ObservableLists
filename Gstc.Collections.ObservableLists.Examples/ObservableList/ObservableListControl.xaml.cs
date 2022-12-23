@@ -50,7 +50,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         public ObservableListControl() {
             InitializeComponent();
             BindingList = CustomerObservableList;
-            CustomerObservableList.IsWpfDataBinding = true; //Fixes WPF issue with add range.
+            CustomerObservableList.IsResetForAddRange = true; //Fixes WPF issue with add range.
             CustomerObservableList.List = Customer.GenerateCustomerList();
             CustomerObservableIList.List = Customer.GenerateCustomerList();
             CustomerObservableIListLocking.List = Customer.GenerateCustomerList();

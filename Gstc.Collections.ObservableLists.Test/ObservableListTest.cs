@@ -66,48 +66,24 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
         AssertPropertyCollectionTest();
     }
 
-    [Test, Description("Test AddRange only on the ObservableList<>")]
-    public void TestMethod_AddRange() {
-        var obvList = new ObservableList<TestItem> { DefaultTestItem };
-        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
-
-        obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
-
-        AssertPropertyCollectionTest();
-        Assert.That(obvList.Count, Is.EqualTo(4));
-        Assert.That(obvList[0], Is.EqualTo(DefaultTestItem));
-        Assert.That(obvList[1], Is.EqualTo(Item1));
-        Assert.That(obvList[2], Is.EqualTo(Item2));
-        Assert.That(obvList[3], Is.EqualTo(Item3));
-    }
-
     [Test, Description("Tests the reset event for WPF data binding")]
-    public void TestMethod_AddRange2() {
-        var obvList = new ObservableList<TestItem> { IsWpfDataBinding = true };
+    public void TestMethod_AddRange_Wpf() {
+        var obvList = new ObservableList<TestItem> { IsResetForAddRange = true };
         obvList.Add(DefaultTestItem);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
         obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
         AssertPropertyCollectionTest();
-    }
 
-    [Test, Description("Tests that move generated the appropriate events.")]
-    public void TestMethod_Move() {
-        var obvList = new ObservableList<TestItem>() { Item1, Item2, Item3 };
-        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
-        obvList.Move(1, 2);
-        AssertPropertyCollectionTest(1, 0, 1);
-        Assert.That(obvList[2], Is.EqualTo(Item2));
+        var obvList2 = new ObservableIList<TestItem, List<TestItem>>() { IsResetForAddRange = true };
+        obvList2.Add(DefaultTestItem);
+        InitPropertyCollectionTest(obvList2, AssertArgs.OnCollectionChanged_Reset);
+        obvList2.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
+        AssertPropertyCollectionTest();
 
-        var obvList2 = new ObservableIList<TestItem, List<TestItem>> { Item1, Item2, Item3 };
-        InitPropertyCollectionTest(obvList2, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
-        obvList2.Move(1, 2);
-        AssertPropertyCollectionTest(1, 0, 1);
-        Assert.That(obvList[2], Is.EqualTo(Item2));
-
-        var obvList3 = new ObservableIListLocking<TestItem, List<TestItem>>() { Item1, Item2, Item3 };
-        InitPropertyCollectionTest(obvList3, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
-        obvList3.Move(1, 2);
-        AssertPropertyCollectionTest(1, 0, 1);
-        Assert.That(obvList[2], Is.EqualTo(Item2));
+        var obvList3 = new ObservableIListLocking<TestItem, List<TestItem>> { IsResetForAddRange = true };
+        obvList3.Add(DefaultTestItem);
+        InitPropertyCollectionTest(obvList3, AssertArgs.OnCollectionChanged_Reset);
+        obvList3.AddRange(new List<TestItem>() { Item1, Item2, Item3 });
+        AssertPropertyCollectionTest();
     }
 }

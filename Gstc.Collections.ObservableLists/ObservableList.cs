@@ -76,10 +76,10 @@ public class ObservableList<TItem> :
     public bool IsReadOnly => false;
 
     /// <summary>
-    /// A flag that will call an OnChanged event for each element in an AddRange operation. This is primarily for
+    /// A flag that will call the reset action instead of add action. This is primarily for
     /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
     /// </summary>
-    public bool IsWpfDataBinding = false;
+    public bool IsResetForAddRange { get; set; }= false;
 
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
@@ -124,13 +124,13 @@ public class ObservableList<TItem> :
 
     #endregion
 
-    #region Methods
+    #region Methods IObservableList<>
 
     /// <summary>
     /// Adds a list of items and triggers a single CollectionChanged and Add event. 
     /// </summary>
     /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
-    public void AddRange(IList<TItem> items) {
+    public void AddRange(IEnumerable<TItem> items) {
         CheckReentrancy();
 
         var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
@@ -141,7 +141,7 @@ public class ObservableList<TItem> :
             _list.AddRange(items);
             OnPropertyChangedCountAndIndex();
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (IsWpfDataBinding) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            if (IsResetForAddRange) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             else CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
         }

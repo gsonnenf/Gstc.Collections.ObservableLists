@@ -32,11 +32,20 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
         Assert.That(obvList, Has.Count.EqualTo(1));
     }
 
-    [Test, Description("Ensure that IList is implemented as an explicit interface, and is not accessible unless cast.")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Add_object(IObservableList<TestItem> obvList) {
-        //TODO - BUG: IList, Work on this for all IList methods and/or move elsewhere
-        Assert.Throws<InvalidCastException>(() => obvList.Add(new object()));
+    [Test, Description("Test AddRange")]
+    public void TestMethod_AddRange(IObservableList<TestItem> obvList) {
+        obvList.Add(DefaultTestItem);
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
+
+        obvList.AddRange(new [] { Item1, Item2, Item3 });
+
+        AssertPropertyCollectionTest();
+        Assert.That(obvList.Count, Is.EqualTo(4));
+        Assert.That(obvList[0], Is.EqualTo(DefaultTestItem));
+        Assert.That(obvList[1], Is.EqualTo(Item1));
+        Assert.That(obvList[2], Is.EqualTo(Item2));
+        Assert.That(obvList[3], Is.EqualTo(Item3));
     }
 
     [Test, Description("")]
@@ -79,6 +88,16 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
         AssertPropertyCollectionTest();
         Assert.That(obvList[1], Is.EqualTo(Item2));
         Assert.That(obvList, Has.Count.EqualTo(3));
+    }
+
+    [Test, Description("Tests that move generated the appropriate events.")]
+    [TestCaseSource(nameof(StaticDataSource))]
+    public void TestMethod_Move(IObservableList<TestItem> obvList) {
+        obvList.AddRange(new []{ Item1, Item2, Item3 });
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
+        obvList.Move(1, 2);
+        AssertPropertyCollectionTest(1, 0, 1);
+        Assert.That(obvList[2], Is.EqualTo(Item2));
     }
 
     [Test, Description("")]

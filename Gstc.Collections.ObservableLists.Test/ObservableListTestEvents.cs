@@ -25,13 +25,13 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
             ActAction = (obvList) => obvList.Add(StaticTestItem),
             IsCountChanged = true
         },
-        //new EventTestSet { //Todo: after addRange is added to interface
-        //    Name = "AddRange",
-        //    EventOrderList = EventTestSet.EventOrderList_AddRange, 
-        //    ArrangeAction = (_) => { },
-        //    ActAction = (obvList) => {obvList.AddRange(StaticTestItem, StaticTestItem, StaticTestItem) },
-        //    IsCountChanged = true
-        //},
+        new EventTestSet {
+            Name = "AddRange",
+            EventOrderList = EventTestSet.EventOrderList_AddRange,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => obvList.AddRange(new[] {StaticTestItem, StaticTestItem, StaticTestItem}),
+            IsCountChanged = true
+        },
         new EventTestSet {
             Name = "Clear",
             EventOrderList = EventTestSet.EventOrderList_Clear,
@@ -53,13 +53,13 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
             ActAction = (obvList) => obvList.Insert(0, StaticTestItem),
             IsCountChanged = true
         },
-        //new EventTestSet {
-        //    Name = "Move",
-        //    EventOrderList = EventTestSet.EventOrderList_Move, 
-        //    ArrangeAction = (obvList) => obvList.AddRange(StaticTestItem,StaticTestItem) ,
-        //    ActAction = (obvList) => obvList.Move(1,0),
-        //    IsCountChanged = false
-        //}, //Todo after move is added to interface
+        new EventTestSet {
+            Name = "Move",
+            EventOrderList = EventTestSet.EventOrderList_Move,
+            ArrangeAction = (obvList) => obvList.AddRange(new [] {StaticTestItem,StaticTestItem}) ,
+            ActAction = (obvList) => obvList.Move(1,0),
+            IsCountChanged = false
+        }, 
         new EventTestSet {
             Name = "Remove",
             EventOrderList = EventTestSet.EventOrderList_Remove,

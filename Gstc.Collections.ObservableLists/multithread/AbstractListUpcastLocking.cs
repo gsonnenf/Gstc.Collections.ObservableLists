@@ -11,8 +11,8 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
 public abstract class AbstractListUpcastLocking<TItem> :
-    IList<TItem>,
-    IList {
+    IList<TItem>, 
+    ICollection{
 
     //protected readonly object _syncRoot = new();
 
@@ -26,25 +26,8 @@ public abstract class AbstractListUpcastLocking<TItem> :
     public abstract bool Remove(TItem item);
     #endregion
 
-    #region IList
-    int IList.Add(object value) {
-        Add((TItem)value);
-        return Count - 1; //TODO - Bug: Count behavior isn't thread safe. Wrapping it in the WriteLock() would cause a deadlock. Consider removing IList or using a locked intermediate variable.
-    }
-    bool IList.Contains(object value) => Contains((TItem)value);
-    int IList.IndexOf(object value) => IndexOf((TItem)value);
-    void IList.Insert(int index, object value) => Insert(index, (TItem)value);
-    void IList.Remove(object value) => Remove((TItem)value);
-    bool IList.IsReadOnly {
-        get { using (ReadLock()) return InternalList.IsReadOnly; }
-    }
-
-    bool IList.IsFixedSize => false;
-    object IList.this[int index] {
-        get => this[index];
-        set => this[index] = (TItem)value;
-    }
-    #endregion
+    //Note: AbstractListUpcastLocking does not implement IList as its add method cannot be made threadsafe with out significant over head.
+    //Removal of the seldom used IList seems like a better option.
 
     #region IList<>
     public int Count {

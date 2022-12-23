@@ -35,7 +35,9 @@ public partial class AssertEvent<TEventArgs> : IDisposable
         _parent = parent;
 
         //Uses reflection to get event handler type, and a reflection reference to our method.
-        var methodInfo = typeof(AssertEvent<TEventArgs>).GetMethod(nameof(EventHandler), BindingFlags.NonPublic | BindingFlags.Instance);
+        var methodInfo = typeof(AssertEvent<TEventArgs>)
+            .GetMethod(nameof(EventHandler), BindingFlags.NonPublic | BindingFlags.Instance);
+        
         var eventInfo = parent.GetType().GetEvent(eventName);
 
         //Casts our method group EventHandler to the proper EventHandler type

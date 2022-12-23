@@ -148,8 +148,13 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.AreEqual(array[2], Item3);
     }
 
+
+    public static object[] StaticDataSourceIList => new object[] {
+        new ObservableList<TestItem>(),
+        new ObservableIList<TestItem, List<TestItem>>(),
+    };
     [Test]
-    [TestCaseSource(nameof(StaticDataSource))]
+    [TestCaseSource(nameof(StaticDataSourceIList))]
     [Description("Tests functionality when upcast to IList interface.")]
     public void ListInterfaceTest(IList list) {
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");

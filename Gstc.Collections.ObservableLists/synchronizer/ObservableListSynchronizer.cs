@@ -234,7 +234,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         //propertySyncNotifierList.Add(propertySyncNotifier);
     }
 
-    //TODO: Add an optional dispatcher method to execute update code on a UI thread.
+    //TODO - Feature: Add an optional dispatcher method to execute update code on a UI thread.
     private void SourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (!IsSyncSourceToDestCollection) return;
         if (_destinationObservableList == null) return;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -84,6 +85,11 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
+    /// A flag that will call the reset action instead of add action. This is primarily for
+    /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
+    /// </summary>
+    public bool IsResetForAddRange { get; set; } = false;
+    /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
     /// </summary>
 
@@ -129,6 +135,26 @@ public class ObservableIListLocking<TItem, TList> :
 
 
     #region Method
+
+    /// <summary>
+    /// Adds a list of items and triggers a single CollectionChanged and Add event. 
+    /// </summary>
+    /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
+    public void AddRange(IEnumerable<TItem> items) {
+        using (_monitor.CheckReentrancy()) {
+            lock (SyncRootEvents) {
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
+                CollectionChanging?.Invoke(this, eventArgs);
+                Adding?.Invoke(this, eventArgs);
+                using (WriteLock()) foreach (var item in items) _list.Add(item);
+                OnPropertyChangedCountAndIndex();
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                if (IsResetForAddRange) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                else CollectionChanged?.Invoke(this, eventArgs);
+                Added?.Invoke(this, eventArgs);
+            }
+        }
+    }
     /// <summary>
     /// Moves an item to a new index. CollectionChanged and Moved event are triggered.
     /// </summary>
