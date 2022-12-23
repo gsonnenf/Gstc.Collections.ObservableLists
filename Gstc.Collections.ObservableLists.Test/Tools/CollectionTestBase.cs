@@ -14,7 +14,7 @@ public class CollectionTestBase<TItem> {
     protected AssertEvent<NotifyCollectionChangedEventArgs> CollectionTest { get; set; }
     protected AssertNotifyProperty PropertyTest { get; private set; }
 
-    protected AssertEventArgs<TItem> AssertArgs { get; }= new();
+    protected AssertEventArgs<TItem> AssertArgs { get; } = new();
 
     protected TItem DefaultTestItem { get; set; }
     protected TItem UpdateTestItem { get; set; }

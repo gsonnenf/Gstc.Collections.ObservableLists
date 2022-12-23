@@ -58,8 +58,6 @@ public class ObservableList<TItem> :
 
     #endregion
 
-
-
     #region Fields and Properties
 
     /// <summary>

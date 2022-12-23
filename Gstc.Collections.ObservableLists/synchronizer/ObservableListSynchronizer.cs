@@ -227,8 +227,8 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 
         var propertySyncNotifier = new NotifyPropertySync(
-            (INotifyPropertyChanged) sourceItem,
-            (INotifyPropertyChanged) destItem,
+            (INotifyPropertyChanged)sourceItem,
+            (INotifyPropertyChanged)destItem,
             IsPropertyNotifySourceToDest,
             IsPropertyNotifyDestToSource);
         //propertySyncNotifierList.Add(propertySyncNotifier);
@@ -287,7 +287,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     private void DestinationCollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (!IsSyncDestToSourceCollection) return;
         if (_sourceObservableList == null) return;
-        
+
         _sourceObservableList.CollectionChanged -= SourceCollectionChanged;
 
         switch (args.Action) {

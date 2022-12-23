@@ -68,7 +68,7 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
 
     [Test, Description("Test AddRange only on the ObservableList<>")]
     public void TestMethod_AddRange() {
-        var obvList = new ObservableList<TestItem> {DefaultTestItem};
+        var obvList = new ObservableList<TestItem> { DefaultTestItem };
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
 
         obvList.AddRange(new List<TestItem>() { Item1, Item2, Item3 });

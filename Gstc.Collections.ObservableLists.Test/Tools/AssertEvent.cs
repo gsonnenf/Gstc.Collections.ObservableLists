@@ -10,7 +10,7 @@ namespace Gstc.Utility.UnitTest.Event;
 /// called. It also provides an interface for binding callbacks to events and reports if callbacks were invoked.
 /// </summary>
 /// <typeparam name="TEventArgs">The type of event under test.</typeparam>
-public class AssertEvent<TEventArgs> : IDisposable
+public partial class AssertEvent<TEventArgs> : IDisposable
     where TEventArgs : EventArgs {
 
     private object _parent;
