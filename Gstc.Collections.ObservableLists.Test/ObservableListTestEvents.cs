@@ -59,7 +59,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
             ArrangeAction = (obvList) => obvList.AddRange(new [] {StaticTestItem,StaticTestItem}) ,
             ActAction = (obvList) => obvList.Move(1,0),
             IsCountChanged = false
-        }, 
+        },
         new EventTestSet {
             Name = "Remove",
             EventOrderList = EventTestSet.EventOrderList_Remove,
@@ -145,7 +145,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
         public bool IsCountChanged;
 
         #region Orders of Events for differnet list methods
-        
+
         //TODO: find good way to test obvList.List
         public static List<string> EventOrderList_Add => new() {
         nameof(IObservableList<TestItem>.CollectionChanging),

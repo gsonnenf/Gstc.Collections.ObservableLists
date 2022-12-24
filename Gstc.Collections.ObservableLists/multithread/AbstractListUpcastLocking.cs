@@ -11,8 +11,8 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
 public abstract class AbstractListUpcastLocking<TItem> :
-    IList<TItem>, 
-    ICollection{
+    IList<TItem>,
+    ICollection {
 
     //protected readonly object _syncRoot = new();
 

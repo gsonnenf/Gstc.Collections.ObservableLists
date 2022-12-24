@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
@@ -38,7 +37,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
         obvList.Add(DefaultTestItem);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
 
-        obvList.AddRange(new [] { Item1, Item2, Item3 });
+        obvList.AddRange(new[] { Item1, Item2, Item3 });
 
         AssertPropertyCollectionTest();
         Assert.That(obvList.Count, Is.EqualTo(4));
@@ -93,7 +92,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
     [Test, Description("Tests that move generated the appropriate events.")]
     [TestCaseSource(nameof(StaticDataSource))]
     public void TestMethod_Move(IObservableList<TestItem> obvList) {
-        obvList.AddRange(new []{ Item1, Item2, Item3 });
+        obvList.AddRange(new[] { Item1, Item2, Item3 });
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
         obvList.Move(1, 2);
         AssertPropertyCollectionTest(1, 0, 1);

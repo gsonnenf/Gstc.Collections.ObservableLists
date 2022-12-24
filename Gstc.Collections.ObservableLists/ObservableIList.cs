@@ -76,7 +76,7 @@ public class ObservableIList<TItem, TList> :
     /// A flag that will call the reset action instead of add action. This is primarily for
     /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
     /// </summary>
-    public bool IsResetForAddRange { get; set; }= false;
+    public bool IsResetForAddRange { get; set; } = false;
 
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
@@ -137,7 +137,7 @@ public class ObservableIList<TItem, TList> :
         using (BlockReentrancy()) { //TODO: Fix block reentrancy to match rest ofclass
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
-            foreach(var item in items) _list.Add(item);
+            foreach (var item in items) _list.Add(item);
             OnPropertyChangedCountAndIndex();
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (IsResetForAddRange) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

@@ -79,7 +79,7 @@ public class ObservableList<TItem> :
     /// A flag that will call the reset action instead of add action. This is primarily for
     /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
     /// </summary>
-    public bool IsResetForAddRange { get; set; }= false;
+    public bool IsResetForAddRange { get; set; } = false;
 
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
