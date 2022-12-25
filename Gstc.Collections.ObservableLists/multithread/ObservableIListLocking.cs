@@ -28,7 +28,7 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// <typeparam name="TList">The type of internal list.</typeparam>
 ///
 public class ObservableIListLocking<TItem, TList> :
-    AbstractUpcastLockingList<TItem>,
+    AbstractUpcastLockingIList<TItem>,
     IObservableList<TItem>
     where TList : IList<TItem>, new() {
 

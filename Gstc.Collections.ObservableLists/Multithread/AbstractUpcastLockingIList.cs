@@ -10,7 +10,7 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// A base class to assist in the down casting of ObservableList{T} to its base interfaces and still provide notification.
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
-public abstract class AbstractUpcastLockingList<TItem> :
+public abstract class AbstractUpcastLockingIList<TItem> :
     IList<TItem>,
     ICollection {
 
