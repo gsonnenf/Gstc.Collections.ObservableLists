@@ -18,7 +18,7 @@ namespace Gstc.Collections.ObservableLists;
 /// over using the .NET ObservableCollection for its compatibility with existing collection types and interface.
 ///
 /// Author: Greg Sonnenfeld
-/// Copyright 2019
+/// Copyright 2019,2022,2023
 /// </summary>
 /// <typeparam name="TItem">The type of list.</typeparam>
 public class ObservableList<TItem> :
@@ -87,13 +87,13 @@ public class ObservableList<TItem> :
     public List<TItem> List {
         get => _list;
         set {
-            CheckReentrancy();
-            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-
             using (BlockReentrancy()) {
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 CollectionChanging?.Invoke(this, eventArgs);
                 Resetting?.Invoke(this, eventArgs);
+
                 _list = value;
+
                 OnPropertyChangedCountAndIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
                 Reset?.Invoke(this, eventArgs);
@@ -131,14 +131,13 @@ public class ObservableList<TItem> :
     /// </summary>
     /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
     public void AddRange(IEnumerable<TItem> items) {
-        CheckReentrancy();
-
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
-
         using (BlockReentrancy()) {
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
+
             _list.AddRange(items);
+
             OnPropertyChangedCountAndIndex();
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (IsResetForAddRange) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -153,16 +152,15 @@ public class ObservableList<TItem> :
     /// <param name="oldIndex"></param>
     /// <param name="newIndex"></param>
     public void Move(int oldIndex, int newIndex) {
-        CheckReentrancy();
-        var removedItem = this[oldIndex];
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex],
-            newIndex, oldIndex);
-
         using (BlockReentrancy()) {
+            var removedItem = this[oldIndex];
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex], newIndex, oldIndex);
             CollectionChanging?.Invoke(this, eventArgs);
             Moving?.Invoke(this, eventArgs);
+
             _list.RemoveAt(oldIndex);
             _list.Insert(newIndex, removedItem);
+
             OnPropertyChangedIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Moved?.Invoke(this, eventArgs);
@@ -180,14 +178,14 @@ public class ObservableList<TItem> :
     public override TItem this[int index] {
         get => _list[index];
         set {
-            CheckReentrancy();
-            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value,
-                _list[index], index);
-
             using (BlockReentrancy()) {
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value,
+                _list[index], index);
                 CollectionChanging?.Invoke(this, eventArgs);
                 Replacing?.Invoke(this, eventArgs);
+
                 _list[index] = value;
+
                 OnPropertyChangedIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
                 Replaced?.Invoke(this, eventArgs);
@@ -200,14 +198,14 @@ public class ObservableList<TItem> :
     /// </summary>
     /// <param name="item">Item to add</param>
     public override void Add(TItem item) {
-        CheckReentrancy();
-        //bug: Fix add event args for list types that may not append added element to the end of the list.
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
-
         using (BlockReentrancy()) {
+            //bug: Fix add event args for list types that may not append added element to the end of the list.
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
+
             _list.Add(item);
+
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
@@ -218,13 +216,13 @@ public class ObservableList<TItem> :
     /// Clears all item from the list. CollectionChanged and Reset event are triggered.
     /// </summary>
     public override void Clear() {
-        CheckReentrancy();
-
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
         using (BlockReentrancy()) {
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             CollectionChanging?.Invoke(this, eventArgs);
             Resetting?.Invoke(this, eventArgs);
+
             _list.Clear();
+
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Reset?.Invoke(this, eventArgs);
@@ -237,13 +235,13 @@ public class ObservableList<TItem> :
     /// <param name="index"></param>
     /// <param name="item"></param>
     public override void Insert(int index, TItem item) {
-        CheckReentrancy();
-
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
         using (BlockReentrancy()) {
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
+
             _list.Insert(index, item);
+
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
@@ -256,16 +254,15 @@ public class ObservableList<TItem> :
     /// <param name="item">Item to remove.</param>
     /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
     public override bool Remove(TItem item) {
-        CheckReentrancy();
-        var index = _list.IndexOf(item);
-        if (index == -1) return false;
-
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
-
         using (BlockReentrancy()) {
+            var index = _list.IndexOf(item);
+            if (index == -1) return false;
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Removing?.Invoke(this, eventArgs);
+
             _list.RemoveAt(index);
+
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Removed?.Invoke(this, eventArgs);
@@ -278,14 +275,14 @@ public class ObservableList<TItem> :
     /// </summary>
     /// <param name="index"></param>
     public override void RemoveAt(int index) {
-        CheckReentrancy();
-        var item = _list[index];
-        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
-
         using (BlockReentrancy()) {
+            var item = _list[index];
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Removing?.Invoke(this, eventArgs);
+
             _list.RemoveAt(index);
+
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Removed?.Invoke(this, eventArgs);
@@ -311,8 +308,6 @@ public class ObservableList<TItem> :
         OnPropertyChanged(IndexerName);
     }
 
-
-
     #endregion
 
     #region Reentrancy Monitor
@@ -326,20 +321,15 @@ public class ObservableList<TItem> :
     public bool AllowReentrancy { get; set; } = false;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void CheckReentrancy() {
-        if (_blockReentrancyCount <= 0 || AllowReentrancy) return;
-        throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected IDisposable BlockReentrancy() {
+        if (_blockReentrancyCount > 0 && !AllowReentrancy) throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
         _blockReentrancyCount++;
         return ReentrancyMonitor;
     }
 
     private class SimpleMonitor : IDisposable {
         private readonly ObservableList<TItem> _list;
-        public SimpleMonitor(ObservableList<TItem> list) => _list = list;
+        public SimpleMonitor(ObservableList<TItem> list) { _list = list; }
         public void Dispose() => _list._blockReentrancyCount--;
     }
     #endregion

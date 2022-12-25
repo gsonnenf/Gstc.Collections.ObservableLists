@@ -24,7 +24,7 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// new threads in onChange events that write to the list. This can result in infinite onChange events or a stack overflow.
 ///
 /// Author: Greg Sonnenfeld
-/// Copyright 2019
+/// Copyright 2019,2022,2023
 /// </summary>
 /// <typeparam name="TItem">The type of item used in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
@@ -32,7 +32,6 @@ public class ObservableIListLocking<TItem, TList> :
     AbstractListUpcastLocking<TItem>,
     IObservableList<TItem>
     where TList : IList<TItem>, new() {
-
 
     #region Events Collection Changing
     public event NotifyCollectionChangedEventHandler CollectionChanging;
@@ -307,13 +306,13 @@ public class ObservableIListLocking<TItem, TList> :
     protected const string IndexerName = "Item[]";
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void OnPropertyChangedIndex() => OnPropertyChanged(IndexerName);
+    protected void OnPropertyChangedIndex() => OnPropertyChanged(IndexerName);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void OnPropertyChangedCountAndIndex() {
+    protected void OnPropertyChangedCountAndIndex() {
         OnPropertyChanged(CountString);
         OnPropertyChanged(IndexerName);
     }
