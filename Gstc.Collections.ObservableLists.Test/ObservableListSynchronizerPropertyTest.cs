@@ -1,4 +1,12 @@
-﻿using Gstc.Collections.ObservableLists.Synchronizer;
+﻿#pragma warning disable IDE0079
+#pragma warning disable NUnit2002
+#pragma warning disable NUnit2003
+#pragma warning disable NUnit2004
+#pragma warning disable NUnit2005
+#pragma warning disable NUnit2019
+#pragma warning disable NUnit2045
+
+using Gstc.Collections.ObservableLists.Synchronizer;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using NUnit.Framework;
 

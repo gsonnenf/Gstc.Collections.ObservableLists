@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Synchronizer;
@@ -130,9 +129,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         if (_sourceObservableList != null) _sourceObservableList.CollectionChanged -= SourceCollectionChanged;
         _sourceObservableList = sourceObvList;
         if (_sourceObservableList == null) { _destinationObservableList?.Clear(); return; }
-
         if (_destinationObservableList == null) { _sourceObservableList.CollectionChanged += SourceCollectionChanged; return; }
-
 
         _destinationObservableList.CollectionChanged -= DestinationCollectionChanged;
         _destinationObservableList.Clear();
@@ -279,7 +276,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
 
             default:
                 _destinationObservableList.CollectionChanged += DestinationCollectionChanged;
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidEnumArgumentException(args.Action.ToString());
         }
         _destinationObservableList.CollectionChanged += DestinationCollectionChanged;
     }
@@ -329,7 +326,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
                 break;
             default:
                 _sourceObservableList.CollectionChanged += SourceCollectionChanged;
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidEnumArgumentException(args.Action.ToString());
         }
         _sourceObservableList!.CollectionChanged += SourceCollectionChanged;
     }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿#pragma warning disable IDE0079
+#pragma warning disable NUnit2002
+#pragma warning disable NUnit2003
+#pragma warning disable NUnit2004
+#pragma warning disable NUnit2005
+#pragma warning disable NUnit2019
+using System;
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Synchronizer;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
@@ -12,7 +18,6 @@ public class ObservableListSynchronizerTest {
     public ObservableList<ItemASource> SourceObvListA;
     public ObservableList<ItemADest> DestObvListA;
     public ObservableListSynchronizer<ItemASource, ItemADest> ObvListSyncA;
-
 
     [Test, Description("Creates a sync and tests initialization copying from source item to dest item.")]
     public void TestMethod_CopyOnInitialize() {
@@ -56,7 +61,6 @@ public class ObservableListSynchronizerTest {
             ObvListSyncA.SourceObservableList = SourceObvListA;
         }
 
-
         Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
         for (var index = 0; index < 3; index++) {
             Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);
@@ -86,7 +90,7 @@ public class ObservableListSynchronizerTest {
             (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() }
         );
 
-        List<Action> actionList = new List<Action>();
+        List<Action> actionList = new();
 
         actionList.Insert(0, () => ObvListSyncA.ReplaceSource_SyncToDestination(SourceObvListA));
         actionList.Insert(1, () => ObvListSyncA.ReplaceSource_SyncFromDestination(SourceObvListA));
@@ -163,11 +167,10 @@ public class ObservableListSynchronizerTest {
             (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
             (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
             SourceObvListA,
-            DestObvListA
-        );
-
-        ObvListSyncA.IsSyncSourceToDestCollection = true;
-        ObvListSyncA.IsSyncDestToSourceCollection = false;
+            DestObvListA) {
+            IsSyncSourceToDestCollection = true,
+            IsSyncDestToSourceCollection = false
+        };
 
         var item1 = new ItemASource { MyNum = 10, MyStringLower = "x" };
         var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };

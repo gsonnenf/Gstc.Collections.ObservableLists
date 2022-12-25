@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Gstc.Collections.ObservableLists.Abstract;
-using Gstc.Collections.ObservableLists.Interface;
 
 namespace Gstc.Collections.ObservableLists;
 
@@ -111,9 +110,7 @@ public class ObservableIList<TItem, TList> :
     /// <summary>
     /// Creates an observable list. The observable list is backed internally by a new TList{T}.
     /// </summary>
-    public ObservableIList() {
-        _list = new TList();
-    }
+    public ObservableIList() => _list = new TList();
 
     /// <summary>
     /// Creates an observable list using the list supplied in the constructor. Events are triggered
@@ -121,9 +118,7 @@ public class ObservableIList<TItem, TList> :
     /// triggered if using your provided list directly.
     /// </summary>
     /// <param name="list">List to wrap with observable list.</param>
-    public ObservableIList(TList list) {
-        _list = list;
-    }
+    public ObservableIList(TList list) => _list = list;
 
     #endregion
 
@@ -247,7 +242,6 @@ public class ObservableIList<TItem, TList> :
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
 
-
             _list.Insert(index, item);
 
             OnPropertyChangedCountAndIndex();
@@ -341,7 +335,7 @@ public class ObservableIList<TItem, TList> :
 
     private class SimpleMonitor : IDisposable {
         private readonly ObservableIList<TItem, TList> _list;
-        public SimpleMonitor(ObservableIList<TItem, TList> list) { _list = list; }
+        public SimpleMonitor(ObservableIList<TItem, TList> list) => _list = list;
         public void Dispose() => _list._blockReentrancyCount--;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
 using AutoFixture;
-using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Utility.UnitTest.Event;
 using NUnit.Framework;
 
@@ -64,7 +63,6 @@ public class CollectionTestBase<TItem> {
 
     protected void InitPropertyTest_Collection(INotifyPropertyChanged obvList) => PropertyTest = new AssertNotifyProperty(obvList);
 
-
     /// <summary>
     /// Asserts that the callbacks have been triggered/invoked, all counters and callback triggers are reset.
     /// </summary>
@@ -76,31 +74,14 @@ public class CollectionTestBase<TItem> {
         AssertCollectionTest(timesCollectionChangedCalled);
     }
 
-    protected void AssertPropertyTestForCollection(int timesItemCalled, int timesCountCalled) {
-        Assert.True(PropertyTest.TestPropertyCalled(timesItemCalled, "Item[]"), PropertyTest.ErrorMessages);
-        Assert.True(PropertyTest.TestPropertyCalled(timesCountCalled, "Count"), PropertyTest.ErrorMessages);
-        Assert.True(PropertyTest.TestOnChangedAll(timesItemCalled + timesCountCalled), PropertyTest.ErrorMessages);
-    }
+    protected void AssertPropertyTestForCollection(int timesItemCalled, int timesCountCalled)
+        => Assert.Multiple(() => {
+            Assert.That(PropertyTest.TestPropertyCalled(timesItemCalled, "Item[]"), PropertyTest.ErrorMessages);
+            Assert.That(PropertyTest.TestPropertyCalled(timesCountCalled, "Count"), PropertyTest.ErrorMessages);
+            Assert.That(PropertyTest.TestOnChangedAll(timesItemCalled + timesCountCalled), PropertyTest.ErrorMessages);
+        });
 
     protected void AssertCollectionTest(int expectedTimesCalled)
-        => Assert.True(CollectionTest.TestAll(expectedTimesCalled), CollectionTest.ErrorMessages);
+        => Assert.That(CollectionTest.TestAll(expectedTimesCalled), CollectionTest.ErrorMessages);
     #endregion
-
-
-    #region Event Utilities      
-    public void AddNotifiers<T>(IObservableList<T> obvList) {
-        //Sets up event testers
-        //obvList.Adding += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
-        //obvList.Moving += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
-        //obvList.Removing += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
-        //obvList.Replacing += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
-        //obvList.Resetting += (sender, args) => AssertEvent.Call(nameof(obvList.Resetting));
-
-    }
-
-
-
-    #endregion
-
-
 }

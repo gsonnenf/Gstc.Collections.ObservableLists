@@ -8,7 +8,7 @@ namespace Gstc.Collections.ObservableLists.Synchronizer;
 /// </summary>
 public class NotifyPropertySync {
 
-    public List<PropertyChangedEventArgs> LastArgs = new();
+    public List<PropertyChangedEventArgs> LastArgs { get; set; } = new();
     public IPropertyChangedSyncHook SourceSync { get; set; }
     public IPropertyChangedSyncHook DestSync { get; set; }
     public INotifyPropertyChanged SourceNotify { get; set; }
@@ -27,13 +27,13 @@ public class NotifyPropertySync {
     }
 
     public void DestTrigger(object sender, PropertyChangedEventArgs args) {
-        if (LastArgs.Contains(args)) { LastArgs.Remove(args); return; } //Allows concurrent execution.
+        if (LastArgs.Contains(args)) { _ = LastArgs.Remove(args); return; } //Allows concurrent execution. //Todo: verify this
         LastArgs.Add(args);
         DestSync.OnPropertyChanged(sender, args);
     }
 
     public void SourceTrigger(object sender, PropertyChangedEventArgs args) {
-        if (LastArgs.Contains(args)) { LastArgs.Remove(args); return; } //Allows concurrent execution.
+        if (LastArgs.Contains(args)) { _ = LastArgs.Remove(args); return; } //Allows concurrent execution.
         LastArgs.Add(args);
         SourceSync.OnPropertyChanged(sender, args);
     }

@@ -12,8 +12,7 @@ public class ItemASource {
     public int MyNum { get; set; }
     public string MyStringLower { get; set; }
     public override bool Equals(object obj) {
-        var temp = obj as ItemASource;
-        if (temp == null) return false;
+        if (obj is not ItemASource temp) return false;
         if (temp.MyNum == MyNum && temp.MyStringLower == MyStringLower) return true;
         return false;
     }

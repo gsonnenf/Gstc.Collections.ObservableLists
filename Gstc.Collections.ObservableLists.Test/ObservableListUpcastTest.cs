@@ -1,7 +1,13 @@
-﻿using System;
+﻿#pragma warning disable IDE0079
+#pragma warning disable NUnit2002
+#pragma warning disable NUnit2003
+#pragma warning disable NUnit2004
+#pragma warning disable NUnit2005
+#pragma warning disable NUnit2019
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Gstc.Collections.ObservableLists.Test.Tools;
@@ -35,9 +41,8 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.AreEqual(1, collection.Count);
         AssertPropertyCollectionTest();
 
-        var a = PropertyTest;
         //Remove Test
-        collection.Remove(Item1);
+        _ = collection.Remove(Item1);
         Assert.AreEqual(0, collection.Count);
         AssertPropertyCollectionTest();
 
@@ -69,12 +74,12 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
         IEnumerator enumerator = collection.GetEnumerator();
         Assert.IsNotNull(enumerator);
-        enumerator.MoveNext();
+        _ = enumerator.MoveNext();
         Assert.AreEqual(enumerator.Current, Item1);
 
         IEnumerator<TestItem> enumeratorGeneric = collection.GetEnumerator();
         Assert.IsNotNull(enumeratorGeneric);
-        enumeratorGeneric.MoveNext();
+        _ = enumeratorGeneric.MoveNext();
         Assert.AreEqual(enumeratorGeneric.Current, Item1);
 
         //CopyTo test
@@ -84,7 +89,6 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.AreEqual(array[1], Item2);
         Assert.AreEqual(array[2], Item3);
     }
-
 
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
@@ -134,9 +138,9 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         var enumerator = collection.GetEnumerator();
         Assert.IsNotNull(enumerator);
         foreach (var item in collection) {
-            enumerator.MoveNext();
+            _ = enumerator.MoveNext();
             Assert.AreEqual(item, enumerator.Current);
-            Assert.IsTrue(item != null);
+            Assert.IsNotNull(item);
         }
 
         //Array Test
@@ -147,7 +151,6 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.AreEqual(array[1], Item2);
         Assert.AreEqual(array[2], Item3);
     }
-
 
     public static object[] StaticDataSourceIList => new object[] {
         new ObservableList<TestItem>(),
@@ -161,7 +164,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
         //Add test
         InitPropertyCollectionTest(obvCollection);
-        list.Add(Item1);
+        _ = list.Add(Item1);
         Assert.AreEqual(Item1, list[0]);
         AssertPropertyCollectionTest();
 
@@ -189,7 +192,4 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         AssertPropertyCollectionTest();
     }
     #endregion
-
-
-
 }

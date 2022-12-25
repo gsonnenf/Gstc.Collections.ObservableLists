@@ -1,8 +1,13 @@
-﻿using System;
+﻿#pragma warning disable IDE0079
+#pragma warning disable NUnit2002
+#pragma warning disable NUnit2003
+#pragma warning disable NUnit2004
+#pragma warning disable NUnit2005
+#pragma warning disable NUnit2019
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
-using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Collections.ObservableLists.Multithread;
 using NUnit.Framework;
 
@@ -25,7 +30,7 @@ public class ObservableListReentrancyTest {
     [Description("Tests that reentrancy is only allowed if AllowReentrancy is set to true")]
     public void ReentrancySucceedTest(IObservableCollection<string> list) {
 
-        int reentrancyCounter = 0;
+        var reentrancyCounter = 0;
         //Demonstrates single reentrancy success or notImplementedException
         try {
             list.AllowReentrancy = true;
@@ -51,13 +56,12 @@ public class ObservableListReentrancyTest {
             if (list.Count > 10) return;
             if (args.Action == NotifyCollectionChangedAction.Add) list.Add("This add should cause reentrancy.");
         };
-        Assert.Throws<InvalidOperationException>(() => list.Add("This add should start reentrancy."));
+        _ = Assert.Throws<InvalidOperationException>(() => list.Add("This add should start reentrancy."));
     }
-
 
     [Test]
     public void JoinRecursiveChainTest() {
-        int count = 0;
+        var count = 0;
         void ThreadFunc() {
             var newCount = Interlocked.Increment(ref count);
             if (count < 100) {
@@ -82,20 +86,20 @@ public class ObservableListReentrancyTest {
         //creates stack of threads to access 
         void AddList() {
             if (callCount > 10) return;
-            Interlocked.Increment(ref callCount);
+            _ = Interlocked.Increment(ref callCount);
             var newThread = new Thread(AddList);
-            Console.WriteLine("Approaching lock:" + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("Approaching lock:" + Environment.CurrentManagedThreadId);
             list.Add(newThread);
             newThread.Join();
-            Console.WriteLine("Thread exiting:" + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("Thread exiting:" + Environment.CurrentManagedThreadId);
         }
 
         list.CollectionChanged += (sender, args) => {
-            Console.WriteLine("Enter Lock:" + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("Enter Lock:" + Environment.CurrentManagedThreadId);
             if (args.NewItems[0] is not Thread thread) throw new NullReferenceException("Not a thread");
             thread.Start();
             Thread.Sleep(50); //Allows started thread to hit lock before releasing lock.
-            Console.WriteLine("Exit Lock:" + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("Exit Lock:" + Environment.CurrentManagedThreadId);
         };
 
         AddList();

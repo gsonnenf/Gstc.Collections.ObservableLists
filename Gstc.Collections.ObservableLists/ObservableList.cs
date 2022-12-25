@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Gstc.Collections.ObservableLists.Abstract;
-using Gstc.Collections.ObservableLists.Interface;
 
 namespace Gstc.Collections.ObservableLists;
 
@@ -108,9 +107,7 @@ public class ObservableList<TItem> :
     /// <summary>
     /// Creates an observable list. The observable list is backed internally by a new List{T}.
     /// </summary>
-    public ObservableList() {
-        _list = new List<TItem>();
-    }
+    public ObservableList() => _list = new List<TItem>();
 
     /// <summary>
     /// Creates an observable list using the list supplied in the constructor. Events are triggered
@@ -118,9 +115,8 @@ public class ObservableList<TItem> :
     /// triggered if using your provided list directly.
     /// </summary>
     /// <param name="list">List to wrap with observable list.</param>
-    public ObservableList(List<TItem> list) {
-        _list = list;
-    }
+
+    public ObservableList(List<TItem> list) => _list = list;
 
     #endregion
 
@@ -329,7 +325,7 @@ public class ObservableList<TItem> :
 
     private class SimpleMonitor : IDisposable {
         private readonly ObservableList<TItem> _list;
-        public SimpleMonitor(ObservableList<TItem> list) { _list = list; }
+        public SimpleMonitor(ObservableList<TItem> list) => _list = list;
         public void Dispose() => _list._blockReentrancyCount--;
     }
     #endregion

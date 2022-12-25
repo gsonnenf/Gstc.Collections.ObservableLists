@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using Gstc.Collections.ObservableLists.Interface;
 
 namespace Gstc.Collections.ObservableLists.Multithread;
 
@@ -28,8 +26,9 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// </summary>
 /// <typeparam name="TItem">The type of item used in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
+///
 public class ObservableIListLocking<TItem, TList> :
-    AbstractListUpcastLocking<TItem>,
+    AbstractUpcastLockingList<TItem>,
     IObservableList<TItem>
     where TList : IList<TItem>, new() {
 
@@ -63,7 +62,6 @@ public class ObservableIListLocking<TItem, TList> :
 
     public event NotifyCollectionChangedEventHandler Reset;
     #endregion
-
 
     #region Fields and Properties
     /// <summary>
@@ -117,9 +115,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// <summary>
     /// Creates an observable list. The observable list is backed internally by a new TList{T}.
     /// </summary>
-    public ObservableIListLocking() {
-        _list = new TList();
-    }
+    public ObservableIListLocking() => _list = new TList();
 
     /// <summary>
     /// Creates an observable list using the list supplied in the constructor. Events are triggered
@@ -127,11 +123,8 @@ public class ObservableIListLocking<TItem, TList> :
     /// triggered if using your provided list directly.
     /// </summary>
     /// <param name="list">List to wrap with observable list.</param>
-    public ObservableIListLocking(TList list) {
-        _list = list;
-    }
+    public ObservableIListLocking(TList list) => _list = list;
     #endregion
-
 
     #region Method
 
@@ -331,7 +324,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// </summary>
     private readonly MultithreadMonitor _monitor = new();
 
-    protected readonly object SyncRootEvents = new();
+    protected object SyncRootEvents { get; } = new();
 
     public bool AllowReentrancy {
         set {
@@ -343,14 +336,14 @@ public class ObservableIListLocking<TItem, TList> :
         private readonly ConcurrentDictionary<int, int> _reentrancyDictionary = new();
 
         public MultithreadMonitor CheckReentrancy() {
-            var threadId = Thread.CurrentThread.ManagedThreadId;
+            var threadId = Environment.CurrentManagedThreadId;
             if (!_reentrancyDictionary.TryAdd(threadId, threadId)) throw new InvalidOperationException("Single thread Reentrancy not permitted as it would cause a deadlock.");
             return this;
         }
 
         public void Dispose() {
-            var threadId = Thread.CurrentThread.ManagedThreadId;
-            _reentrancyDictionary.TryRemove(threadId, out _);
+            var threadId = Environment.CurrentManagedThreadId;
+            _ = _reentrancyDictionary.TryRemove(threadId, out _);
         }
     }
     #endregion

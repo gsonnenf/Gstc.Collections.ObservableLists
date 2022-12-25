@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Gstc.Collections.ObservableLists.Test.Tools;
@@ -14,7 +13,6 @@ namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
 public class ObservableListTestEvents : CollectionTestBase<TestItem> {
-
 
     public readonly static TestItem StaticTestItem = new();
     public static List<EventTestSet> StaticOperationListDataSource => new() {
@@ -76,7 +74,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
         }
     };
 
-    public static object[] ObservableListDataSource = {
+    public readonly static object[] ObservableListDataSource = {
         () => new ObservableList<TestItem>(),
         () => new ObservableIList<TestItem, List<TestItem>>(),
         () => new ObservableIListLocking<TestItem,List<TestItem>>()
@@ -121,7 +119,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
                 testEventList.Add(testEvent);
                 testEvent.AddCallback((_, args) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName + " : " + args.PropertyName));
                 testEvent.AddCallback((_, args) => {
-                    if (args.PropertyName == "Count") Assert.True(testSet.IsCountChanged, "OnPropertyChanged: Count is not suppose to be called for method: " + testSet.Name);
+                    if (args.PropertyName == "Count") Assert.That(testSet.IsCountChanged, "OnPropertyChanged: Count is not suppose to be called for method: " + testSet.Name);
 
                     if (args.PropertyName == "Item[]") callOrder = (callOrder == staticIndex) ? callOrder + 1
                     : throw new Exception(testSet.Name + ": Call order of " + eventName + " was not correct. " + staticIndex + " was expected, but " + callOrder + " was received.");

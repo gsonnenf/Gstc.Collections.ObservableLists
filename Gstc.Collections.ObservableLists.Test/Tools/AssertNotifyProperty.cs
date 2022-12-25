@@ -71,7 +71,7 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="e"></param>
     protected void PropertyChangedHandler(object sender, PropertyChangedEventArgs e) {
         TimesCalled++;
-        PropertyDictionary.AddOrUpdate(
+        _ = PropertyDictionary.AddOrUpdate(
             key: e.PropertyName,
             addValue: new CountAndCallbackList(e.PropertyName, 1),
 
@@ -128,8 +128,8 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="propertyName"></param>
     /// <returns></returns>
     public bool TestPropertyAll(int expectedTimesCalled, string propertyName) {
-        TestCallbacksInvoked(propertyName);
-        TestPropertyCalled(expectedTimesCalled, propertyName);
+        _ = TestCallbacksInvoked(propertyName);
+        _ = TestPropertyCalled(expectedTimesCalled, propertyName);
         return ErrorLog.IsSuccess();
     }
 
@@ -164,8 +164,8 @@ public class AssertNotifyProperty : IDisposable {
     }
 
     public bool TestOnChangedAll(int expectedTimesCalled) {
-        TestOnChangedTimesCalled(expectedTimesCalled);
-        TestAllCallbacksInvoked();
+        _ = TestOnChangedTimesCalled(expectedTimesCalled);
+        _ = TestAllCallbacksInvoked();
         return ErrorLog.IsSuccess();
     }
     #endregion

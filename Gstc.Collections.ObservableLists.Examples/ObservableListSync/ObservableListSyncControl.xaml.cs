@@ -11,7 +11,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
         /// <summary>
         /// The synchronized observable list for viewmodel.
         /// </summary>       
-        private ObservableListSynchronizer<TestModel, TestViewModel> _obvListSync =
+        private readonly ObservableListSynchronizer<TestModel, TestViewModel> _obvListSync =
            new ObservableListSynchronizerFunc<TestModel, TestViewModel>(
                (sourceItem) => new TestViewModel(sourceItem),
                (destItem) => destItem.TestModel
@@ -19,7 +19,6 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
 
         public ObservableList<TestModel> SourceObvList = new ObservableList<TestModel>();
         public ObservableList<TestViewModel> DestObvList = new ObservableList<TestViewModel>();
-
 
         public ObservableListSyncControl() {
             InitializeComponent();

@@ -15,25 +15,21 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
 
         private static string GenerateId() => "id_" + _idCounter++;
 
-        public static Customer GenerateCustomer() {
-            return new Customer() {
-                FirstName = FirstNameList[RandomGenerator.Next(10)],
-                LastName = LastNameList[RandomGenerator.Next(10)],
-                BirthDate = DateTime.Now.AddDays(-1 * RandomGenerator.Next(30000) - 3000),
-                PurchaseAmount = 1 + RandomGenerator.Next(10000) * 0.01,
-                Id = GenerateId()
-            };
-        }
+        public static Customer GenerateCustomer() => new Customer() {
+            FirstName = FirstNameList[RandomGenerator.Next(10)],
+            LastName = LastNameList[RandomGenerator.Next(10)],
+            BirthDate = DateTime.Now.AddDays(-1 * RandomGenerator.Next(30000) - 3000),
+            PurchaseAmount = 1 + RandomGenerator.Next(10000) * 0.01,
+            Id = GenerateId()
+        };
 
-        public static List<Customer> GenerateCustomerList() {
-            return new List<Customer>() {
+        public static List<Customer> GenerateCustomerList() => new List<Customer>() {
                 Customer.GenerateCustomer(),
                 Customer.GenerateCustomer(),
                 Customer.GenerateCustomer(),
                 Customer.GenerateCustomer(),
                 Customer.GenerateCustomer(),
             };
-        }
 
         private readonly static List<string> FirstNameList = new List<string>() {
             "Emma",

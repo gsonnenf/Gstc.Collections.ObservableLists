@@ -2,12 +2,11 @@
 using Gstc.Collections.ObservableLists.Synchronizer;
 using NotifyPropertySyncChanged = Gstc.Collections.ObservableLists.Examples.ObservableListSync.NotifyPropertySyncChanged;
 
-
 namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
     public class GithubExample2 {
         public static void Start() {
-            ObservableList<Model> sourceList = new ObservableList<Model>();
-            ObservableList<ViewModel> destList = new ObservableList<ViewModel>();
+            var sourceList = new ObservableList<Model>();
+            var destList = new ObservableList<ViewModel>();
 
             //Synchronizes our lists
             ObservableListSynchronizer<Model, ViewModel> obvListSync =
@@ -71,6 +70,7 @@ namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
 
             public Model SourceItem { get; set; }
             public ViewModel() => SourceItem = new Model();
+
             public ViewModel(Model sourceItem) => SourceItem = sourceItem;
 
             public string MyNum { get => SourceItem.MyNum.ToString(); set => SourceItem.MyNum = int.Parse(value); }

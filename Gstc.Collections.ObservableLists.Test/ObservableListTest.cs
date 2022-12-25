@@ -1,4 +1,13 @@
-﻿using System.Collections.Generic;
+﻿#pragma warning disable IDE0079
+#pragma warning disable NUnit2002
+#pragma warning disable NUnit2003
+#pragma warning disable NUnit2004
+#pragma warning disable NUnit2005
+#pragma warning disable NUnit2010
+#pragma warning disable NUnit2019
+#pragma warning disable NUnit2045
+
+using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Gstc.Collections.ObservableLists.Test.Tools;

@@ -33,7 +33,6 @@ public class ObservableListSynchronizerFunc<TSource, TDestination> : ObservableL
 
     public override TSource ConvertDestinationToSource(TDestination item) => _convertDestToSource(item);
 
-
     /// <summary>
     /// The ObservableListSynchronizerFunc is a concrete implementation of ObservableListSynchronizer that
     /// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 

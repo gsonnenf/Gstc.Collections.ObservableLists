@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using Gstc.Collections.ObservableLists.Interface;
 using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
@@ -40,7 +39,6 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
         /// Demo for ObservableIListLocking{}
         /// </summary>
         private ObservableIListLocking<Customer, List<Customer>> CustomerObservableIListLocking { get; set; } = new ObservableIListLocking<Customer, List<Customer>>();
-
 
         /// <summary>
         /// Demonstrates the observable list upcast to the IList{} interface and still generating OnChange events.

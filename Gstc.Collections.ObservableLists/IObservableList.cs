@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Interface;
+namespace Gstc.Collections.ObservableLists;
 
 /// <summary>
 /// An interface containing IList{T}, and also IObservableCollection{T}.
@@ -22,6 +22,6 @@ public interface IObservableList<TItem> :
     new void Clear();
     new void RemoveAt(int index);
     new TItem this[int index] { get; set; }
-    void AddRange(IEnumerable<TItem> item);
+    void AddRange(IEnumerable<TItem> items);
     void Move(int oldIndex, int newIndex);
 }

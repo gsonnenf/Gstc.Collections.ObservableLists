@@ -10,7 +10,7 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// A base class to assist in the down casting of ObservableList{T} to its base interfaces and still provide notification.
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
-public abstract class AbstractListUpcastLocking<TItem> :
+public abstract class AbstractUpcastLockingList<TItem> :
     IList<TItem>,
     ICollection {
 
@@ -89,9 +89,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
 
     protected class ReadLockClass : IDisposable {
         private readonly ReaderWriterLockSlim _rwLock;
-        public ReadLockClass(ReaderWriterLockSlim rwLock) {
-            _rwLock = rwLock;
-        }
+        public ReadLockClass(ReaderWriterLockSlim rwLock) => _rwLock = rwLock;
         public void Dispose() => _rwLock.ExitReadLock();
 
         public ReadLockClass Lock() {
@@ -101,9 +99,7 @@ public abstract class AbstractListUpcastLocking<TItem> :
     }
     protected class WriteLockClass : IDisposable {
         private readonly ReaderWriterLockSlim _rwLock;
-        public WriteLockClass(ReaderWriterLockSlim rwLock) {
-            _rwLock = rwLock;
-        }
+        public WriteLockClass(ReaderWriterLockSlim rwLock) => _rwLock = rwLock;
         public void Dispose() => _rwLock.ExitWriteLock();
 
         public WriteLockClass Lock() {

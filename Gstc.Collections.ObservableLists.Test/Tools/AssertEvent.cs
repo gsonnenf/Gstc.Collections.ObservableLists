@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-
 // ReSharper disable once CheckNamespace
 namespace Gstc.Utility.UnitTest.Event;
 /// <summary>
@@ -120,8 +119,8 @@ public partial class AssertEvent<TEventArgs> : IDisposable
     /// <param name="expectedTimesCalled"></param>
     /// <returns></returns>
     public bool TestAll(int expectedTimesCalled) {
-        TestTimesCalled(expectedTimesCalled);
-        TestAllCallbacksInvoked();
+        _ = TestTimesCalled(expectedTimesCalled);
+        _ = TestAllCallbacksInvoked();
         return ErrorLog.IsSuccess();
     }
     #endregion

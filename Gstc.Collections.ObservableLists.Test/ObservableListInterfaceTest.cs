@@ -1,5 +1,12 @@
-﻿using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.Interface;
+﻿#pragma warning disable IDE0079
+#pragma warning disable NUnit2002
+#pragma warning disable NUnit2003
+#pragma warning disable NUnit2004
+#pragma warning disable NUnit2005
+#pragma warning disable NUnit2019
+#pragma warning disable NUnit2045
+
+using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Gstc.Collections.ObservableLists.Test.Tools;
@@ -40,7 +47,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
         obvList.AddRange(new[] { Item1, Item2, Item3 });
 
         AssertPropertyCollectionTest();
-        Assert.That(obvList.Count, Is.EqualTo(4));
+        Assert.That(obvList, Has.Count.EqualTo(4));
         Assert.That(obvList[0], Is.EqualTo(DefaultTestItem));
         Assert.That(obvList[1], Is.EqualTo(Item1));
         Assert.That(obvList[2], Is.EqualTo(Item2));
@@ -108,7 +115,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
         obvList.Add(Item3);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Removed(1, Item2));
 
-        obvList.Remove(Item2);
+        _ = obvList.Remove(Item2);
 
         AssertPropertyCollectionTest();
         Assert.That(obvList[0], Is.EqualTo(Item1));

@@ -4,6 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>Gstc.Collections.ObservableLists.nuspec</NuspecFile>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>6.0-recommended</AnalysisLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -13,11 +16,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="Gstc.Collections.ObservableLists.nuspec">

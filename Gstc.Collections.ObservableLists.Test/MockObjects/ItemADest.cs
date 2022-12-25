@@ -13,8 +13,7 @@ public class ItemADest {
     public string MyNum { get; set; }
     public string MyStringUpper { get; set; }
     public override bool Equals(object obj) {
-        var temp = obj as ItemADest;
-        if (temp == null) return false;
+        if (obj is not ItemADest temp) return false;
         if (temp.MyNum == MyNum && temp.MyStringUpper == MyStringUpper) return true;
         return false;
     }

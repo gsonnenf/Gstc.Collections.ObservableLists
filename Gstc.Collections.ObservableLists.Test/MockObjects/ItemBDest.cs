@@ -14,11 +14,9 @@ public class ItemBDest : NotifyPropertySyncChanged {
         };
 
     public ItemBSource ItemBSourceItem { get; set; }
-    public ItemBDest() { ItemBSourceItem = new ItemBSource(); }
+    public ItemBDest() => ItemBSourceItem = new ItemBSource();
 
-    public ItemBDest(ItemBSource itemBSourceItem) {
-        ItemBSourceItem = itemBSourceItem;
-    }
+    public ItemBDest(ItemBSource itemBSourceItem) => ItemBSourceItem = itemBSourceItem;
 
     public string MyNum {
         get => ItemBSourceItem.MyNum.ToString();
@@ -29,8 +27,7 @@ public class ItemBDest : NotifyPropertySyncChanged {
         set => ItemBSourceItem.MyStringLower = value.ToLower();
     }
     public override bool Equals(object obj) {
-        var temp = obj as ItemBDest;
-        if (temp == null) return false;
+        if (obj is not ItemBDest temp) return false;
         if (temp.MyNum == MyNum && temp.MyStringUpper == MyStringUpper) return true;
         return false;
     }

@@ -8,5 +8,5 @@ namespace Gstc.Collections.ObservableLists.Test.MockObjects;
 public class TestItem {
     private static Fixture Fixture { get; } = new();
     public string Id { get; set; }
-    public TestItem() { Id = Fixture.Create<string>(); }
+    public TestItem() => Id = Fixture.Create<string>();
 }
