@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿#pragma warning disable CA1707 // Identifiers should not contain underscores
+
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Synchronizer;
@@ -142,6 +144,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
         _sourceObservableList.CollectionChanged += SourceCollectionChanged;
         _destinationObservableList.CollectionChanged += DestinationCollectionChanged;
     }
+
     /// <summary>
     /// Replaces the source collection, then clears and synchronizes the newly added source collection with the destination collection.
     /// </summary>

@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>Gstc.Collections.ObservableLists.nuspec</NuspecFile>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisLevel>6.0-recommended</AnalysisLevel>
   </PropertyGroup>

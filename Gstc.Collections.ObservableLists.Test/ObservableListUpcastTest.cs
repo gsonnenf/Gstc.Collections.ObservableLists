@@ -1,11 +1,4 @@
-﻿#pragma warning disable IDE0079
-#pragma warning disable NUnit2002
-#pragma warning disable NUnit2003
-#pragma warning disable NUnit2004
-#pragma warning disable NUnit2005
-#pragma warning disable NUnit2019
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
@@ -38,56 +31,58 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         InitPropertyCollectionTest(obvList);
         //Add and count Test
         collection.Add(Item1);
-        Assert.AreEqual(1, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(1));
         AssertPropertyCollectionTest();
 
         //Remove Test
         _ = collection.Remove(Item1);
-        Assert.AreEqual(0, collection.Count);
+        Assert.That(collection, Is.Empty);
         AssertPropertyCollectionTest();
 
         //Clear Test
         collection.Add(Item1);
         collection.Add(Item2);
         collection.Add(Item3);
-        Assert.AreEqual(3, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(3));
         AssertPropertyCollectionTest(3, 3, 3);
 
         collection.Clear();
-        Assert.AreEqual(0, collection.Count);
+        Assert.That(collection, Is.Empty);
         AssertPropertyCollectionTest();
 
         //Contains Test
         collection.Add(Item1);
-        Assert.IsTrue(collection.Contains(Item1));
-        Assert.IsFalse(collection.Contains(Item2));
-
-        //SyncRoot Test
-        Assert.IsFalse(collection.IsReadOnly);
+        Assert.Multiple(() => {
+            Assert.That(collection.Contains(Item1), Is.True);
+            Assert.That(collection.Contains(Item2), Is.False);
+            Assert.That(collection.IsReadOnly, Is.False);
+        });
 
         //IEnumerator/ EnumeratorGeneric test
         collection.Clear();
         collection.Add(Item1);
         collection.Add(Item2);
         collection.Add(Item3);
-        Assert.AreEqual(3, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(3));
 
         IEnumerator enumerator = collection.GetEnumerator();
-        Assert.IsNotNull(enumerator);
+        Assert.That(enumerator, Is.Not.Null);
         _ = enumerator.MoveNext();
-        Assert.AreEqual(enumerator.Current, Item1);
+        Assert.That(Item1, Is.EqualTo(enumerator.Current));
 
         IEnumerator<TestItem> enumeratorGeneric = collection.GetEnumerator();
-        Assert.IsNotNull(enumeratorGeneric);
+        Assert.That(enumeratorGeneric, Is.Not.Null);
         _ = enumeratorGeneric.MoveNext();
-        Assert.AreEqual(enumeratorGeneric.Current, Item1);
+        Assert.That(Item1, Is.EqualTo(enumeratorGeneric.Current));
 
         //CopyTo test
-        var array = new TestItem[3];
+        TestItem[] array = new TestItem[3];
         collection.CopyTo(array, 0);
-        Assert.AreEqual(array[0], Item1);
-        Assert.AreEqual(array[1], Item2);
-        Assert.AreEqual(array[2], Item3);
+        Assert.Multiple(() => {
+            Assert.That(Item1, Is.EqualTo(array[0]));
+            Assert.That(Item2, Is.EqualTo(array[1]));
+            Assert.That(Item3, Is.EqualTo(array[2]));
+        });
     }
 
     [Test]
@@ -102,15 +97,16 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
         //Index
         list[0] = Item2;
-        Assert.AreEqual(Item2, list[0]);
-        AssertPropertyCollectionTest(1, 0, 1);
 
-        //IndexOf test
-        Assert.AreEqual(0, list.IndexOf(Item2));
-
-        //Contains test
-        Assert.IsTrue(list.Contains(Item2));
-        Assert.IsFalse(list.Contains(Item1));
+        Assert.Multiple(() => {
+            AssertPropertyCollectionTest(1, 0, 1);
+            Assert.That(list[0], Is.EqualTo(Item2));
+            //IndexOf test
+            Assert.That(list.IndexOf(Item2), Is.EqualTo(0));
+            //Contains test
+            Assert.That(list.Contains(Item2), Is.True);
+            Assert.That(list.Contains(Item1), Is.False);
+        });
     }
     #endregion
 
@@ -125,31 +121,35 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         obvList.Add(Item3);
 
         //Count Test
-        Assert.AreEqual(3, collection.Count);
+        Assert.That(collection, Has.Count.EqualTo(3));
 
         //SyncRoot Test
-        try { Assert.IsNotNull(collection.SyncRoot); }
+        try { Assert.That(collection.SyncRoot, Is.Not.Null); }
         catch (NotSupportedException e) { Console.WriteLine(e.Message); }//Concurrent Collections will not support sync root.
 
         //isSynchronized Test
-        Assert.IsNotNull(collection.IsSynchronized);
+        Assert.That(() => collection.IsSynchronized, Throws.Nothing);
 
         //IEnumerator and CopyTo test
-        var enumerator = collection.GetEnumerator();
-        Assert.IsNotNull(enumerator);
-        foreach (var item in collection) {
-            _ = enumerator.MoveNext();
-            Assert.AreEqual(item, enumerator.Current);
-            Assert.IsNotNull(item);
-        }
+        IEnumerator enumerator = collection.GetEnumerator();
+
+        Assert.Multiple(() => {
+            Assert.That(enumerator, Is.Not.Null);
+            foreach (object item in collection) {
+                _ = enumerator.MoveNext();
+                Assert.That(enumerator.Current, Is.EqualTo(item));
+                Assert.That(item, Is.Not.Null);
+            }
+        });
 
         //Array Test
-        var array = new object[3];
+        object[] array = new object[3];
         collection.CopyTo(array, 0);
-
-        Assert.AreEqual(array[0], Item1);
-        Assert.AreEqual(array[1], Item2);
-        Assert.AreEqual(array[2], Item3);
+        Assert.Multiple(() => {
+            Assert.That(Item1, Is.EqualTo(array[0]));
+            Assert.That(Item2, Is.EqualTo(array[1]));
+            Assert.That(Item3, Is.EqualTo(array[2]));
+        });
     }
 
     public static object[] StaticDataSourceIList => new object[] {
@@ -165,30 +165,33 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         //Add test
         InitPropertyCollectionTest(obvCollection);
         _ = list.Add(Item1);
-        Assert.AreEqual(Item1, list[0]);
-        AssertPropertyCollectionTest();
 
-        //Contains test
-        Assert.IsTrue(list.Contains(Item1));
-        Assert.IsFalse(list.Contains(new TestItem()));
+        Assert.Multiple(() => {
+            Assert.That(list[0], Is.EqualTo(Item1));
+            //Contains test
+            Assert.That(list.Contains(Item1), Is.True);
+            Assert.That(list.Contains(new TestItem()), Is.False);
+            AssertPropertyCollectionTest();
+        });
 
         //Index Test
         InitPropertyCollectionTest(obvCollection);
         list[0] = Item2;
-        Assert.AreEqual(Item2, list[0]);
-        AssertPropertyCollectionTest(1, 0, 1);
-
-        //Index of test
-        Assert.AreEqual(0, list.IndexOf(Item2));
+        Assert.Multiple(() => {
+            Assert.That(list[0], Is.EqualTo(Item2));
+            //Index of test
+            Assert.That(list.IndexOf(Item2), Is.EqualTo(0));
+            AssertPropertyCollectionTest(1, 0, 1);
+        });
 
         //Insert(,)
         list.Insert(0, Item3);
-        Assert.AreEqual(Item3, list[0]);
+        Assert.That(list[0], Is.EqualTo(Item3));
         AssertPropertyCollectionTest();
 
         //RemoveAt()
         list.RemoveAt(0);
-        Assert.AreEqual(Item2, list[0]);
+        Assert.That(list[0], Is.EqualTo(Item2));
         AssertPropertyCollectionTest();
     }
     #endregion

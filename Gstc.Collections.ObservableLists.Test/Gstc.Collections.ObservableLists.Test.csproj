@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,6 +27,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gstc.Collections.ObservableLists\Gstc.Collections.ObservableLists.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\Laptop\source\repos\Gstc.Collections.ObservableDictionary\Gstc.Collections.ObservableLists\Gstc.Collections.ObservableLists.Test\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\Laptop\source\repos\Gstc.Collections.ObservableDictionary\Gstc.Collections.ObservableLists\Gstc.Collections.ObservableLists.Test\.editorconfig" />
   </ItemGroup>
 
 </Project>

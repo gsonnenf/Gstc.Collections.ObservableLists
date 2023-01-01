@@ -1,10 +1,4 @@
-﻿#pragma warning disable IDE0079
-#pragma warning disable NUnit2002
-#pragma warning disable NUnit2003
-#pragma warning disable NUnit2004
-#pragma warning disable NUnit2005
-#pragma warning disable NUnit2019
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Synchronizer;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
@@ -31,11 +25,13 @@ public class ObservableListSynchronizerTest {
             DestObvListA
         );
 
-        Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
-        for (var index = 0; index < 3; index++) {
-            Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);
-            Assert.AreEqual(SourceObvListA[index].MyStringLower.ToUpper(), DestObvListA[index].MyStringUpper);
-        }
+        Assert.Multiple(() => {
+            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
+            for (int index = 0; index < 3; index++) {
+                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
+                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+            }
+        });
     }
 
     [Description("Creates a sync and tests assignment copying from source item to dest item.")]
@@ -60,12 +56,13 @@ public class ObservableListSynchronizerTest {
             ObvListSyncA.DestinationObservableList = DestObvListA;
             ObvListSyncA.SourceObservableList = SourceObvListA;
         }
-
-        Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
-        for (var index = 0; index < 3; index++) {
-            Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);
-            Assert.AreEqual(SourceObvListA[index].MyStringLower.ToUpper(), DestObvListA[index].MyStringUpper);
-        }
+        Assert.Multiple(() => {
+            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
+            for (int index = 0; index < 3; index++) {
+                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
+                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+            }
+        });
     }
 
     [Description("Creates a sync and tests all combinations of assignment of lists.")]
@@ -77,13 +74,12 @@ public class ObservableListSynchronizerTest {
     [TestCase(2, 1, "Dest")]
     [TestCase(3, 0, "Source")]
     [TestCase(3, 1, "Clear")]
-
     public void TestMethod_TestAfterInitializeReplace(int firstCommand, int secondCommand, string result) {
         SourceObvListA = ItemASource.GetSampleSourceItemAList();
         DestObvListA = ItemADest.GetSampleDestItemAList();
 
-        var sourceItemCheck = SourceObvListA[0].MyStringLower;
-        var destItemCheck = DestObvListA[0].MyStringUpper;
+        string sourceItemCheck = SourceObvListA[0].MyStringLower;
+        string destItemCheck = DestObvListA[0].MyStringUpper;
 
         ObvListSyncA = new ObservableListSynchronizerFunc<ItemASource, ItemADest>(
             (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
@@ -103,21 +99,25 @@ public class ObservableListSynchronizerTest {
 
         //Both lists are cleared
         if (result == "Clear") {
-            Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
-            Assert.AreEqual(0, SourceObvListA.Count);
+            Assert.Multiple(() => {
+                Assert.That(DestObvListA, Is.Empty);
+                Assert.That(SourceObvListA, Is.Empty);
+            });
             return;
         }
 
         //Test that lists are synced
-        Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
-        for (var index = 0; index < 3; index++) {
-            Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);
-            Assert.AreEqual(SourceObvListA[index].MyStringLower.ToUpper(), DestObvListA[index].MyStringUpper);
-            Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
-        }
+        Assert.Multiple(() => {
+            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
+            for (int index = 0; index < 3; index++) {
+                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
+                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+                Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
+            }
 
-        if (result == "Source") Assert.AreEqual(sourceItemCheck, SourceObvListA[0].MyStringLower); // Source list is preserved
-        if (result == "Dest") Assert.AreEqual(destItemCheck, DestObvListA[0].MyStringUpper); // Dest list is preserved
+            if (result == "Source") Assert.That(SourceObvListA[0].MyStringLower, Is.EqualTo(sourceItemCheck)); // Source list is preserved
+            if (result == "Dest") Assert.That(DestObvListA[0].MyStringUpper, Is.EqualTo(destItemCheck)); // Dest list is preserved
+        });
     }
 
     [Test, Description("Tests synchronization when adding and removing items for a two way sync.")]
@@ -132,30 +132,32 @@ public class ObservableListSynchronizerTest {
             DestObvListA
         );
 
-        var item1 = new ItemASource { MyNum = 10, MyStringLower = "x" };
-        var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };
+        ItemASource item1 = new() { MyNum = 10, MyStringLower = "x" };
+        ItemASource item2 = new() { MyNum = 15, MyStringLower = "y" };
 
         SourceObvListA.Add(item1);
         SourceObvListA.Add(item2);
 
-        var item3 = new ItemADest { MyNum = "1000", MyStringUpper = "A" };
-        var item4 = new ItemADest { MyNum = "2000", MyStringUpper = "B" };
+        ItemADest item3 = new() { MyNum = "1000", MyStringUpper = "A" };
+        ItemADest item4 = new() { MyNum = "2000", MyStringUpper = "B" };
         DestObvListA.Add(item3);
         DestObvListA.Add(item4);
 
-        Assert.AreEqual(SourceObvListA.Count, DestObvListA.Count);
-        Assert.AreEqual(4, SourceObvListA.Count);
+        Assert.Multiple(() => {
+            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
+            Assert.That(SourceObvListA, Has.Count.EqualTo(4));
 
-        for (var index = 0; index < SourceObvListA.Count; index++) {
-            Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);
-            Assert.AreEqual(SourceObvListA[index].MyStringLower.ToUpper(), DestObvListA[index].MyStringUpper);
-            Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
-        }
+            for (int index = 0; index < SourceObvListA.Count; index++) {
+                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
+                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+                Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
+            }
 
-        Assert.AreEqual(SourceObvListA[0], item1);
-        Assert.AreEqual(SourceObvListA[1], item2);
-        Assert.AreEqual(DestObvListA[2], item3);
-        Assert.AreEqual(DestObvListA[3], item4);
+            Assert.That(item1, Is.EqualTo(SourceObvListA[0]));
+            Assert.That(item2, Is.EqualTo(SourceObvListA[1]));
+            Assert.That(item3, Is.EqualTo(DestObvListA[2]));
+            Assert.That(item4, Is.EqualTo(DestObvListA[3]));
+        });
     }
 
     [Test, Description("Tests synchronization when adding and removing items for a one way sync.")]
@@ -172,33 +174,34 @@ public class ObservableListSynchronizerTest {
             IsSyncDestToSourceCollection = false
         };
 
-        var item1 = new ItemASource { MyNum = 10, MyStringLower = "x" };
-        var item2 = new ItemASource { MyNum = 15, MyStringLower = "y" };
-        var item3 = new ItemADest { MyNum = "1000", MyStringUpper = "A" };
-        var item4 = new ItemADest { MyNum = "2000", MyStringUpper = "B" };
+        ItemASource item1 = new() { MyNum = 10, MyStringLower = "x" };
+        ItemASource item2 = new() { MyNum = 15, MyStringLower = "y" };
+        ItemADest item3 = new() { MyNum = "1000", MyStringUpper = "A" };
+        ItemADest item4 = new() { MyNum = "2000", MyStringUpper = "B" };
 
         SourceObvListA.Add(item1);
         SourceObvListA.Add(item2);
-
         DestObvListA.Add(item3);
         DestObvListA.Add(item4);
 
-        Assert.AreEqual(2, SourceObvListA.Count);
-        Assert.AreEqual(4, DestObvListA.Count);
+        Assert.Multiple(() => {
+            Assert.That(SourceObvListA, Has.Count.EqualTo(2));
+            Assert.That(DestObvListA, Has.Count.EqualTo(4));
 
-        for (var index = 0; index < SourceObvListA.Count; index++) {
-            Assert.AreEqual(SourceObvListA[index].MyNum.ToString(), DestObvListA[index].MyNum);
-            Assert.AreEqual(SourceObvListA[index].MyStringLower.ToUpper(), DestObvListA[index].MyStringUpper);
-            Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
-        }
+            for (int index = 0; index < SourceObvListA.Count; index++) {
+                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
+                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+                Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
+            }
 
-        Assert.AreEqual(SourceObvListA[0], item1);
-        Assert.AreEqual(SourceObvListA[1], item2);
+            Assert.That(item1, Is.EqualTo(SourceObvListA[0]));
+            Assert.That(item2, Is.EqualTo(SourceObvListA[1]));
 
-        Assert.AreEqual(DestObvListA[0], ObvListSyncA.ConvertSourceToDestination(item1));
-        Assert.AreEqual(DestObvListA[1], ObvListSyncA.ConvertSourceToDestination(item2));
+            Assert.That(ObvListSyncA.ConvertSourceToDestination(item1), Is.EqualTo(DestObvListA[0]));
+            Assert.That(ObvListSyncA.ConvertSourceToDestination(item2), Is.EqualTo(DestObvListA[1]));
 
-        Assert.AreEqual(DestObvListA[2], item3);
-        Assert.AreEqual(DestObvListA[3], item4);
+            Assert.That(item3, Is.EqualTo(DestObvListA[2]));
+            Assert.That(item4, Is.EqualTo(DestObvListA[3]));
+        });
     }
 }

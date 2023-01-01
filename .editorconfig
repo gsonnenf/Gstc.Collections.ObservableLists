@@ -3,7 +3,6 @@
 # You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
 [*.cs]
 
-
 #Core editorconfig formatting - indentation
 
 #use soft tabs (spaces) for indentation
@@ -252,3 +251,4 @@ dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_event = false:suggestion
+dotnet_diagnostic.CA1823.severity = suggestion

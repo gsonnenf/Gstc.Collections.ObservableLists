@@ -10,6 +10,7 @@ namespace Gstc.Collections.ObservableLists;
 /// Author: Greg Sonnenfeld
 /// Copyright 2019
 /// </summary>
+#pragma warning disable CA1010 // Generic interface should also be implemented
 public interface IObservableCollection :
     ICollection,
     INotifyCollectionChanged,

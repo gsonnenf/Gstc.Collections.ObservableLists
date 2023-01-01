@@ -1,4 +1,5 @@
-﻿using System;
+﻿// ReSharper disable InconsistentNaming
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -7,72 +8,11 @@ using Gstc.Collections.ObservableLists.Test.MockObjects;
 using Gstc.Collections.ObservableLists.Test.Tools;
 using Gstc.Utility.UnitTest.Event;
 using NUnit.Framework;
-// ReSharper disable InconsistentNaming
 
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
 public class ObservableListTestEvents : CollectionTestBase<TestItem> {
-
-    public readonly static TestItem StaticTestItem = new();
-    public static List<EventTestSet> StaticOperationListDataSource => new() {
-        new EventTestSet {
-            Name = "Add",
-            EventOrderList = EventTestSet.EventOrderList_Add,
-            ArrangeAction = (_) => { },
-            ActAction = (obvList) => obvList.Add(StaticTestItem),
-            IsCountChanged = true
-        },
-        new EventTestSet {
-            Name = "AddRange",
-            EventOrderList = EventTestSet.EventOrderList_AddRange,
-            ArrangeAction = (_) => { },
-            ActAction = (obvList) => obvList.AddRange(new[] {StaticTestItem, StaticTestItem, StaticTestItem}),
-            IsCountChanged = true
-        },
-        new EventTestSet {
-            Name = "Clear",
-            EventOrderList = EventTestSet.EventOrderList_Clear,
-            ArrangeAction = (_) => { },
-            ActAction = (obvList) => obvList.Clear(),
-            IsCountChanged = true
-        },
-        new EventTestSet {
-            Name = "Index",
-            EventOrderList = EventTestSet.EventOrderList_Index,
-            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
-            ActAction = (obvList) => obvList[0] = StaticTestItem,
-            IsCountChanged = false
-        },
-        new EventTestSet {
-            Name = "Insert",
-            EventOrderList = EventTestSet.EventOrderList_Insert,
-            ArrangeAction = (_) => { },
-            ActAction = (obvList) => obvList.Insert(0, StaticTestItem),
-            IsCountChanged = true
-        },
-        new EventTestSet {
-            Name = "Move",
-            EventOrderList = EventTestSet.EventOrderList_Move,
-            ArrangeAction = (obvList) => obvList.AddRange(new [] {StaticTestItem,StaticTestItem}) ,
-            ActAction = (obvList) => obvList.Move(1,0),
-            IsCountChanged = false
-        },
-        new EventTestSet {
-            Name = "Remove",
-            EventOrderList = EventTestSet.EventOrderList_Remove,
-            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
-            ActAction = (obvList) => obvList.Remove(StaticTestItem),
-            IsCountChanged = true
-        },
-        new EventTestSet {
-            Name = "RemoveAt",
-            EventOrderList = EventTestSet.EventOrderList_RemoveAt,
-            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
-            ActAction = (obvList) => obvList.RemoveAt(0),
-            IsCountChanged = true
-        }
-    };
 
     public readonly static object[] ObservableListDataSource = {
         () => new ObservableList<TestItem>(),
@@ -80,10 +20,10 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
         () => new ObservableIListLocking<TestItem,List<TestItem>>()
     };
 
-    public readonly AssertEventArgs<TestItem> TestArgs = new();
+    public static List<EventTestSet> StaticOperationListDataSource => EventTestSet.GetEventTestSets();
 
     /// <summary>
-    /// The cardinality of these tests are high, so loops and value sources are used to auto-generate tests.
+    /// The combinations of these tests are high, so loops and value sources are used to auto-generate tests.
     /// This test runs over different methods called by lists, the different events in the observable lists,
     /// and over the included variations of observable list.
     /// </summary>
@@ -95,27 +35,27 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
         [ValueSource(nameof(ObservableListDataSource))] Func<IObservableList<TestItem>> obvListGenerator,
         [ValueSource(nameof(StaticOperationListDataSource))] EventTestSet testSet) {
 
-        var obvList = obvListGenerator();
+        IObservableList<TestItem> obvList = obvListGenerator();
         Console.WriteLine("Name: " + testSet.Name);
         Console.WriteLine("List: " + obvList.GetType());
 
         testSet.ArrangeAction(obvList);
 
-        var testEventList = new List<object>();
-        var callOrder = 0;
-        var index = 0;
+        List<object> testEventList = new();
+        int callOrder = 0;
+        int index = 0;
 
-        foreach (var eventName in testSet.EventOrderList) {
-            var staticIndex = index++;
+        foreach (string eventName in testSet.EventOrderList) {
+            int staticIndex = index++;
             if (eventName != nameof(IObservableList<TestItem>.PropertyChanged)) {
-                var testEvent = new AssertEvent<NotifyCollectionChangedEventArgs>(obvList, eventName);
+                AssertEvent<NotifyCollectionChangedEventArgs> testEvent = new(obvList, eventName);
                 testEventList.Add(testEvent);
                 testEvent.AddCallback((_, _) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName));
                 testEvent.AddCallback((_, _) => callOrder = (callOrder == staticIndex) ? callOrder + 1
                     : throw new Exception(testSet.Name + ": Call order of " + eventName + " was not correct. " + staticIndex + " was expected, but " + callOrder + " was received."));
             }
             else {
-                var testEvent = new AssertEvent<PropertyChangedEventArgs>(obvList, eventName);
+                AssertEvent<PropertyChangedEventArgs> testEvent = new(obvList, eventName);
                 testEventList.Add(testEvent);
                 testEvent.AddCallback((_, args) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName + " : " + args.PropertyName));
                 testEvent.AddCallback((_, args) => {
@@ -129,7 +69,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
 
         testSet.ActAction(obvList);
 
-        foreach (var item in testEventList) {
+        foreach (object item in testEventList) {
             if (item is AssertEvent<PropertyChangedEventArgs> testEventProperty) testEventProperty.AssertAll((testSet.IsCountChanged) ? 2 : 1);
             else if (item is AssertEvent<CollectionChangeEventArgs> testEventCollection) testEventCollection.AssertAll(1);
         }
@@ -142,7 +82,70 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
         public Action<IObservableList<TestItem>> ActAction;
         public bool IsCountChanged;
 
-        #region Orders of Events for differnet list methods
+        #region Predefined tests for each list operation.
+        public static TestItem StaticTestItem { get; } = new();
+
+        public static List<EventTestSet> GetEventTestSets() => new() {
+        new EventTestSet {
+            Name = "Add",
+            EventOrderList = EventOrderList_Add,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => obvList.Add(StaticTestItem),
+            IsCountChanged = true
+        },
+        new EventTestSet {
+            Name = "AddRange",
+            EventOrderList = EventOrderList_AddRange,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => obvList.AddRange(new[] {StaticTestItem, StaticTestItem, StaticTestItem}),
+            IsCountChanged = true
+        },
+        new EventTestSet {
+            Name = "Clear",
+            EventOrderList = EventOrderList_Clear,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => obvList.Clear(),
+            IsCountChanged = true
+        },
+        new EventTestSet {
+            Name = "Index",
+            EventOrderList = EventOrderList_Index,
+            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
+            ActAction = (obvList) => obvList[0] = StaticTestItem,
+            IsCountChanged = false
+        },
+        new EventTestSet {
+            Name = "Insert",
+            EventOrderList = EventOrderList_Insert,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => obvList.Insert(0, StaticTestItem),
+            IsCountChanged = true
+        },
+        new EventTestSet {
+            Name = "Move",
+            EventOrderList = EventOrderList_Move,
+            ArrangeAction = (obvList) => obvList.AddRange(new [] {StaticTestItem,StaticTestItem}) ,
+            ActAction = (obvList) => obvList.Move(1,0),
+            IsCountChanged = false
+        },
+        new EventTestSet {
+            Name = "Remove",
+            EventOrderList = EventOrderList_Remove,
+            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
+            ActAction = (obvList) => obvList.Remove(StaticTestItem),
+            IsCountChanged = true
+        },
+        new EventTestSet {
+            Name = "RemoveAt",
+            EventOrderList = EventOrderList_RemoveAt,
+            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
+            ActAction = (obvList) => obvList.RemoveAt(0),
+            IsCountChanged = true
+        }
+    };
+        #endregion
+
+        #region Orders of Events for different list methods
 
         //TODO: find good way to test obvList.List
         public static List<string> EventOrderList_Add => new() {

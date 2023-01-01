@@ -1,11 +1,4 @@
-﻿#pragma warning disable IDE0079
-#pragma warning disable NUnit2002
-#pragma warning disable NUnit2003
-#pragma warning disable NUnit2004
-#pragma warning disable NUnit2005
-#pragma warning disable NUnit2019
-#pragma warning disable NUnit2045
-
+﻿// ReSharper disable RedundantArgumentDefaultValue
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
@@ -28,14 +21,15 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
     public void TestMethod_Add(IObservableList<TestItem> obvList) {
-
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Add(0, Item1));
 
         obvList.Add(Item1);
 
-        AssertPropertyCollectionTest();
-        Assert.That(obvList[0], Is.EqualTo(Item1));
-        Assert.That(obvList, Has.Count.EqualTo(1));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(1));
+            Assert.That(obvList[0], Is.EqualTo(Item1));
+            AssertPropertyCollectionTest();
+        });
     }
 
     [TestCaseSource(nameof(StaticDataSource))]
@@ -46,12 +40,14 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
         obvList.AddRange(new[] { Item1, Item2, Item3 });
 
-        AssertPropertyCollectionTest();
-        Assert.That(obvList, Has.Count.EqualTo(4));
-        Assert.That(obvList[0], Is.EqualTo(DefaultTestItem));
-        Assert.That(obvList[1], Is.EqualTo(Item1));
-        Assert.That(obvList[2], Is.EqualTo(Item2));
-        Assert.That(obvList[3], Is.EqualTo(Item3));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(4));
+            Assert.That(obvList[0], Is.EqualTo(DefaultTestItem));
+            Assert.That(obvList[1], Is.EqualTo(Item1));
+            Assert.That(obvList[2], Is.EqualTo(Item2));
+            Assert.That(obvList[3], Is.EqualTo(Item3));
+            AssertPropertyCollectionTest();
+        });
     }
 
     [Test, Description("")]
@@ -62,8 +58,10 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
         obvList.Clear();
 
-        AssertPropertyCollectionTest();
-        Assert.That(obvList, Has.Count.EqualTo(0));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(0));
+            AssertPropertyCollectionTest();
+        });
     }
 
     [Test, Description("")]
@@ -75,10 +73,12 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
         obvList[1] = Item3;
 
-        AssertPropertyCollectionTest(1, 0, 1);
-        Assert.That(obvList[1], Is.EqualTo(Item3));
-        Assert.That(obvList.IndexOf(Item3), Is.EqualTo(1)); //IndexOf test
-        Assert.That(obvList, Has.Count.EqualTo(2));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(2));
+            Assert.That(obvList[1], Is.EqualTo(Item3));
+            Assert.That(obvList.IndexOf(Item3), Is.EqualTo(1)); //IndexOf test
+            AssertPropertyCollectionTest(1, 0, 1);
+        });
     }
 
     [Test, Description("")]
@@ -86,14 +86,15 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
     public void TestMethod_Insert(IObservableList<TestItem> obvList) {
         obvList.Add(Item1);
         obvList.Add(Item3);
-
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Add(1, Item2));
 
         obvList.Insert(1, Item2);
 
-        AssertPropertyCollectionTest();
-        Assert.That(obvList[1], Is.EqualTo(Item2));
-        Assert.That(obvList, Has.Count.EqualTo(3));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(3));
+            Assert.That(obvList[1], Is.EqualTo(Item2));
+            AssertPropertyCollectionTest();
+        });
     }
 
     [Test, Description("Tests that move generated the appropriate events.")]
@@ -101,15 +102,18 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
     public void TestMethod_Move(IObservableList<TestItem> obvList) {
         obvList.AddRange(new[] { Item1, Item2, Item3 });
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
+
         obvList.Move(1, 2);
-        AssertPropertyCollectionTest(1, 0, 1);
-        Assert.That(obvList[2], Is.EqualTo(Item2));
+
+        Assert.Multiple(() => {
+            Assert.That(obvList[2], Is.EqualTo(Item2));
+            AssertPropertyCollectionTest(1, 0, 1);
+        });
     }
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
     public void TestMethod_Remove(IObservableList<TestItem> obvList) {
-
         obvList.Add(Item1);
         obvList.Add(Item2);
         obvList.Add(Item3);
@@ -117,10 +121,12 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
         _ = obvList.Remove(Item2);
 
-        AssertPropertyCollectionTest();
-        Assert.That(obvList[0], Is.EqualTo(Item1));
-        Assert.That(obvList[1], Is.EqualTo(Item3));
-        Assert.That(obvList, Has.Count.EqualTo(2));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(2));
+            Assert.That(obvList[0], Is.EqualTo(Item1));
+            Assert.That(obvList[1], Is.EqualTo(Item3));
+            AssertPropertyCollectionTest();
+        });
     }
 
     [Test, Description("")]
@@ -133,10 +139,11 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
         obvList.RemoveAt(1);
 
-        AssertPropertyCollectionTest();
-        Assert.That(obvList[0], Is.EqualTo(Item1));
-        Assert.That(obvList[1], Is.EqualTo(Item3));
-        Assert.That(obvList, Has.Count.EqualTo(2));
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(2));
+            Assert.That(obvList[0], Is.EqualTo(Item1));
+            Assert.That(obvList[1], Is.EqualTo(Item3));
+            AssertPropertyCollectionTest();
+        });
     }
-
 }
