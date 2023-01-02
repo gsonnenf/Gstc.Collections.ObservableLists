@@ -3,80 +3,87 @@ using Gstc.Collections.ObservableLists.Synchronizer;
 using NotifyPropertySyncChanged = Gstc.Collections.ObservableLists.Examples.ObservableListSync.NotifyPropertySyncChanged;
 
 namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
-    public class GithubExample2 {
+
+    public class GithubExampleListSynchronizer {
         public static void Start() {
             var sourceList = new ObservableList<Model>();
             var destList = new ObservableList<ViewModel>();
 
-            //Synchronizes our lists
+            // This class synchronization between the sourceList and the destList, in this case a model and a view model.
+            // The convertSourceToDest/convertDestToSource define a mapping between the two lists.
+            // An abstract class version also exists wherein the mapping is defined by implementing the method interface.
             ObservableListSynchronizer<Model, ViewModel> obvListSync =
                        new ObservableListSynchronizerFunc<Model, ViewModel>(
-                           (sourceItem) => new ViewModel(sourceItem),
-                           (destItem) => destItem.SourceItem,
-                           sourceList,
-                           destList
+                           convertSourceToDest: (sourceItem) => new ViewModel(sourceItem),
+                           convertDestToSource: (destItem) => destItem.SourceItem,
+                           sourceObvList: sourceList,
+                           destObvList: destList
                        );
 
-            //That's it for setup.
+            sourceList.CollectionChanged += (sender, args) => Console.WriteLine("Source Collection Changed.");
+            destList.CollectionChanged += (sender, args) => Console.WriteLine("Source Collection Changed.");
 
-            //Example functionality
-            sourceList.Add(new Model { MyNum = 10, MyStringLower = "x" });
-            destList.Add(new ViewModel { MyNum = "1000", MyStringUpper = "A" });
+            //Adding items to source, syncing to destination
+            sourceList.Add(new Model { MyNumber = 10, MyStringLower = "item number 0" });
 
-            Console.WriteLine(sourceList.Count);
-            Console.WriteLine(destList.Count);
+            Console.WriteLine(sourceList[0].MyStringLower);  //Output: item number 0
+            Console.WriteLine(destList[0].MyStringUpper);    //Output: ITEM NUMBER 0
+            Console.WriteLine(sourceList[0].MyNumber);       //Output: 10
+            Console.WriteLine(destList[0].MyNumberString);   //Output: Your number is 10
 
-            //OUTPUT
-            // 2
-            // 2
+            //Adding items to destination, syncing to source
+            destList.Add(new ViewModel { MyStringUpper = "ITEM NUMBER 1" });
 
-            sourceList[0].MyNum = -1;
+            Console.WriteLine(sourceList[1].MyStringLower);  //Output: item number 1
+            Console.WriteLine(destList[1].MyStringUpper);    //Output: ITEM NUMBER 1
+            Console.WriteLine(sourceList[1].MyNumber);       //Output: 0
+            Console.WriteLine(destList[1].MyNumberString);   //Output: Your number is 0
 
-            Console.WriteLine(sourceList[0].MyNum); //-1
-            Console.WriteLine(destList[0].MyNum); // -1
+            //changing source, propagating event to destination
+            sourceList[0].MyNumber = -1;
 
-            //OUTPUT
-            // -1
-            // -1
-
-            destList[1].MyStringUpper = "TEST";
-
-            Console.WriteLine(sourceList[1].MyStringLower);
-            Console.WriteLine(destList[1].MyStringUpper);
-
-            //OUTPUT
-            // test
-            // TEST
-
-            sourceList[0].PropertyChanged += (sender, args) => Console.WriteLine("Source Event");
-            destList[0].PropertyChanged += (sender, args) => Console.WriteLine("Dest Event");
-
-            destList[0].MyNum = "100000";
-
-            //OUTPUT
-            //Dest Event
-            //Source Event
+            Console.WriteLine(sourceList[0].MyStringLower);  //Output: item number 0
+            Console.WriteLine(destList[0].MyStringUpper);    //Output: ITEM NUMBER 0
+            Console.WriteLine(sourceList[0].MyNumber);       //Output: -1
+            Console.WriteLine(destList[0].MyNumberString);   //Output: Your number is -1
 
         }
+
+        //This class defines a mapping from a model to a view model. It also implements on property changed.
         public class Model : NotifyPropertySyncChanged {
             private int _myNum;
             private string _myStringLower;
 
-            public int MyNum { get => _myNum; set { _myNum = value; OnPropertyChanged(null); } }
-            public string MyStringLower { get => _myStringLower; set { _myStringLower = value; OnPropertyChanged(null); } }
+            public int MyNumber {
+                get => _myNum;
+                set {
+                    _myNum = Math.Abs(value);
+                    OnPropertyChanged(nameof(MyNumber));
+                }
+            }
+            public string MyStringLower {
+                get => _myStringLower;
+                set {
+                    _myStringLower = value;
+                    OnPropertyChanged(nameof(MyStringLower));
+                }
+            }
         }
 
+        /// <summary>
+        /// This class defines a mapping from a viewmodel back to a model. It does not use onProperty changed as it writes 
+        /// directly back to the model.
+        /// </summary>
         public class ViewModel : NotifyPropertySyncChanged {
-
             public Model SourceItem { get; set; }
             public ViewModel() => SourceItem = new Model();
-
             public ViewModel(Model sourceItem) => SourceItem = sourceItem;
-
-            public string MyNum { get => SourceItem.MyNum.ToString(); set => SourceItem.MyNum = int.Parse(value); }
-            public string MyStringUpper { get => SourceItem.MyStringLower.ToUpper(); set => SourceItem.MyStringLower = value.ToLower(); }
+            public string MyNumberString => "Your number is: " + SourceItem.MyNumber;
+            public string MyStringUpper {
+                get => SourceItem.MyStringLower.ToUpper();
+                set => SourceItem.MyStringLower = value.ToLower();
+            }
 
         }
-
     }
 }

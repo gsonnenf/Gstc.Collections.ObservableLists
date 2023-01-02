@@ -1,6 +1,4 @@
-﻿#pragma warning disable CA1707 // Identifiers should not contain underscores
-
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Synchronizer;
@@ -74,14 +72,14 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     public bool IsSyncDestToSourceCollection { get; set; } = true;
 
     /// <summary>
-    /// If true, an PropertyChanged event triggered on an source item will also trigger a PropertyChanged event on the correlated destination item.
+    /// If true, a PropertyChanged event triggered on an source item will also trigger a PropertyChanged event on the correlated destination item.
     /// This is primarily used to ensure change notifications are triggered for destination items that are mapped to the source item instead of copied.
     /// True by default.
     /// </summary>
     public bool IsPropertyNotifySourceToDest { get; private set; }
 
     /// <summary>
-    /// If true, an PropertyChanged event triggered on an destination item will also trigger a PropertyChanged event on the correlated source item.
+    /// If true, a PropertyChanged event triggered on an destination item will also trigger a PropertyChanged event on the correlated source item.
     /// This is primarily used to ensure change notifications are triggered for source items that are mapped to the destination item instead of copied.
     /// This is not very common. False by default.
     /// </summary>
@@ -110,7 +108,14 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     /// <summary>
     /// Creates a new ObservableListSynchronizer with the provided sourceCollection and destination collection.
     /// </summary>
-    protected ObservableListSynchronizer(ObservableList<TSource> sourceCollection, ObservableList<TDestination> destCollection, bool propertyNotifySourceToDest = true, bool propertyNotifyDestToSource = false) {
+    protected ObservableListSynchronizer(
+        ObservableList<TSource> sourceCollection,
+        ObservableList<TDestination> destCollection,
+        bool propertyNotifySourceToDest = true,
+        bool propertyNotifyDestToSource = false,
+        bool isPropertyNotifySourceToDest = false,
+        bool IsPropertyNotifyDestToSource = false
+        ) {
         IsPropertyNotifySourceToDest = propertyNotifySourceToDest;
         IsPropertyNotifySourceToDest = propertyNotifyDestToSource;
         _destinationObservableList = destCollection;
@@ -176,10 +181,18 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
     /// <param name="destObvList"></param>
     public void ReplaceDestination_SyncToSource(ObservableList<TDestination> destObvList) {
         if (_destinationObservableList != null) _destinationObservableList.CollectionChanged -= DestinationCollectionChanged;
-        _destinationObservableList = destObvList;
-        if (_destinationObservableList == null) { _sourceObservableList?.Clear(); return; }
 
-        if (_sourceObservableList == null) { _destinationObservableList.CollectionChanged += DestinationCollectionChanged; return; }
+        _destinationObservableList = destObvList;
+
+        if (_destinationObservableList == null) {
+            _sourceObservableList?.Clear();
+            return;
+        }
+
+        if (_sourceObservableList == null) {
+            _destinationObservableList.CollectionChanged += DestinationCollectionChanged;
+            return;
+        }
 
         _sourceObservableList.CollectionChanged -= SourceCollectionChanged;
         _sourceObservableList.Clear();
@@ -222,7 +235,7 @@ public abstract class ObservableListSynchronizer<TSource, TDestination> {
 
     private void CreatePropertySync(TSource sourceItem, TDestination destItem) {
 
-        //bug: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
+        //todo - bug: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
         if (!(sourceItem is INotifyPropertyChanged && destItem is INotifyPropertyChanged)) return;
         if (!(sourceItem is IPropertyChangedSyncHook || destItem is IPropertyChangedSyncHook)) return;
 

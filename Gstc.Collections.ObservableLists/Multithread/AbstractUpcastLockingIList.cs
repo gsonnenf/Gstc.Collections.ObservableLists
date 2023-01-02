@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CA1710 // Identifiers should have correct suffix
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// </summary>
 /// <typeparam name="TItem">The type of item used in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
-///
+/// 
 public class ObservableIListLocking<TItem, TList> :
     AbstractUpcastLockingIList<TItem>,
     IObservableList<TItem>
@@ -85,7 +86,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// A flag that will call the reset action instead of add action. This is primarily for
     /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
     /// </summary>
-    public bool IsResetForAddRange { get; set; } = false;
+    public bool IsResetForAddRange { get; set; }
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
     /// </summary>

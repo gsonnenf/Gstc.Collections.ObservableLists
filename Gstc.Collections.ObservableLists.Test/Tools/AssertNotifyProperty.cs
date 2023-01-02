@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,7 +53,7 @@ public class AssertNotifyProperty : IDisposable {
     /// <exception cref="ArgumentNullException"></exception>
     public void AddCallback(string propertyName, int invokeOrder, string description, Action callback) {
         if (callback == null) throw new ArgumentNullException(nameof(callback), "A callback must be provided. If you only wish to assert call count, addCallback is not necessary.");
-        var pair = PropertyDictionary.GetOrAdd(propertyName, new CountAndCallbackList(propertyName));
+        CountAndCallbackList pair = PropertyDictionary.GetOrAdd(propertyName, new CountAndCallbackList(propertyName));
         pair.CallbackList.Add(new AssertCallback(propertyName, invokeOrder, description, callback));
     }
     //Overloads
@@ -91,7 +92,7 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="propertyName"></param>
     /// <returns></returns>
     public bool TestPropertyCalled(int expectedTimesCalled, string propertyName) {
-        var timesCalled = TimesPropertyCalled(propertyName);
+        int timesCalled = TimesPropertyCalled(propertyName);
         if (timesCalled != expectedTimesCalled) ErrorLog += "PropertyChanged:" + propertyName +
                                                             " was called " + timesCalled +
                                                             " times, but " + expectedTimesCalled + " calls were expected.";
@@ -105,11 +106,11 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="propertyName"></param>
     /// <returns></returns>
     public bool TestCallbacksInvoked(string propertyName) {
-        if (!PropertyDictionary.TryGetValue(propertyName, out var countAndCallbackList)) {
+        if (!PropertyDictionary.TryGetValue(propertyName, out CountAndCallbackList countAndCallbackList)) {
             ErrorLog += "Callback for Property: " + propertyName + " does not exist.\n ";
             return ErrorLog.IsSuccess();
         }
-        foreach (var item in countAndCallbackList.CallbackList) {
+        foreach (AssertCallback item in countAndCallbackList.CallbackList) {
             if (item.IsInvoked == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
                                                      "\nProperty Name: " + propertyName +
                                                      "\nCallback Description:" + item.Description +
@@ -151,8 +152,8 @@ public class AssertNotifyProperty : IDisposable {
     /// </summary>
     /// <returns></returns>
     public bool TestAllCallbacksInvoked() {
-        foreach (var kvp in PropertyDictionary) {
-            foreach (var item in kvp.Value.CallbackList) {
+        foreach (KeyValuePair<string, CountAndCallbackList> kvp in PropertyDictionary) {
+            foreach (AssertCallback item in kvp.Value.CallbackList) {
                 if (item.IsInvoked == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
                                                          "\nCallback Description:" + item.Description +
                                                          "\nCallback IsInvoked: " + item.IsInvoked +
@@ -177,10 +178,10 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="propertyName"></param>
     /// <returns></returns>
     public int TimesPropertyCalled(string propertyName)
-        => PropertyDictionary.TryGetValue(propertyName, out var itemSet) ? itemSet.TimesCalled : 0;
+        => PropertyDictionary.TryGetValue(propertyName, out CountAndCallbackList itemSet) ? itemSet.TimesCalled : 0;
 
     protected void ResetTimesPropertyCalled(string propertyName) {
-        if (PropertyDictionary.TryGetValue(propertyName, out var itemSet)) itemSet.TimesCalled = 0;
+        if (PropertyDictionary.TryGetValue(propertyName, out CountAndCallbackList itemSet)) itemSet.TimesCalled = 0;
     }
 
     public class CountAndCallbackList {

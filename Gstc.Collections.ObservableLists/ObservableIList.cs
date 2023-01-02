@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -81,7 +82,7 @@ public class ObservableIList<TItem, TList> :
     /// A flag that will call the reset action instead of add action. This is primarily for
     /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
     /// </summary>
-    public bool IsResetForAddRange { get; set; } = false;
+    public bool IsResetForAddRange { get; set; }
 
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
@@ -320,7 +321,7 @@ public class ObservableIList<TItem, TList> :
     /// Allows onChange events reentrancy when set to true. Be careful when allowing reentrancy, as it can cause stack overflow
     /// from infinite calls due to conflicting callbacks.
     /// </summary>
-    public bool AllowReentrancy { get; set; } = false;
+    public bool AllowReentrancy { get; set; }
 
     private SimpleMonitor ReentrancyMonitor => _monitor ??= new SimpleMonitor(this);
     private SimpleMonitor _monitor;

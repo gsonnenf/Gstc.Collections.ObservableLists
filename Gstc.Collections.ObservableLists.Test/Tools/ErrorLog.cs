@@ -23,7 +23,7 @@ public class ErrorLog : BlockingCollection<string> {
     /// </summary>
     /// <param name="errorLog"></param>
     public void Add(ErrorLog errorLog) {
-        foreach (var msg in errorLog) Add(msg);
+        foreach (string msg in errorLog) Add(msg);
     }
 
     public void Clear() { while (TryTake(out _)) { } }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -34,10 +35,10 @@ public partial class AssertEvent<TEventArgs> : IDisposable
         _parent = parent;
 
         //Uses reflection to get event handler type, and a reflection reference to our method.
-        var methodInfo = typeof(AssertEvent<TEventArgs>)
+        MethodInfo methodInfo = typeof(AssertEvent<TEventArgs>)
             .GetMethod(nameof(EventHandler), BindingFlags.NonPublic | BindingFlags.Instance);
 
-        var eventInfo = parent.GetType().GetEvent(eventName);
+        EventInfo eventInfo = parent.GetType().GetEvent(eventName);
 
         //Casts our method group EventHandler to the proper EventHandler type
         _eventInfo = eventInfo ?? throw new NullReferenceException("Event was not found in the parent object.");
@@ -77,7 +78,7 @@ public partial class AssertEvent<TEventArgs> : IDisposable
     /// <param name="sender"></param>
     /// <param name="args"></param>
     protected void EventHandler(object sender, TEventArgs args) {
-        foreach (var item in AssertCallbackList) item.Invoke(TimesCalled, sender, args);
+        foreach (AssertCallback item in AssertCallbackList) item.Invoke(TimesCalled, sender, args);
         TimesCalled++;
     }
     #endregion
@@ -101,8 +102,8 @@ public partial class AssertEvent<TEventArgs> : IDisposable
     /// </summary>
     /// <returns>True if all callbacks invoked</returns>
     public bool TestAllCallbacksInvoked() {
-        for (var index = 0; index < AssertCallbackList.Count; index++) {
-            var item = AssertCallbackList[index];
+        for (int index = 0; index < AssertCallbackList.Count; index++) {
+            AssertCallback item = AssertCallbackList[index];
             if (!item.IsInvoked) ErrorLog += "A callback was expected to be invoked but was not invoked." +
                                              "\nCallback Description:" + item.Description +
                                              "\nCallback Number:" + index +

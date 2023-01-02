@@ -3,6 +3,7 @@ dotnet_diagnostic.NUnit2002.severity=suggestion
 dotnet_diagnostic.NUnit2003.severity=suggestion
 dotnet_diagnostic.NUnit2004.severity=suggestion
 dotnet_diagnostic.NUnit2005.severity=suggestion
+dotnet_diagnostic.NUnit2006.severity=suggestion
 dotnet_diagnostic.NUnit2019.severity=suggestion
 dotnet_diagnostic.NUnit2045.severity=suggestion
 
