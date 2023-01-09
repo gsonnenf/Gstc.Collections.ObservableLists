@@ -1,4 +1,5 @@
 ﻿// ReSharper disable RedundantArgumentDefaultValue
+using System;
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
@@ -110,6 +111,20 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
             AssertPropertyCollectionTest(1, 0, 1);
         });
     }
+
+    [Test, Description("")]
+    [TestCaseSource(nameof(StaticDataSource))]
+    public void TestMethod_RefreshIndex(IObservableList<TestItem> obvList) {
+        throw new NotImplementedException();
+    }
+
+    [Test, Description("")]
+    [TestCaseSource(nameof(StaticDataSource))]
+    public void TestMethod_RefreshAll(IObservableList<TestItem> obvList) {
+        throw new NotImplementedException();
+    }
+
+
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]

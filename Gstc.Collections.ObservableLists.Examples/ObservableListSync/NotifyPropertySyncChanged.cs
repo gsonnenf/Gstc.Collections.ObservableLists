@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using Gstc.Collections.ObservableLists.Synchronizer;
+using Gstc.Collections.ObservableLists.Binding;
 
 namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
 
@@ -12,5 +12,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(object sender, PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
         public void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        //Todo: Change this to use OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
     }
 }

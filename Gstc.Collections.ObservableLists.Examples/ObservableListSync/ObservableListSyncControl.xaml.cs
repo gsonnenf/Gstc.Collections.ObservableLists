@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Gstc.Collections.ObservableLists.Synchronizer;
+using Gstc.Collections.ObservableLists.Binding;
 
 namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
     /// <summary>
@@ -11,8 +11,8 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
         /// <summary>
         /// The synchronized observable list for viewmodel.
         /// </summary>       
-        private readonly ObservableListSynchronizer<TestModel, TestViewModel> _obvListSync =
-           new ObservableListSynchronizerFunc<TestModel, TestViewModel>(
+        private readonly ObservableListBind<TestModel, TestViewModel> _obvListSync =
+           new ObservableListBindFunc<TestModel, TestViewModel>(
                (sourceItem) => new TestViewModel(sourceItem),
                (destItem) => destItem.TestModel
            );
@@ -24,8 +24,8 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
             InitializeComponent();
             //Initializes example data
 
-            _obvListSync.SourceObservableList = SourceObvList;
-            _obvListSync.DestinationObservableList = DestObvList;
+            _obvListSync.ObservableListA = SourceObvList;
+            _obvListSync.ObservableListB = DestObvList;
 
             SourceGrid.ItemsSource = SourceObvList;
             DestGrid.ItemsSource = DestObvList;

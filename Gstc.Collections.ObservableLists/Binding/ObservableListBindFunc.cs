@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gstc.Collections.ObservableLists.Synchronizer;
+namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
 /// The ObservableListSynchronizerFunc is a concrete implementation of ObservableListSynchronizer that
@@ -22,16 +22,16 @@ namespace Gstc.Collections.ObservableLists.Synchronizer;
 ///
 /// 
 /// </summary>
-/// <typeparam name="TSource">The source or model list type.</typeparam>
-/// <typeparam name="TDestination">The destination or viewmodel list type.</typeparam>
-public class ObservableListSynchronizerFunc<TSource, TDestination> : ObservableListSynchronizer<TSource, TDestination> {
+/// <typeparam name="TItemA">The source or model list type.</typeparam>
+/// <typeparam name="TItemB">The destination or viewmodel list type.</typeparam>
+public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA, TItemB> {
 
-    private readonly Func<TSource, TDestination> _convertSourceToDest;
-    private readonly Func<TDestination, TSource> _convertDestToSource;
+    private readonly Func<TItemA, TItemB> _convertItemAToItemB;
+    private readonly Func<TItemB, TItemA> _convertItemBTItemA;
 
-    public override TDestination ConvertSourceToDestination(TSource item) => _convertSourceToDest(item);
+    public override TItemB ConvertItem(TItemA item) => _convertItemAToItemB(item);
 
-    public override TSource ConvertDestinationToSource(TDestination item) => _convertDestToSource(item);
+    public override TItemA ConvertItem(TItemB item) => _convertItemBTItemA(item);
 
     /// <summary>
     /// The ObservableListSynchronizerFunc is a concrete implementation of ObservableListSynchronizer that
@@ -52,13 +52,17 @@ public class ObservableListSynchronizerFunc<TSource, TDestination> : ObservableL
     /// <param name="convertDestToSource">Method for converting a {TDestination} type to {TSource} type.</param>
     /// <param name="propertyNotifySourceToDest">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
     /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
-    public ObservableListSynchronizerFunc(
-        Func<TSource, TDestination> convertSourceToDest,
-        Func<TDestination, TSource> convertDestToSource,
-        bool propertyNotifySourceToDest = true,
-        bool propertyNotifyDestToSource = true) : base(propertyNotifySourceToDest, propertyNotifyDestToSource) {
-        _convertSourceToDest = convertSourceToDest;
-        _convertDestToSource = convertDestToSource;
+    public ObservableListBindFunc(
+        Func<TItemA, TItemB> convertSourceToDest,
+        Func<TItemB, TItemA> convertDestToSource,
+        bool isBidirectional = false,
+        ListIdentifier sourceList = ListIdentifier.ListA
+        ) : base() {
+        _convertItemAToItemB = convertSourceToDest;
+        _convertItemBTItemA = convertDestToSource;
+
+        IsBidirectional = isBidirectional;
+        SourceList = sourceList;
     }
 
     /// <summary>
@@ -78,21 +82,26 @@ public class ObservableListSynchronizerFunc<TSource, TDestination> : ObservableL
     /// </summary>
     /// <param name="convertSourceToDest">Method for converting a {TSource} type to {TDestination} type.</param>
     /// <param name="convertDestToSource">Method for converting a {TDestination} type to {TSource} type.</param>
-    /// <param name="sourceObvList">The source ObservableList{TSource} to be synchronized.</param>
-    /// <param name="destObvList">The destination ObservableList{TDestination} to be synchronized.</param>
-    /// <param name="propertyNotifySourceToDest">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
+    /// <param name="obvListA">The source ObservableList{TSource} to be synchronized.</param>
+    /// <param name="obvListB">The destination ObservableList{TDestination} to be synchronized.</param>
+    /// <param name="propertySyncListAToListB">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
     /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
 
-    public ObservableListSynchronizerFunc(
-        Func<TSource, TDestination> convertSourceToDest,
-        Func<TDestination, TSource> convertDestToSource,
-        ObservableList<TSource> sourceObvList,
-        ObservableList<TDestination> destObvList,
-        bool propertyNotifySourceToDest = true,
-        bool propertyNotifyDestToSource = true) : base(propertyNotifySourceToDest, propertyNotifyDestToSource) {
-        _convertSourceToDest = convertSourceToDest;
-        _convertDestToSource = convertDestToSource;
-        SourceObservableList = sourceObvList;
-        DestinationObservableList = destObvList;
+    public ObservableListBindFunc(
+        Func<TItemA, TItemB> convertSourceToDest,
+        Func<TItemB, TItemA> convertDestToSource,
+        ObservableList<TItemA> obvListA,
+        ObservableList<TItemB> obvListB,
+        bool isBidirectional = false,
+        ListIdentifier sourceList = ListIdentifier.ListA
+        ) {
+        _convertItemAToItemB = convertSourceToDest;
+        _convertItemBTItemA = convertDestToSource;
+
+        SourceList = sourceList;
+        IsBidirectional = isBidirectional;
+        ReplaceListA(obvListA);
+        ReplaceListB(obvListB);
+
     }
 }

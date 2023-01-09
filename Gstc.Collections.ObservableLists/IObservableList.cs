@@ -24,4 +24,5 @@ public interface IObservableList<TItem> :
     new TItem this[int index] { get; set; }
     void AddRange(IEnumerable<TItem> items);
     void Move(int oldIndex, int newIndex);
+
 }

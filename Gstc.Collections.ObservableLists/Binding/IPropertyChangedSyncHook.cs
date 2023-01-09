@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Synchronizer;
+namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
 /// This interface allows external triggering of PropertyChanged events. This is used to trigger notify on corresponding 
@@ -13,4 +13,6 @@ public interface IPropertyChangedSyncHook : INotifyPropertyChanged {
     /// <param name="sender"></param>
     /// <param name="args"></param>
     void OnPropertyChanged(object sender, PropertyChangedEventArgs args);
+
+    //Todo: OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
 }

@@ -20,7 +20,7 @@ csharp_indent_switch_labels = true
 #place catch statements on the same line
 csharp_new_line_before_catch =true
 #place else statements on a new line
-csharp_new_line_before_else = true
+csharp_new_line_before_else = false
 #require members of object initializers to be on the same line
 csharp_new_line_before_members_in_object_initializers = false
 
@@ -135,7 +135,7 @@ csharp_style_namespace_declarations= file_scoped:warning
 
 csharp_space_between_method_declaration_name_and_open_parenthesis=false
 insert_final_newline=true
-csharp_new_line_before_open_brace=none
+csharp_new_line_before_open_brace= none
 csharp_indent_labels = one_less_than_current
 csharp_using_directive_placement = outside_namespace:warning
 csharp_prefer_simple_using_statement = true:suggestion
@@ -168,6 +168,7 @@ csharp_style_prefer_pattern_matching = true:silent
 csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
+dotnet_diagnostic.CA1805.severity = silent
 
 [*.{cs,vb}]
 #### Naming styles ####

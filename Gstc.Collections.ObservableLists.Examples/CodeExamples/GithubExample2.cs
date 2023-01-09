@@ -1,5 +1,6 @@
 ﻿using System;
-using Gstc.Collections.ObservableLists.Synchronizer;
+using Gstc.Collections.ObservableLists.Binding;
+
 using NotifyPropertySyncChanged = Gstc.Collections.ObservableLists.Examples.ObservableListSync.NotifyPropertySyncChanged;
 
 namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
@@ -12,12 +13,12 @@ namespace Gstc.Collections.ObservableLists.Examples.CodeExamples {
             // This class synchronization between the sourceList and the destList, in this case a model and a view model.
             // The convertSourceToDest/convertDestToSource define a mapping between the two lists.
             // An abstract class version also exists wherein the mapping is defined by implementing the method interface.
-            ObservableListSynchronizer<Model, ViewModel> obvListSync =
-                       new ObservableListSynchronizerFunc<Model, ViewModel>(
+            ObservableListBind<Model, ViewModel> obvListSync =
+                       new ObservableListBindFunc<Model, ViewModel>(
                            convertSourceToDest: (sourceItem) => new ViewModel(sourceItem),
                            convertDestToSource: (destItem) => destItem.SourceItem,
-                           sourceObvList: sourceList,
-                           destObvList: destList
+                           obvListA: sourceList,
+                           obvListB: destList
                        );
 
             sourceList.CollectionChanged += (sender, args) => Console.WriteLine("Source Collection Changed.");

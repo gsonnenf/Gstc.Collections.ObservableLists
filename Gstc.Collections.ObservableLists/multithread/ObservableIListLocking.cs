@@ -233,6 +233,33 @@ public class ObservableIListLocking<TItem, TList> :
         }
     }
 
+    public void RefreshIndex(int index) {
+        using (_monitor.CheckReentrancy()) {
+
+            lock (SyncRootEvents) {
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, _list[index], _list[index], index);
+                CollectionChanging?.Invoke(this, eventArgs);
+                Replacing?.Invoke(this, eventArgs);
+                OnPropertyChangedIndex();
+                CollectionChanged?.Invoke(this, eventArgs);
+                Replaced?.Invoke(this, eventArgs);
+            }
+        }
+    }
+
+    public void RefreshAll() {
+        using (_monitor.CheckReentrancy()) {
+            lock (SyncRootEvents) {
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                CollectionChanging?.Invoke(this, eventArgs);
+                Resetting?.Invoke(this, eventArgs);
+                OnPropertyChangedCountAndIndex();
+                CollectionChanged?.Invoke(this, eventArgs);
+                Reset?.Invoke(this, eventArgs);
+            }
+        }
+    }
+
     /// <summary>
     /// Inserts an item at a specific index. CollectionChanged and Added event are triggered.
     /// </summary>

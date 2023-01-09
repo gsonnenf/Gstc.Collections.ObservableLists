@@ -247,6 +247,36 @@ public class ObservableList<TItem> :
     }
 
     /// <summary>
+    /// Generates a replace event without modifying the underlying list.
+    /// </summary>
+    /// <param name="index"></param>
+    public void RefreshIndex(int index) {
+        var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, _list[index], _list[index], index);
+        CollectionChanging?.Invoke(this, eventArgs);
+        Replacing?.Invoke(this, eventArgs);
+
+        OnPropertyChangedIndex();
+        CollectionChanged?.Invoke(this, eventArgs);
+        Replaced?.Invoke(this, eventArgs);
+    }
+
+    /// <summary>
+    /// Generates a reset event without modifying the underlying list.
+    /// </summary>
+    /// <param name="index"></param>
+    public void RefreshAll() {
+        using (BlockReentrancy()) {
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+            CollectionChanging?.Invoke(this, eventArgs);
+            Resetting?.Invoke(this, eventArgs);
+
+            OnPropertyChangedCountAndIndex();
+            CollectionChanged?.Invoke(this, eventArgs);
+            Reset?.Invoke(this, eventArgs);
+        }
+    }
+
+    /// <summary>
     /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
     /// </summary>
     /// <param name="item">Item to remove.</param>

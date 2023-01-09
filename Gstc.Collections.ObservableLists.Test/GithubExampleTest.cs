@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using Gstc.Collections.ObservableLists.Synchronizer;
+using Gstc.Collections.ObservableLists.Binding;
 using Gstc.Collections.ObservableLists.Test.Tools;
 using NUnit.Framework;
 
@@ -8,19 +8,20 @@ namespace Gstc.Collections.ObservableLists.Test;
 [TestFixture]
 public class GithubExampleTest {
     [Test]
-    public static void Start() {
+    public static void Start() { //Todo: checkresults to see if they still work after binding list change
         ObservableList<Model> sourceList = new();
         ObservableList<ViewModel> destList = new();
 
         // This class synchronization between the sourceList and the destList, in this case a model and a view model.
         // The convertSourceToDest/convertDestToSource define a mapping between the two lists.
         // An abstract class version also exists wherein the mapping is defined by implementing the method interface.
-        ObservableListSynchronizer<Model, ViewModel> obvListSync =
-                   new ObservableListSynchronizerFunc<Model, ViewModel>(
+        ObservableListBind<Model, ViewModel> obvListSync =
+                   new ObservableListBindFunc<Model, ViewModel>(
                        convertSourceToDest: (sourceItem) => new ViewModel(sourceItem),
                        convertDestToSource: (destItem) => destItem.SourceItem,
-                       sourceObvList: sourceList,
-                       destObvList: destList
+                       obvListA: sourceList,
+                       obvListB: destList
+
                    );
 
         sourceList.CollectionChanged += (_, _) => Console.WriteLine("Source Collection Changed.");
@@ -35,7 +36,6 @@ public class GithubExampleTest {
         Console.WriteLine(sourceList[0].MyNumber);             //Output: 10
         Console.WriteLine(destList[0].MyNumberString + "\n");   //Output: Your number is 10
 
-
         //Adding items to destination, syncing to source
         destList.Add(new ViewModel { MyStringUpper = "ITEM NUMBER 1" });
         // Output: Dest Collection Changed.
@@ -44,8 +44,6 @@ public class GithubExampleTest {
         Console.WriteLine(destList[1].MyStringUpper);          //Output: ITEM NUMBER 1
         Console.WriteLine(sourceList[1].MyNumber);             //Output: 0
         Console.WriteLine(destList[1].MyNumberString + "\n");  //Output: Your number is 0
-
-
 
         //changing source, propagating event to destination
         sourceList[1].MyNumber = -1;

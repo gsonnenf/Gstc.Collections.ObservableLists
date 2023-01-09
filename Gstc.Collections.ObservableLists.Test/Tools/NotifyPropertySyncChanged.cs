@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using Gstc.Collections.ObservableLists.Synchronizer;
+using Gstc.Collections.ObservableLists.Binding;
 
 namespace Gstc.Collections.ObservableLists.Test.Tools;
 

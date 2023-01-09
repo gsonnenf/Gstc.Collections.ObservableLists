@@ -53,8 +53,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
                 testEvent.AddCallback((_, _) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName));
                 testEvent.AddCallback((_, _) => callOrder = (callOrder == staticIndex) ? callOrder + 1
                     : throw new Exception(testSet.Name + ": Call order of " + eventName + " was not correct. " + staticIndex + " was expected, but " + callOrder + " was received."));
-            }
-            else {
+            } else {
                 AssertEvent<PropertyChangedEventArgs> testEvent = new(obvList, eventName);
                 testEventList.Add(testEvent);
                 testEvent.AddCallback((_, args) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName + " : " + args.PropertyName));
@@ -128,6 +127,8 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
             ActAction = (obvList) => obvList.Move(1,0),
             IsCountChanged = false
         },
+        //Todo: Add RefreshIndex and RefreshAll
+
         new EventTestSet {
             Name = "Remove",
             EventOrderList = EventOrderList_Remove,
