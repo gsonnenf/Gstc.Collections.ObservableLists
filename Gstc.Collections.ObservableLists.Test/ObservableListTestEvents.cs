@@ -15,7 +15,7 @@ namespace Gstc.Collections.ObservableLists.Test;
 public class ObservableListTestEvents : CollectionTestBase<TestItem> {
 
     public readonly static object[] ObservableListDataSource = {
-        () => new ObservableList<TestItem>(),
+        () => new ObservableList<TestItem>(), //A generator is needed. The static data souce is only called once per ValueSource method.
         () => new ObservableIList<TestItem, List<TestItem>>(),
         () => new ObservableIListLocking<TestItem,List<TestItem>>()
     };
@@ -33,7 +33,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
     [Test, NUnit.Framework.Description("Tests that all events are called in the correct order.")]
     public void TestCallOrderOfEvents(
         [ValueSource(nameof(ObservableListDataSource))] Func<IObservableList<TestItem>> obvListGenerator,
-        [ValueSource(nameof(StaticOperationListDataSource))] EventTestSet testSet) {
+        [ValueSource(nameof(StaticOperationListDataSource))] EventTestSet testSet) { //Todo: verify this is done via combinatorics
 
         IObservableList<TestItem> obvList = obvListGenerator();
         Console.WriteLine("Name: " + testSet.Name);
@@ -69,7 +69,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
         testSet.ActAction(obvList);
 
         foreach (object item in testEventList) {
-            if (item is AssertEvent<PropertyChangedEventArgs> testEventProperty) testEventProperty.AssertAll((testSet.IsCountChanged) ? 2 : 1);
+            if (item is AssertEvent<PropertyChangedEventArgs> testEventProperty) testEventProperty.AssertAll(testSet.IsCountChanged ? 2 : 1);
             else if (item is AssertEvent<CollectionChangeEventArgs> testEventCollection) testEventCollection.AssertAll(1);
         }
     }

@@ -70,18 +70,18 @@ public abstract class ObservableListBindProperty<TItemSource, TItemTarget>
         ReplaceListTarget(obvListTarget);
     }
 
-    ~ObservableListBindProperty() => ClearAll();
+    ~ObservableListBindProperty() => Dispose();
+    public void Dispose() { //todo come up with better name
+        _bindTracker.UnbindAll();
+        if (_observableListS != null) _observableListS.CollectionChanged -= ListSourceChanged;
+        if (_observableListT != null) _observableListT.CollectionChanged -= ListTargetChanged;
+        _observableListS = null;
+        _observableListT = null;
+        _bindTracker = null;
+    }
     #endregion
 
     #region Methods
-
-    public void ClearAll() {
-        _bindTracker.UnbindAll();
-        if (_observableListS != null) _observableListS.CollectionChanged -= ListSourceChanged;
-        if (_observableListT != null) _observableListT.CollectionChanged -= ListBChanged;
-        _observableListS = null;
-        _observableListT = null;
-    }
 
     protected void ReplaceListSource(IObservableList<TItemSource> observableListS) {
         if (_observableListS != null) {
@@ -93,15 +93,17 @@ public abstract class ObservableListBindProperty<TItemSource, TItemTarget>
         if (_observableListS == null || _observableListT == null) return;
         ResetListSynchronization();
         _bindTracker.BindAll();
+        _observableListS.CollectionChanged += ListSourceChanged;
     }
 
     protected void ReplaceListTarget(IObservableList<TItemTarget> observableListB) {
         if (_observableListT != null) {
-            _observableListT.CollectionChanged -= ListBChanged;
+            _observableListT.CollectionChanged -= ListTargetChanged;
             _bindTracker.UnbindAll();
         }
         _observableListT = observableListB;
         ResetListSynchronization();
+        _observableListT.CollectionChanged += ListTargetChanged;
         _bindTracker.BindAll();
     }
 
@@ -178,7 +180,7 @@ public abstract class ObservableListBindProperty<TItemSource, TItemTarget>
         _isSynchronizationInProgress = false;
     }
 
-    private void ListBChanged(object sender, NotifyCollectionChangedEventArgs args) {
+    private void ListTargetChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (_isSynchronizationInProgress) return;
         if (_observableListT == null) return;
         if (IsBidirectional == false) throw new InvalidOperationException("An item was added, removed, or modified in the non-primary list, but bidirectional sync is not turned on.");

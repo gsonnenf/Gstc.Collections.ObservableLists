@@ -80,7 +80,13 @@ public abstract class ObservableListBind<TItemA, TItemB> {
     /// <summary>
     /// Creates a new ObservableListSynchronizer with an empty source list and an empty destination list.
     /// </summary>
-    protected ObservableListBind() { }
+    protected ObservableListBind(
+        bool isBidirectional = false,
+        ListIdentifier sourceList = ListIdentifier.ListA
+        ) {
+        SourceList = sourceList;
+        IsBidirectional = isBidirectional;
+    }
 
     /// <summary>
     /// Creates a new ObservableListSynchronizer with the provided sourceCollection and destination collection.
@@ -97,9 +103,9 @@ public abstract class ObservableListBind<TItemA, TItemB> {
         ReplaceListB(obvListB);
     }
 
-    ~ObservableListBind() => ClearAll();
+    ~ObservableListBind() => Dispose();
 
-    public void ClearAll() {
+    public void Dispose() { //todo: come up with better name
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
         _observableListA = null;
@@ -116,12 +122,14 @@ public abstract class ObservableListBind<TItemA, TItemB> {
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         _observableListA = observableListA;
         ResetListSynchronization();
+        _observableListA.CollectionChanged += ListAChanged;
     }
 
     protected void ReplaceListB(IObservableList<TItemB> observableListB) {
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
         _observableListB = observableListB;
         ResetListSynchronization();
+        _observableListB.CollectionChanged += ListBChanged;
     }
 
     protected void ResetListSynchronization() {

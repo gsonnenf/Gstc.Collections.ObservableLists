@@ -28,9 +28,7 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
 
     private readonly Func<TItemA, TItemB> _convertItemAToItemB;
     private readonly Func<TItemB, TItemA> _convertItemBTItemA;
-
     public override TItemB ConvertItem(TItemA item) => _convertItemAToItemB(item);
-
     public override TItemA ConvertItem(TItemB item) => _convertItemBTItemA(item);
 
     /// <summary>

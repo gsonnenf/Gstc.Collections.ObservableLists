@@ -6,209 +6,282 @@ using NUnit.Framework;
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
-public class ObservableListBindTest { //todo: validate all these tests for new form
+public class ObservableListBindTest {
 
-    public ObservableList<ItemASource> SourceObvListA;
-    public ObservableList<ItemADest> DestObvListA;
-    public ObservableListBind<ItemASource, ItemADest> ObvListSyncA;
+    #region Datasources
+    public static object[] DataSource_ObvBind => new object[] {
+       ()=> new ObservableListBind_Item1(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
+       ()=> new ObservableListBindFunc<ItemA, ItemB>(
+            (sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+            (destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+            new ObservableList<ItemA>(),
+            new ObservableList<ItemB>())
+    };
 
-    [Test, Description("Creates a sync and tests initialization copying from source item to dest item.")]
-    public void TestMethod_CopyOnInitialize() {
-        SourceObvListA = ItemASource.GetSampleSourceItemAList();
-        DestObvListA = new ObservableList<ItemADest>();
+    public static object[] DataSource_ObvBind_Prepopulated => new object[] {
+       ()=> new ObservableListBind_Item1(
+           new ObservableList<ItemA>() {ItemA1},
+           new ObservableList<ItemB>() {ItemB1}
+           ),
+       ()=>new ObservableListBindFunc<ItemA, ItemB>(
+            (sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+            (destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+             new ObservableList<ItemA>() {ItemA1 },
+             new ObservableList<ItemB>() {ItemB1 }
+            )
+    };
+    #endregion
 
-        ObvListSyncA = new ObservableListBindFunc<ItemASource, ItemADest>(
-            (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
-            SourceObvListA,
-            DestObvListA
-        );
+    #region TestFixture
+
+    public static ItemA ItemA1 => new() { MyNum = 1, MyStringLower = "test string 1" };
+    public static ItemB ItemB1 => new() { MyNum = "1", MyStringUpper = "TEST STRING 1" };
+    public static ItemA ItemA2 => new() { MyNum = 2, MyStringLower = "test string 2" };
+    public static ItemB ItemB2 => new() { MyNum = "2", MyStringUpper = "TEST STRING 2" };
+    public static ItemA ItemA3 => new() { MyNum = 3, MyStringLower = "test string 3" };
+    public static ItemB ItemB3 => new() { MyNum = "3", MyStringUpper = "TEST STRING 3" };
+
+    #endregion
+
+    [Test, Description("Tests initialization from constructor for ObservableListBind")]
+    public void CopyOnInitialize_ObservableListBind() {
+        ObservableListBind<ItemA, ItemB> obvListBind =
+            new ObservableListBind_Item1(ItemA.GetSampleSourceItemAList(), new ObservableList<ItemB>());
 
         Assert.Multiple(() => {
-            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
+            Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(obvListBind.ObservableListB.Count));
             for (int index = 0; index < 3; index++) {
-                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
-                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+                Assert.That(obvListBind.ObservableListB[index].MyNum, Is.EqualTo(obvListBind.ObservableListA[index].MyNum.ToString()));
+                Assert.That(obvListBind.ObservableListB[index].MyStringUpper, Is.EqualTo(obvListBind.ObservableListA[index].MyStringLower.ToUpper()));
             }
         });
     }
 
-    [Description("Creates a sync and tests assignment copying from source item to dest item.")]
-    [TestCase("SourceFirst")]
-    [TestCase("DestFirst")]
-    public void TestMethod_TestAfterInitialize(string order) {
-        SourceObvListA = ItemASource.GetSampleSourceItemAList();
-        DestObvListA = new ObservableList<ItemADest>();
-
-        ObvListSyncA = new ObservableListBindFunc<ItemASource, ItemADest>(
-            (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() }
+    [Test, Description("Tests initialization from constructor for ObservableListBindFunc")]
+    public void CopyOnInitialize_ObservableListBindFunc() {
+        //Func
+        ObservableListBind<ItemA, ItemB> obvListBind2 =
+        new ObservableListBindFunc<ItemA, ItemB>(
+            (sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
+            (destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+            ItemA.GetSampleSourceItemAList(),
+            new ObservableList<ItemB>()
         );
 
-        //Tests several order with same boiler plate code.
-        if (order == "SourceFirst") {
-            ObvListSyncA.ObservableListA = SourceObvListA;
-            ObvListSyncA.ObservableListB = DestObvListA;
-        }
-
-        if (order == "DestFirst") {
-            ObvListSyncA.ObservableListB = DestObvListA;
-            ObvListSyncA.ObservableListA = SourceObvListA;
-        }
         Assert.Multiple(() => {
-            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
+            Assert.That(obvListBind2.ObservableListA, Has.Count.EqualTo(obvListBind2.ObservableListB.Count));
             for (int index = 0; index < 3; index++) {
-                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
-                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
+                Assert.That(obvListBind2.ObservableListB[index].MyNum, Is.EqualTo(obvListBind2.ObservableListA[index].MyNum.ToString()));
+                Assert.That(obvListBind2.ObservableListB[index].MyStringUpper, Is.EqualTo(obvListBind2.ObservableListA[index].MyStringLower.ToUpper()));
             }
         });
     }
 
-    //todo: fix this test
-    /*
-    [Description("Creates a sync and tests all combinations of assignment of lists.")]
-    [TestCase(0, 2, "Dest")]
-    [TestCase(0, 3, "Source")]
-    [TestCase(1, 2, "Dest")]
-    [TestCase(1, 3, "Clear")]
-    [TestCase(2, 0, "Source")]
-    [TestCase(2, 1, "Dest")]
-    [TestCase(3, 0, "Source")]
-    [TestCase(3, 1, "Clear")]
-    public void TestMethod_TestAfterInitializeReplace(int firstCommand, int secondCommand, string result) {
-        SourceObvListA = ItemASource.GetSampleSourceItemAList();
-        DestObvListA = ItemADest.GetSampleDestItemAList();
+    [Test, Description("Ensures correct initialization of prepopulated")]
+    [TestCaseSource(nameof(DataSource_ObvBind_Prepopulated))]
+    public void Prepopulated(Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator) {
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
 
-        string sourceItemCheck = SourceObvListA[0].MyStringLower;
-        string destItemCheck = DestObvListA[0].MyStringUpper;
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(1));
+            Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(1));
+            Assert.That(ItemA1, Is.EqualTo(obvListBind.ObservableListA[0]));
+            Assert.That(ItemB1, Is.EqualTo(obvListBind.ObservableListB[0]));
 
-        ObvListSyncA = new ObservableListBindingFunc<ItemASource, ItemADest>(
-            (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+        });
+    }
 
+    [Test, Description("Tests that list replace copies over properly")]
+    public void CopyAfterInitialize(
+            [ValueSource(nameof(DataSource_ObvBind))] Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier sourceList,
+            [Values] ListIdentifier listOrder) {
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        IObservableList<ItemA> compareA = ItemA.GetSampleSourceItemAList();
+        IObservableList<ItemB> compareB = ItemB.GetSampleDestItemAList();
+        obvListBind.SourceList = sourceList;
 
+        //Tests order of assignment.
+        if (listOrder == sourceList) {
+            obvListBind.ObservableListA = ItemA.GetSampleSourceItemAList();
+            obvListBind.ObservableListB = ItemB.GetSampleDestItemAList();
+        }
+        if (listOrder != sourceList) {
+            obvListBind.ObservableListB = ItemB.GetSampleDestItemAList();
+            obvListBind.ObservableListA = ItemA.GetSampleSourceItemAList();
+        }
 
-            );
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(obvListBind.ObservableListA.Count));
+            for (int index = 0; index < 3; index++) {
+                //Checks correct list was preserved
+                if (sourceList == ListIdentifier.ListA) {
+                    Assert.That(obvListBind.ObservableListA[index].MyNum, Is.EqualTo(compareA[index].MyNum));
+                    Assert.That(obvListBind.ObservableListA[index].MyStringLower, Is.EqualTo(compareA[index].MyStringLower));
+                }
+                if (sourceList == ListIdentifier.ListB) {
+                    Assert.That(obvListBind.ObservableListB[index].MyNum, Is.EqualTo(compareB[index].MyNum));
+                    Assert.That(obvListBind.ObservableListB[index].MyStringUpper, Is.EqualTo(compareB[index].MyStringUpper));
+                }
+                //Checks lists match
+                Assert.That(obvListBind.ObservableListB[index].MyNum, Is.EqualTo(obvListBind.ObservableListA[index].MyNum.ToString()));
+                Assert.That(obvListBind.ObservableListB[index].MyStringUpper, Is.EqualTo(obvListBind.ObservableListA[index].MyStringLower.ToUpper()));
+            }
+        });
+    }
 
-        List<Action> actionList = new();
+    [Test, Description("Tests that bidirectional add works properly.")]
+    public void Add(
+            [ValueSource(nameof(DataSource_ObvBind))] Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier sourceList,
+            [Values] bool isBidirectional,
+            [Values] ListIdentifier testList) {
 
-        actionList.Insert(0, () => ObvListSyncA.ReplaceListA(SourceObvListA));
-        actionList.Insert(1, () => ObvListSyncA.ReplaceSource_SyncFromDestination(SourceObvListA));
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        obvListBind.IsBidirectional = isBidirectional;
+        obvListBind.SourceList = sourceList;
 
-        actionList.Insert(2, () => ObvListSyncA.ReplaceDestination_SyncToSource(DestObvListA));
-        actionList.Insert(3, () => ObvListSyncA.ReplaceDestination_SyncFromSource(DestObvListA));
-
-        actionList[firstCommand].Invoke();
-        actionList[secondCommand].Invoke();
-
-        //Both lists are cleared
-        if (result == "Clear") {
-            Assert.Multiple(() => {
-                Assert.That(DestObvListA, Is.Empty);
-                Assert.That(SourceObvListA, Is.Empty);
+        if (testList != sourceList && !isBidirectional) {
+            _ = Assert.Throws<InvalidOperationException>(testList switch {
+                ListIdentifier.ListA => () => obvListBind.ObservableListA.Add(ItemA1),
+                ListIdentifier.ListB => () => obvListBind.ObservableListB.Add(ItemB1)
             });
             return;
         }
 
-        //Test that lists are synced
-        Assert.Multiple(() => {
-            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
-            for (int index = 0; index < 3; index++) {
-                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
-                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
-                Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
-            }
-
-            if (result == "Source") Assert.That(SourceObvListA[0].MyStringLower, Is.EqualTo(sourceItemCheck)); // Source list is preserved
-            if (result == "Dest") Assert.That(DestObvListA[0].MyStringUpper, Is.EqualTo(destItemCheck)); // Dest list is preserved
-        });
-    }
-    */
-    [Test, Description("Tests synchronization when adding and removing items for a two way sync.")]
-    public void TestMethod_AddSubtractTwoWaySync() {
-        SourceObvListA = new ObservableList<ItemASource>();
-        DestObvListA = new ObservableList<ItemADest>();
-
-        ObvListSyncA = new ObservableListBindFunc<ItemASource, ItemADest>(
-            (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
-            SourceObvListA,
-            DestObvListA
-        );
-
-        ItemASource item1 = new() { MyNum = 10, MyStringLower = "x" };
-        ItemASource item2 = new() { MyNum = 15, MyStringLower = "y" };
-
-        SourceObvListA.Add(item1);
-        SourceObvListA.Add(item2);
-
-        ItemADest item3 = new() { MyNum = "1000", MyStringUpper = "A" };
-        ItemADest item4 = new() { MyNum = "2000", MyStringUpper = "B" };
-        DestObvListA.Add(item3);
-        DestObvListA.Add(item4);
+        if (testList == ListIdentifier.ListA) obvListBind.ObservableListA.Add(ItemA1);
+        if (testList == ListIdentifier.ListB) obvListBind.ObservableListB.Add(ItemB1);
 
         Assert.Multiple(() => {
-            Assert.That(DestObvListA, Has.Count.EqualTo(SourceObvListA.Count));
-            Assert.That(SourceObvListA, Has.Count.EqualTo(4));
-
-            for (int index = 0; index < SourceObvListA.Count; index++) {
-                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
-                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
-                Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
-            }
-
-            Assert.That(item1, Is.EqualTo(SourceObvListA[0]));
-            Assert.That(item2, Is.EqualTo(SourceObvListA[1]));
-            Assert.That(item3, Is.EqualTo(DestObvListA[2]));
-            Assert.That(item4, Is.EqualTo(DestObvListA[3]));
+            Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(1));
+            Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(1));
+            Assert.That(ItemA1, Is.EqualTo(obvListBind.ObservableListA[0]));
+            Assert.That(ItemB1, Is.EqualTo(obvListBind.ObservableListB[0]));
         });
     }
 
-    //todo: fix this test
-    /*
-    [Test, Description("Tests synchronization when adding and removing items for a one way sync.")]
-    public void TestMethod_AddSubtractOneWaySync() {
-        SourceObvListA = new ObservableList<ItemASource>();
-        DestObvListA = new ObservableList<ItemADest>();
+    [Test, Description("Tests that remove works properly")]
+    public void Clear(
+            [ValueSource(nameof(DataSource_ObvBind_Prepopulated))] Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier sourceList,
+            [Values] bool isBidirectional,
+            [Values] ListIdentifier testList) {
 
-        ObvListSyncA = new ObservableListBindingFunc<ItemASource, ItemADest>(
-            (sourceItem) => new ItemADest { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemASource { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
-            SourceObvListA,
-            DestObvListA) {
-            IsSyncListAToListB = true,
-            IsSyncListBToListA = false
-        };
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        obvListBind.IsBidirectional = isBidirectional;
+        obvListBind.SourceList = sourceList;
 
-        ItemASource item1 = new() { MyNum = 10, MyStringLower = "x" };
-        ItemASource item2 = new() { MyNum = 15, MyStringLower = "y" };
-        ItemADest item3 = new() { MyNum = "1000", MyStringUpper = "A" };
-        ItemADest item4 = new() { MyNum = "2000", MyStringUpper = "B" };
+        if (testList != sourceList && !isBidirectional) {
+            _ = Assert.Throws<InvalidOperationException>(testList switch {
+                ListIdentifier.ListA => () => obvListBind.ObservableListA.Clear(),
+                ListIdentifier.ListB => () => obvListBind.ObservableListB.Clear()
+            });
+            return;
+        }
 
-        SourceObvListA.Add(item1);
-        SourceObvListA.Add(item2);
-        DestObvListA.Add(item3);
-        DestObvListA.Add(item4);
+        if (testList == ListIdentifier.ListA) obvListBind.ObservableListA.Clear();
+        if (testList == ListIdentifier.ListB) obvListBind.ObservableListB.Clear();
+        Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(0));
+        Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(0));
+    }
+
+    [Test, Description("Tests that move works properly")]
+    public void Move(
+            [ValueSource(nameof(DataSource_ObvBind_Prepopulated))] Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier sourceList,
+            [Values] bool isBidirectional,
+            [Values] ListIdentifier testList) {
+
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        obvListBind.IsBidirectional = isBidirectional;
+        obvListBind.SourceList = sourceList;
+
+        //ensures add works which is used in arrangment.
+        if (sourceList == ListIdentifier.ListA) obvListBind.ObservableListA.Add(ItemA2);
+        if (sourceList == ListIdentifier.ListB) obvListBind.ObservableListB.Add(ItemB2);
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(2));
+            Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(2));
+            Assert.That(ItemA1, Is.EqualTo(obvListBind.ObservableListA[0]));
+            Assert.That(ItemB1, Is.EqualTo(obvListBind.ObservableListB[0]));
+            Assert.That(ItemA2, Is.EqualTo(obvListBind.ObservableListA[1]));
+            Assert.That(ItemB2, Is.EqualTo(obvListBind.ObservableListB[1]));
+        });
+
+        if (sourceList != testList && !isBidirectional) {
+            _ = Assert.Throws<InvalidOperationException>(testList switch {
+                ListIdentifier.ListA => () => obvListBind.ObservableListA.Move(0, 1),
+                ListIdentifier.ListB => () => obvListBind.ObservableListB.Move(0, 1)
+            });
+            return;
+        }
+
+        if (testList == ListIdentifier.ListA) obvListBind.ObservableListA.Move(0, 1);
+        if (testList == ListIdentifier.ListB) obvListBind.ObservableListB.Move(0, 1);
 
         Assert.Multiple(() => {
-            Assert.That(SourceObvListA, Has.Count.EqualTo(2));
-            Assert.That(DestObvListA, Has.Count.EqualTo(4));
+            Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(2));
+            Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(2));
+            Assert.That(ItemA1, Is.EqualTo(obvListBind.ObservableListA[1]));
+            Assert.That(ItemB1, Is.EqualTo(obvListBind.ObservableListB[1]));
+            Assert.That(ItemA2, Is.EqualTo(obvListBind.ObservableListA[0]));
+            Assert.That(ItemB2, Is.EqualTo(obvListBind.ObservableListB[0]));
+        });
 
-            for (int index = 0; index < SourceObvListA.Count; index++) {
-                Assert.That(DestObvListA[index].MyNum, Is.EqualTo(SourceObvListA[index].MyNum.ToString()));
-                Assert.That(DestObvListA[index].MyStringUpper, Is.EqualTo(SourceObvListA[index].MyStringLower.ToUpper()));
-                Console.WriteLine("Source: " + SourceObvListA[index].MyStringLower + "  Dest: " + DestObvListA[index].MyStringUpper);
-            }
 
-            Assert.That(item1, Is.EqualTo(SourceObvListA[0]));
-            Assert.That(item2, Is.EqualTo(SourceObvListA[1]));
+    }
 
-            Assert.That(ObvListSyncA.ConvertItem(item1), Is.EqualTo(DestObvListA[0]));
-            Assert.That(ObvListSyncA.ConvertItem(item2), Is.EqualTo(DestObvListA[1]));
+    [Test, Description("Tests that remove works properly")]
+    public void Remove(
+            [ValueSource(nameof(DataSource_ObvBind_Prepopulated))] Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier sourceList,
+            [Values] bool isBidirectional,
+            [Values] ListIdentifier testList) {
 
-            Assert.That(item3, Is.EqualTo(DestObvListA[2]));
-            Assert.That(item4, Is.EqualTo(DestObvListA[3]));
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        obvListBind.IsBidirectional = isBidirectional;
+        obvListBind.SourceList = sourceList;
+
+        if (sourceList != testList && !isBidirectional) {
+            _ = Assert.Throws<InvalidOperationException>(testList switch {
+                ListIdentifier.ListA => () => obvListBind.ObservableListA.Remove(ItemA1),
+                ListIdentifier.ListB => () => obvListBind.ObservableListB.Remove(ItemB1)
+            });
+            return;
+        }
+
+        if (testList == ListIdentifier.ListA) _ = obvListBind.ObservableListA.Remove(ItemA1);
+        if (testList == ListIdentifier.ListB) _ = obvListBind.ObservableListB.Remove(ItemB1);
+        Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(0));
+        Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(0));
+    }
+
+    [Test, Description("Tests that replace works properly")]
+    public void Replace(
+            [ValueSource(nameof(DataSource_ObvBind_Prepopulated))] Func<ObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier sourceList,
+            [Values] bool isBidirectional,
+            [Values] ListIdentifier testList) {
+        ObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        obvListBind.IsBidirectional = isBidirectional;
+        obvListBind.SourceList = sourceList;
+
+        if (testList != sourceList && !isBidirectional) {
+            _ = Assert.Throws<InvalidOperationException>(testList switch {
+                ListIdentifier.ListA => () => obvListBind.ObservableListA[0] = ItemA2,
+                ListIdentifier.ListB => () => obvListBind.ObservableListB[0] = ItemB2
+            });
+            return;
+        }
+
+        if (testList == ListIdentifier.ListA) obvListBind.ObservableListA[0] = ItemA2;
+        if (testList == ListIdentifier.ListB) obvListBind.ObservableListB[0] = ItemB2;
+        Assert.Multiple(() => {
+            Assert.That(ItemA2, Is.EqualTo(obvListBind.ObservableListA[0]));
+            Assert.That(ItemB2, Is.EqualTo(obvListBind.ObservableListB[0]));
+            Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(1));
+            Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(1));
         });
     }
-    */
 }
+

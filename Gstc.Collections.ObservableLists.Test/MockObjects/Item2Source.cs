@@ -3,8 +3,8 @@ using Gstc.Collections.ObservableLists.Test.Tools;
 
 namespace Gstc.Collections.ObservableLists.Test.MockObjects;
 
-public class ItemBSource : NotifyPropertySyncChanged {
-    public static ObservableList<ItemBSource> GetSampleSourceBList() => new() {
+public class Item2Source : NotifyPropertySyncChanged {
+    public static ObservableList<Item2Source> GetSampleSourceBList() => new() {
             new() { MyNum = 10, MyStringLower = "x" },
             new() { MyNum = 15, MyStringLower = "y" },
             new() { MyNum = 20, MyStringLower = "z" },
@@ -24,7 +24,7 @@ public class ItemBSource : NotifyPropertySyncChanged {
     }
 
     public override bool Equals(object obj) {
-        if (obj is not ItemBSource temp) return false;
+        if (obj is not Item2Source temp) return false;
         if (temp.MyNum == MyNum && temp.MyStringLower == MyStringLower) return true;
         return false;
     }
