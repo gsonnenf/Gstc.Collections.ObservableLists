@@ -1,5 +1,4 @@
 ﻿// ReSharper disable RedundantArgumentDefaultValue
-using System;
 using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.MockObjects;
@@ -115,16 +114,31 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
     public void TestMethod_RefreshIndex(IObservableList<TestItem> obvList) {
-        throw new NotImplementedException();
+        obvList.AddRange(new[] { Item1 });
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Replace(0, Item1, Item1));
+
+        obvList.RefreshIndex(0);
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(1));
+            Assert.That(obvList[0], Is.EqualTo(Item1));
+            AssertPropertyCollectionTest(1, 0, 1);
+        });
     }
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
     public void TestMethod_RefreshAll(IObservableList<TestItem> obvList) {
-        throw new NotImplementedException();
+        obvList.AddRange(new[] { Item1 });
+        InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
+
+        obvList.RefreshAll();
+
+        Assert.Multiple(() => {
+            Assert.That(obvList, Has.Count.EqualTo(1));
+            Assert.That(obvList[0], Is.EqualTo(Item1));
+            AssertPropertyCollectionTest();
+        });
     }
-
-
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
