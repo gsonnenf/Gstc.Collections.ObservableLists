@@ -1,18 +1,101 @@
-﻿using NUnit.Framework;
+﻿using Gstc.Collections.ObservableLists.Test.MockObjects;
+using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
 public class ObservableListBindPropertyTest {
-
-    //Todo add unit test that ensures onpropertychange is removed from removed objects.
-    /*
-     * todo fix this test
     //TODO: Find a test situation where a two way notify might be used. It seems that any user written mapping between objects would trigger INotifyProperty without needing this.
+
+    public static object[] DataSource_Empty => new object[] {
+       new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
+    };
+
+    public static object[] DataSource_Populated => new object[] {
+       new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(){ ItemA1 }, new ObservableList<ItemB>()),
+    };
+
+    #region Test Fixture
+    public static ItemA ItemA1 => new() { MyNum = 0, MyStringLower = "string number 0" };
+    public static ItemB ItemB1 => new() { MyNum = "0", MyStringUpper = "STRING NUMBER 0" };
+    public static ItemA ItemA2 => new() { MyNum = 1, MyStringLower = "string number 1" };
+    public static ItemB ItemB2 => new() { MyNum = "1", MyStringUpper = "STRING NUMBER 1" };
+
+    #endregion
+
+    [Test, Description("Tests that notify collection are triggered when property is set.")]
+    [TestCaseSource(nameof(DataSource_Populated))]
+    public void BidirectionalTest(ObservableListBindProperty_ItemAB obvListBind) {
+
+        //Initialization
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(0));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("0"));
+        });
+
+        //Tests directionality on assignment
+        obvListBind.IsBidirectional = true;
+        obvListBind.ObservableListB[0].MyNum = "10";
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("10"));
+        });
+
+        // Tests directionality on false
+        obvListBind.IsBidirectional = false;
+        obvListBind.ObservableListB[0].MyNum = "20";
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("20"));
+        });
+        obvListBind.ObservableListA[0].MyNum = 30;
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(30));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("30"));
+        });
+
+        //Test directionality on toggle back to true
+        obvListBind.IsBidirectional = true;
+        obvListBind.ObservableListB[0].MyNum = "100";
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(100));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("100"));
+        });
+        obvListBind.ObservableListA[0].MyNum = 200;
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(200));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("200"));
+        });
+    }
+
+    [Test, Description("Tests that property bind can be disabled.")]
+    [TestCaseSource(nameof(DataSource_Empty))]
+    public void IsPropertyBindEnabled(ObservableListBindProperty_ItemAB obvListBind) {
+        //tests constructor enabled
+        obvListBind.ObservableListA.Add(ItemA1);
+        obvListBind.ObservableListB[0].MyNum = "10";
+        Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
+
+        //tests disabled
+        obvListBind.IsPropertyBindingEnabled = false;
+        obvListBind.ObservableListB.Add(ItemB2);
+        obvListBind.ObservableListB[0].MyNum = "100";
+        obvListBind.ObservableListA[1].MyNum = 100;
+        Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
+        Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1"));
+
+        //Test re-enabled
+        obvListBind.IsPropertyBindingEnabled = true;
+        obvListBind.ObservableListB[0].MyNum = "1000";
+        obvListBind.ObservableListA[1].MyNum = 1000;
+        Assert.That(obvListBind.ObservableListA[1].MyNum, Is.EqualTo(1000));
+        Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1000"));
+    }
+    /*
     [Test, Description("Test that changes in item properties of one list propagate to the other if INotifyPropertyChanged is implemented on the TItem")]
     public void TestMethod_PropertyNotify() {
         //Arrange
-        ObservableList<ItemBSource> sourceObvListB = new();
+        ObservableList<ItemS> sourceObvListB = new();
         ObservableList<ItemBDest> destObvListB = new();
 
         ObservableListBindingFunc<ItemBSource, ItemBDest> obvListSyncB = new(

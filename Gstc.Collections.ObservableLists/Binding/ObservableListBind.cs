@@ -21,19 +21,8 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// </summary>
 /// <typeparam name="TItemA">The source or model list type.</typeparam>
 /// <typeparam name="TItemB">The destination or viewmodel list type.</typeparam>
-public abstract class ObservableListBind<TItemA, TItemB> {
-    /// <summary>
-    /// Converts an item of type {TSource} to {TDestination}.
-    /// </summary>
-    /// <param name="item">The source {TSource} Item.</param>
-    /// <returns>A {TDestination} item.</returns>
+public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<TItemA, TItemB> {
     public abstract TItemB ConvertItem(TItemA item);
-
-    /// <summary>
-    /// Converts an item of type {TDestination} to {TSource}.
-    /// </summary>
-    /// <param name="item">The source {TDestination} Item.</param>
-    /// <returns>A {TSource} item.</returns>
     public abstract TItemA ConvertItem(TItemB item);
 
     /// <summary>
@@ -44,30 +33,13 @@ public abstract class ObservableListBind<TItemA, TItemB> {
     private IObservableList<TItemB> _observableListB;
 
     #region Properties
-
-    /// <summary>
-    /// 
-    /// </summary>
     public bool IsBidirectional { get; set; }
 
-    /// <summary>
-    /// A source observable collection of type {TSource} that will be synchronized to a destination collection of type {TDestination}.
-    /// Source Items are converted using your provided ConvertSourceToDestination(...) method and automatically added to the 
-    /// destination collection.
-    /// </summary>
     public IObservableList<TItemA> ObservableListA {
         get => _observableListA;
         set => ReplaceListA(value);
     }
 
-    /// <summary>
-    /// A destination observable collection of type {TDestination} that will be synchronized to a source collection of type {TSource}.
-    /// On assignment, the destination list is cleared, and items from the source list are converted and added to the destination 
-    /// using your provided ConvertSourceToDestination(...) method. After assignment changes to the destination list are propagated to
-    /// the source list.
-    /// 
-    /// If you wish to propagate items from the destination list to the source list on assignment, use the ReplaceDestinationCopyToSource(...) method.
-    /// </summary>
     public IObservableList<TItemB> ObservableListB {
         get => _observableListB;
         set => ReplaceListB(value);
@@ -77,9 +49,6 @@ public abstract class ObservableListBind<TItemA, TItemB> {
     #endregion
 
     #region Ctor
-    /// <summary>
-    /// Creates a new ObservableListSynchronizer with an empty source list and an empty destination list.
-    /// </summary>
     protected ObservableListBind(
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
@@ -88,9 +57,6 @@ public abstract class ObservableListBind<TItemA, TItemB> {
         IsBidirectional = isBidirectional;
     }
 
-    /// <summary>
-    /// Creates a new ObservableListSynchronizer with the provided sourceCollection and destination collection.
-    /// </summary>
     protected ObservableListBind(
         IObservableList<TItemA> obvListA,
         IObservableList<TItemB> obvListB,
@@ -105,6 +71,9 @@ public abstract class ObservableListBind<TItemA, TItemB> {
 
     ~ObservableListBind() => Dispose();
 
+    /// <summary>
+    /// Releases all events associated with the list.
+    /// </summary>
     public void Dispose() { //todo: come up with better name
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
@@ -121,18 +90,18 @@ public abstract class ObservableListBind<TItemA, TItemB> {
     protected void ReplaceListA(IObservableList<TItemA> observableListA) {
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         _observableListA = observableListA;
-        ResetListSynchronization();
+        RebindLists();
         _observableListA.CollectionChanged += ListAChanged;
     }
 
     protected void ReplaceListB(IObservableList<TItemB> observableListB) {
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
         _observableListB = observableListB;
-        ResetListSynchronization();
+        RebindLists();
         _observableListB.CollectionChanged += ListBChanged;
     }
 
-    protected void ResetListSynchronization() {
+    private void RebindLists() {
         _isSynchronizationInProgress = true;
 
         if (SourceList == ListIdentifier.ListA) {
@@ -163,13 +132,13 @@ public abstract class ObservableListBind<TItemA, TItemB> {
     /// <param name="args"></param>
     /// <exception cref="InvalidEnumArgumentException"></exception>
     private void ListAChanged(object sender, NotifyCollectionChangedEventArgs args) {
-        if (_isSynchronizationInProgress) return;
+        if (_isSynchronizationInProgress || _observableListB == null) return;
         if (IsBidirectional == false && !(SourceList == ListIdentifier.ListA)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to false.");
         ListChanged(args, _observableListA, _observableListB, ConvertItem);
     }
 
     private void ListBChanged(object sender, NotifyCollectionChangedEventArgs args) {
-        if (_isSynchronizationInProgress) return;
+        if (_isSynchronizationInProgress || _observableListA == null) return;
         if (IsBidirectional == false && !(SourceList == ListIdentifier.ListB)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to false.");
         ListChanged(args, _observableListB, _observableListA, ConvertItem);
     }

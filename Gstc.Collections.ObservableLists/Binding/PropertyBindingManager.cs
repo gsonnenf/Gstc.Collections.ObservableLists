@@ -22,16 +22,19 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
         set {
             if (_isBidirectional != value) {
                 UnbindAll();
+                _isBidirectional = value;
                 BindAll();
             }
-            _isBidirectional = value;
         }
     }
     public bool IsBindingEnabled {
-        get => _isBindingEnabled; set {
-            if (!_isBindingEnabled && value) BindAll(); //Binds on state change
-            if (_isBindingEnabled && !value) UnbindAll(); //Unbinds on state change
-            _isBindingEnabled = value;
+        get => _isBindingEnabled;
+        set {
+            if (_isBindingEnabled != value) {
+                UnbindAll();
+                _isBindingEnabled = value;
+                if (_isBindingEnabled) BindAll();
+            }
         }
     }
     /// <summary>
@@ -39,20 +42,21 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
     /// These are tracked so they can be removed when the items are updated or removed from the list.
     /// </summary>
     public Dictionary<TItemTarget, (TItemSource itemS, PropertyChangedEventHandler eventS, PropertyChangedEventHandler eventT)> BindingDictionary { get; private set; } = new();
-    public IObservableList<TItemTarget> TargetList {
-        get => _targetList;
-        set {
-            UnbindAll();
-            _targetList = value;
-            BindAll();
-        }
-    }
 
     public IObservableList<TItemSource> SourceList {
         get => _sourceList;
         set {
             UnbindAll();
             _sourceList = value;
+            BindAll();
+        }
+    }
+
+    public IObservableList<TItemTarget> TargetList {
+        get => _targetList;
+        set {
+            UnbindAll();
+            _targetList = value;
             BindAll();
         }
     }
@@ -76,8 +80,18 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
     /// This should only be run when no bindings exist.
     /// </summary>
     public void BindAll() {
-        if (_sourceList == null || _targetList == null) return;
+        if (_sourceList == null || _targetList == null || !_isBindingEnabled) return;
+        if (BindingDictionary.Count > 0) UnbindAll();
         for (var index = 0; index < _sourceList.Count; index++) Bind(_sourceList[index], _targetList[index]);
+    }
+
+    /// <summary>
+    /// Removes bindings from all items.
+    /// </summary>
+    public void UnbindAll() {
+        if (!_isBindingEnabled && BindingDictionary.Count > 0) throw new Exception(); //todo: delete
+        if (!_isBindingEnabled) return;
+        foreach (var kvp in BindingDictionary) Unbind(kvp.Value.itemS, kvp.Key);
     }
 
     /// <summary>
@@ -86,6 +100,7 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
     /// <param name="itemS">The item type of the source list.</param>
     /// <param name="itemT">The item type of the target list.</param>
     public void Bind(TItemSource itemS, TItemTarget itemT) {
+        if (!_isBindingEnabled) return;
         void eventS(object sender, PropertyChangedEventArgs args) => SourceItemChanged(itemS, itemT);
         void eventT(object sender, PropertyChangedEventArgs args) => TargetItemChanged(itemS, itemT);
 
@@ -101,19 +116,12 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
     }
 
     /// <summary>
-    /// Removes bindings from all items.
-    /// </summary>
-    public void UnbindAll() {
-        foreach (var kvp in BindingDictionary) Unbind(kvp.Value.itemS, kvp.Key);
-        BindingDictionary.Clear();
-    }
-
-    /// <summary>
     /// Unbinds a single set of items.
     /// </summary>
     /// <param name="itemS"></param>
     /// <param name="itemT"></param>
     public void Unbind(TItemSource itemS, TItemTarget itemT) {
+        if (!_isBindingEnabled) return;
         var (_, eventP, eventT) = BindingDictionary[itemT];
         if (itemS is INotifyPropertyChanged obvItemS) obvItemS.PropertyChanged -= eventP;
         if (itemT is INotifyPropertyChanged obvItemT) obvItemT.PropertyChanged -= eventT;
@@ -130,8 +138,8 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
     /// <param name="itemT"></param>
     private void SourceItemChanged(TItemSource itemS, TItemTarget itemT) {
         if (!IsBindingEnabled) return;
-        Unbind(itemS, itemT);
-        for (var indexS = 0; indexS < _sourceList.Count; indexS++) if (itemS == _sourceList[indexS] && itemT == _targetList[indexS]) _sourceList.RefreshIndex(indexS);
+        for (var indexS = 0; indexS < _sourceList.Count; indexS++) //Will generate an event for every listing of this item in the list
+            if (itemS == _sourceList[indexS] && itemT == _targetList[indexS]) _sourceList.RefreshIndex(indexS);
     }
 
     /// <summary>
@@ -141,10 +149,8 @@ public class PropertyBindingManager<TItemSource, TItemTarget>
     /// <param name="itemS"></param>
     /// <param name="itemT"></param>
     private void TargetItemChanged(TItemSource itemS, TItemTarget itemT) {
-        if (!IsBindingEnabled) return;
-        if (!IsBidirectional) return;
-        Unbind(itemS, itemT);
-        var indexT = _targetList.IndexOf(itemT); //Target list can not have repeat elements
+        if (!IsBindingEnabled || !IsBidirectional) return;
+        var indexT = _targetList.IndexOf(itemT); //Target list can not have repeat elements so we find first.
         if (itemS != _sourceList[indexT]) throw DuplicateException();
         _targetList.RefreshIndex(indexT);
     }

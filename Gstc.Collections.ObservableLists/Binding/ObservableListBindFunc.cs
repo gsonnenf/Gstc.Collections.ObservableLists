@@ -46,18 +46,18 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
     /// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
     /// 
     /// </summary>
-    /// <param name="convertSourceToDest">Method for converting a {TSource} type to {TDestination} type.</param>
-    /// <param name="convertDestToSource">Method for converting a {TDestination} type to {TSource} type.</param>
+    /// <param name="convertItemAToItemB">Method for converting a {TSource} type to {TDestination} type.</param>
+    /// <param name="convertItemBtoItemA">Method for converting a {TDestination} type to {TSource} type.</param>
     /// <param name="propertyNotifySourceToDest">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
     /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
     public ObservableListBindFunc(
-        Func<TItemA, TItemB> convertSourceToDest,
-        Func<TItemB, TItemA> convertDestToSource,
+        Func<TItemA, TItemB> convertItemAToItemB,
+        Func<TItemB, TItemA> convertItemBtoItemA,
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) : base() {
-        _convertItemAToItemB = convertSourceToDest;
-        _convertItemBTItemA = convertDestToSource;
+        _convertItemAToItemB = convertItemAToItemB;
+        _convertItemBTItemA = convertItemBtoItemA;
 
         IsBidirectional = isBidirectional;
         SourceList = sourceList;
@@ -78,23 +78,23 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
     /// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
     ///  
     /// </summary>
-    /// <param name="convertSourceToDest">Method for converting a {TSource} type to {TDestination} type.</param>
-    /// <param name="convertDestToSource">Method for converting a {TDestination} type to {TSource} type.</param>
+    /// <param name="convertItemAToItemB">Method for converting a {TSource} type to {TDestination} type.</param>
+    /// <param name="convertItemBtoItemA">Method for converting a {TDestination} type to {TSource} type.</param>
     /// <param name="obvListA">The source ObservableList{TSource} to be synchronized.</param>
     /// <param name="obvListB">The destination ObservableList{TDestination} to be synchronized.</param>
     /// <param name="propertySyncListAToListB">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
     /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
 
     public ObservableListBindFunc(
-        Func<TItemA, TItemB> convertSourceToDest,
-        Func<TItemB, TItemA> convertDestToSource,
+        Func<TItemA, TItemB> convertItemAToItemB,
+        Func<TItemB, TItemA> convertItemBtoItemA,
         ObservableList<TItemA> obvListA,
         ObservableList<TItemB> obvListB,
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
-        _convertItemAToItemB = convertSourceToDest;
-        _convertItemBTItemA = convertDestToSource;
+        _convertItemAToItemB = convertItemAToItemB;
+        _convertItemBTItemA = convertItemBtoItemA;
 
         SourceList = sourceList;
         IsBidirectional = isBidirectional;
