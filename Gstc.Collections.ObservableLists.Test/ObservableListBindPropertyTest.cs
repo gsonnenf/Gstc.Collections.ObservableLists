@@ -91,53 +91,81 @@ public class ObservableListBindPropertyTest {
         Assert.That(obvListBind.ObservableListA[1].MyNum, Is.EqualTo(1000));
         Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1000"));
     }
-    /*
-    [Test, Description("Test that changes in item properties of one list propagate to the other if INotifyPropertyChanged is implemented on the TItem")]
-    public void TestMethod_PropertyNotify() {
-        //Arrange
-        ObservableList<ItemS> sourceObvListB = new();
-        ObservableList<ItemBDest> destObvListB = new();
 
-        ObservableListBindingFunc<ItemBSource, ItemBDest> obvListSyncB = new(
-            (sourceItem) => new ItemBDest(sourceItem),
-            (destItem) => destItem.ItemBSourceItem,
-            sourceObvListB,
-            destObvListB,
-            true,
-            true
-        );
+    [Test, Description("Tests and demonstrates behavior of uni-directional repeat cascade for repeat list items in A.")]
+    [TestCaseSource(nameof(DataSource_Empty))]
+    public void Cascade(ObservableListBindProperty_ItemAB obvListBind) {
+        ItemA itemA1 = ItemA1;
 
-        sourceObvListB.Add(new ItemBSource { MyNum = 10, MyStringLower = "x" });
-        destObvListB.Add(new ItemBDest { MyNum = "1000", MyStringUpper = "A" });
-        const string string0 = "First Synchronized String";
-        const string string1 = "Second Synchronized String";
-
-        //Add event checks
-        int sourceEventCount0 = 0;
-        int destEventCount0 = 0;
-        int sourceEventCount1 = 0;
-        int destEventCount1 = 0;
-
-        sourceObvListB[0].PropertyChanged += (_, _) => sourceEventCount0++;
-        destObvListB[0].PropertyChanged += (_, _) => destEventCount0++;
-        sourceObvListB[1].PropertyChanged += (_, _) => sourceEventCount1++;
-        destObvListB[1].PropertyChanged += (_, _) => destEventCount1++;
-
-        //Act
-        sourceObvListB[0].MyNum = -1;
-        sourceObvListB[0].MyStringLower = string0.ToLower();
-        destObvListB[1].MyStringUpper = string1.ToUpper();
+        obvListBind.ObservableListA.Add(itemA1);
+        obvListBind.ObservableListA.Add(itemA1);
 
         Assert.Multiple(() => {
-            Assert.That(destObvListB[0].MyNum, Is.EqualTo("-1"));
-            Assert.That(destObvListB[0].MyStringUpper, Is.EqualTo(string0.ToUpper()));
-            Assert.That(sourceObvListB[1].MyStringLower, Is.EqualTo(string1.ToLower()));
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(obvListBind.ObservableListA[1]));
+            Assert.That(obvListBind.ObservableListB[0], Is.Not.SameAs(obvListBind.ObservableListB[1]));
+        });
 
-            Assert.That(sourceEventCount0, Is.EqualTo(2));
-            Assert.That(destEventCount0, Is.EqualTo(2));
-            Assert.That(sourceEventCount1, Is.EqualTo(1));
-            Assert.That(destEventCount1, Is.EqualTo(1));
+        obvListBind.ObservableListA[0].MyNum = 10;
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(obvListBind.ObservableListA[1]));
+            Assert.That(obvListBind.ObservableListB[0], Is.Not.SameAs(obvListBind.ObservableListB[1]));
+            Assert.That(obvListBind.ObservableListB[0], Is.EqualTo(obvListBind.ObservableListB[1]));
+        });
+
+        obvListBind.ObservableListB[0].MyNum = "100";
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0], Is.Not.SameAs(obvListBind.ObservableListA[1]));
+            Assert.That(obvListBind.ObservableListB[0], Is.Not.SameAs(obvListBind.ObservableListB[1]));
+            Assert.That(obvListBind.ObservableListB[0], Is.Not.EqualTo(obvListBind.ObservableListB[1]));
         });
     }
-    */
+    /*
+[Test, Description("Test that changes in item properties of one list propagate to the other if INotifyPropertyChanged is implemented on the TItem")]
+public void TestMethod_PropertyNotify() {
+   //Arrange
+   ObservableList<ItemS> sourceObvListB = new();
+   ObservableList<ItemBDest> destObvListB = new();
+
+   ObservableListBindingFunc<ItemBSource, ItemBDest> obvListSyncB = new(
+       (sourceItem) => new ItemBDest(sourceItem),
+       (destItem) => destItem.ItemBSourceItem,
+       sourceObvListB,
+       destObvListB,
+       true,
+       true
+   );
+
+   sourceObvListB.Add(new ItemBSource { MyNum = 10, MyStringLower = "x" });
+   destObvListB.Add(new ItemBDest { MyNum = "1000", MyStringUpper = "A" });
+   const string string0 = "First Synchronized String";
+   const string string1 = "Second Synchronized String";
+
+   //Add event checks
+   int sourceEventCount0 = 0;
+   int destEventCount0 = 0;
+   int sourceEventCount1 = 0;
+   int destEventCount1 = 0;
+
+   sourceObvListB[0].PropertyChanged += (_, _) => sourceEventCount0++;
+   destObvListB[0].PropertyChanged += (_, _) => destEventCount0++;
+   sourceObvListB[1].PropertyChanged += (_, _) => sourceEventCount1++;
+   destObvListB[1].PropertyChanged += (_, _) => destEventCount1++;
+
+   //Act
+   sourceObvListB[0].MyNum = -1;
+   sourceObvListB[0].MyStringLower = string0.ToLower();
+   destObvListB[1].MyStringUpper = string1.ToUpper();
+
+   Assert.Multiple(() => {
+       Assert.That(destObvListB[0].MyNum, Is.EqualTo("-1"));
+       Assert.That(destObvListB[0].MyStringUpper, Is.EqualTo(string0.ToUpper()));
+       Assert.That(sourceObvListB[1].MyStringLower, Is.EqualTo(string1.ToLower()));
+
+       Assert.That(sourceEventCount0, Is.EqualTo(2));
+       Assert.That(destEventCount0, Is.EqualTo(2));
+       Assert.That(sourceEventCount1, Is.EqualTo(1));
+       Assert.That(destEventCount1, Is.EqualTo(1));
+   });
+}
+*/
 }

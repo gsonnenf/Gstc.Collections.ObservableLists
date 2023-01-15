@@ -17,7 +17,7 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// <typeparam name="TItemB"></typeparam>
 public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableListBind<TItemA, TItemB>
     where TItemA : class, INotifyPropertyChanged
-    where TItemB : class {
+    where TItemB : class, INotifyPropertyChanged {
 
     #region Abstract
     public abstract TItemB ConvertItem(TItemA item);
@@ -25,7 +25,7 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     #endregion
 
     #region Fields
-    private PropertyBindingManager<TItemA, TItemB> _bindTracker;
+    private IPropertyBindManager<TItemA, TItemB> _bindTracker;
     private bool _isSynchronizationInProgress;
     private IObservableList<TItemA> _observableListA;
     private IObservableList<TItemB> _observableListB;
@@ -68,14 +68,24 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
      IObservableList<TItemA> obvListA,
      IObservableList<TItemB> obvListB,
      bool isBidirectional = true,
-     bool isPropertyBindEnabled = true
+     bool isPropertyBindEnabled = true,
+     PropertyBindType bindType = PropertyBindType.UpdateCollection
      ) {
-        _bindTracker = new(
-            sourceList: null,
-            targetList: null,
-            isBidirectional: isBidirectional,
-            isBindingEnabled: isPropertyBindEnabled
-            );
+        _bindTracker = bindType switch {
+            PropertyBindType.UpdateCollection =>
+                new PropertyBindUpdateCollection<TItemA, TItemB>(
+                    sourceList: null,
+                    targetList: null,
+                    isBidirectional: isBidirectional,
+                    isBindingEnabled: isPropertyBindEnabled),
+            PropertyBindType.UpdateProperty => new PropertyBindUpdateProperty<TItemA, TItemB>(
+                    sourceList: null,
+                    targetList: null,
+                    isBidirectional: isBidirectional,
+                    isBindingEnabled: isPropertyBindEnabled),
+            _ => throw new InvalidOperationException("Unreachable code")
+        };
+
         IsBidirectional = isBidirectional;
         ReplaceListA(obvListA);
         ReplaceListB(obvListB);
@@ -204,71 +214,13 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
 }
 #endregion
 
+public enum PropertyBindType {
+    UpdateCollection,
+    UpdateProperty
+
+}
 /// Property code for property sync binding
-/// 
 
-/* todo: delete this when verified use of new code
-private void ListSourceChanged(object sender, NotifyCollectionChangedEventArgs args) {
-    if (_isSynchronizationInProgress) return;
-    if (_observableListB == null) return;
-    _isSynchronizationInProgress = true;
-
-    switch (args.Action) {
-        case NotifyCollectionChangedAction.Add:
-            for (var index = 0; index < args.NewItems.Count; index++) {
-                var itemS = (TItemA)args.NewItems[index];
-                var itemT = ConvertItem(itemS);
-                _bindTracker.Bind(itemS, itemT);
-                _observableListB.Insert(args.NewStartingIndex + index, itemT);
-            }
-            break;
-
-        case NotifyCollectionChangedAction.Remove:
-            for (var index = 0; index < args.OldItems.Count; index++) {
-                var itemIndex = args.OldStartingIndex + index;
-                var itemS = (TItemA)args.OldItems[index];
-                var itemT = _observableListB[itemIndex];
-                _bindTracker.Unbind(itemS, itemT);
-                _observableListB.RemoveAt(itemIndex);
-            }
-            break;
-
-        case NotifyCollectionChangedAction.Replace:
-            for (var index = 0; index < args.OldItems.Count; index++) {
-                var itemIndex = args.OldStartingIndex + index;
-                var itemS = (TItemA)args.OldItems[index];
-                var itemT = _observableListB[itemIndex];
-                _bindTracker.Unbind(itemS, itemT);
-            }
-            for (var index = 0; index < args.NewItems.Count; index++) {
-                var itemS = (TItemA)args.NewItems[index];
-                var itemT = ConvertItem(itemS);
-                _observableListB[args.OldStartingIndex + index] = itemT;
-                _bindTracker.Bind(itemS, itemT);
-            }
-            break;
-
-        case NotifyCollectionChangedAction.Move:
-            for (var index = 0; index < args.OldItems.Count; index++)
-                _observableListB.Move(args.OldStartingIndex + index, args.NewStartingIndex + index);
-            break;
-
-        case NotifyCollectionChangedAction.Reset:
-            _bindTracker.UnbindAll();
-            _observableListB.Clear();
-            foreach (var ItemSource in _observableListA) {
-                var ItemDestination = ConvertItem(ItemSource);
-                _observableListB.Add(ItemDestination);
-            }
-            _bindTracker.BindAll();
-            break;
-
-        default:
-            _isSynchronizationInProgress = false;
-            throw new InvalidEnumArgumentException(args.Action.ToString());
-    }
-    _isSynchronizationInProgress = false;
-}*/
 
 //private void CreatePropertySync(int index, TItemA itemA, TItemB itemB) {
 

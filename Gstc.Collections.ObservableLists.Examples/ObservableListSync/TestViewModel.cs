@@ -12,15 +12,15 @@
                 var isParsed = int.TryParse(value, out var num);
                 if (!isParsed) return;
                 TestModel.Num1 = num;
-                OnPropertyChanged(null);
+                OnPropertyChanged();
             }
         }
 
         public int Num2 {
-            get => TestModel.Num2 + 5;
+            get => TestModel.Num2 * -1;
             set {
-                TestModel.Num2 = value - 5;
-                OnPropertyChanged(null);
+                TestModel.Num2 = value * -1;
+                OnPropertyChanged();
             }
         }
     }
