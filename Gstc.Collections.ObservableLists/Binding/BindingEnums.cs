@@ -4,8 +4,9 @@ public enum ListIdentifier {
     ListB
 }
 
-public enum PropertyUpdateBindingType {
-    None,
-    OnCollectionChanged,
-    OnPropertyChanged
+public enum PropertyBindType {
+    UpdateCollectionNotify,
+    UpdateCustomNotify,
+    UpdatePropertyNotify
+
 }

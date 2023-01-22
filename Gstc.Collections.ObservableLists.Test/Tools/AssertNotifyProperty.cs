@@ -14,6 +14,7 @@ namespace Gstc.Utility.UnitTest.Event;
 /// </summary>
 //TODO - Feature: Add a AddCallback feature for the more general OnPropertyChanged event.
 public class AssertNotifyProperty : IDisposable {
+    public static string NullString { get; } = "NULL_VALUE";
 
     #region Fields and Properties
     public ErrorLog ErrorLog { get; protected set; } = new();
@@ -53,7 +54,7 @@ public class AssertNotifyProperty : IDisposable {
     /// <exception cref="ArgumentNullException"></exception>
     public void AddCallback(string propertyName, int invokeOrder, string description, Action callback) {
         if (callback == null) throw new ArgumentNullException(nameof(callback), "A callback must be provided. If you only wish to assert call count, addCallback is not necessary.");
-        CountAndCallbackList pair = PropertyDictionary.GetOrAdd(propertyName, new CountAndCallbackList(propertyName));
+        CountAndCallbackList pair = PropertyDictionary.GetOrAdd(propertyName ?? NullString, new CountAndCallbackList(propertyName));
         pair.CallbackList.Add(new AssertCallback(propertyName, invokeOrder, description, callback));
     }
     //Overloads
@@ -72,8 +73,9 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="e"></param>
     protected void PropertyChangedHandler(object sender, PropertyChangedEventArgs e) {
         TimesCalled++;
+        string key = e.PropertyName ?? NullString;
         _ = PropertyDictionary.AddOrUpdate(
-            key: e.PropertyName,
+            key: key,
             addValue: new CountAndCallbackList(e.PropertyName, 1),
 
             updateValueFactory: (_, oldValue) => {
@@ -93,7 +95,7 @@ public class AssertNotifyProperty : IDisposable {
     /// <returns></returns>
     public bool TestPropertyCalled(int expectedTimesCalled, string propertyName) {
         int timesCalled = TimesPropertyCalled(propertyName);
-        if (timesCalled != expectedTimesCalled) ErrorLog += "PropertyChanged:" + propertyName +
+        if (timesCalled != expectedTimesCalled) ErrorLog += "PropertyChanged:" + propertyName ?? NullString +
                                                             " was called " + timesCalled +
                                                             " times, but " + expectedTimesCalled + " calls were expected.";
         if (IsResetCountOnAssert) ResetTimesPropertyCalled(propertyName);
@@ -107,12 +109,12 @@ public class AssertNotifyProperty : IDisposable {
     /// <returns></returns>
     public bool TestCallbacksInvoked(string propertyName) {
         if (!PropertyDictionary.TryGetValue(propertyName, out CountAndCallbackList countAndCallbackList)) {
-            ErrorLog += "Callback for Property: " + propertyName + " does not exist.\n ";
+            ErrorLog += "Callback for Property: " + propertyName ?? NullString + " does not exist.\n ";
             return ErrorLog.IsSuccess();
         }
         foreach (AssertCallback item in countAndCallbackList.CallbackList) {
             if (item.IsInvoked == false) ErrorLog += "A callback was expected to be invoked but was not invoked." +
-                                                     "\nProperty Name: " + propertyName +
+                                                     "\nProperty Name: " + propertyName ?? NullString +
                                                      "\nCallback Description:" + item.Description +
                                                      "\nCallback IsInvoked: " + item.IsInvoked +
                                                      "\n" + item.CallInfo() + "\n";
@@ -178,10 +180,10 @@ public class AssertNotifyProperty : IDisposable {
     /// <param name="propertyName"></param>
     /// <returns></returns>
     public int TimesPropertyCalled(string propertyName)
-        => PropertyDictionary.TryGetValue(propertyName, out CountAndCallbackList itemSet) ? itemSet.TimesCalled : 0;
+        => PropertyDictionary.TryGetValue(propertyName ?? NullString, out CountAndCallbackList itemSet) ? itemSet.TimesCalled : 0;
 
     protected void ResetTimesPropertyCalled(string propertyName) {
-        if (PropertyDictionary.TryGetValue(propertyName, out CountAndCallbackList itemSet)) itemSet.TimesCalled = 0;
+        if (PropertyDictionary.TryGetValue(propertyName ?? NullString, out CountAndCallbackList itemSet)) itemSet.TimesCalled = 0;
     }
 
     public class CountAndCallbackList {

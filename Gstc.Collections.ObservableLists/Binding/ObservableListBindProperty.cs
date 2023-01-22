@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 
 namespace Gstc.Collections.ObservableLists.Binding;
 
@@ -15,7 +16,7 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// </summary>
 /// <typeparam name="TItemA"></typeparam>
 /// <typeparam name="TItemB"></typeparam>
-public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableListBind<TItemA, TItemB>
+public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObservableListBind<TItemA, TItemB>
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
 
@@ -25,7 +26,7 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     #endregion
 
     #region Fields
-    private IPropertyBindManager<TItemA, TItemB> _bindTracker;
+    private IPropertyBinder<TItemA, TItemB> _bindTracker;
     private bool _isSynchronizationInProgress;
     private IObservableList<TItemA> _observableListA;
     private IObservableList<TItemB> _observableListB;
@@ -64,25 +65,27 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     #endregion
 
     #region ctor
+
     public ObservableListBindProperty(
      IObservableList<TItemA> obvListA,
      IObservableList<TItemB> obvListB,
+     PropertyBindType bindType = PropertyBindType.UpdateCollectionNotify,
      bool isBidirectional = true,
-     bool isPropertyBindEnabled = true,
-     PropertyBindType bindType = PropertyBindType.UpdateCollection
+     bool isPropertyBindEnabled = true
      ) {
         _bindTracker = bindType switch {
-            PropertyBindType.UpdateCollection =>
-                new PropertyBindUpdateCollection<TItemA, TItemB>(
+            PropertyBindType.UpdateCollectionNotify =>
+                new PropertyBinderUpdateCollectionNotify<TItemA, TItemB>(
                     sourceList: null,
                     targetList: null,
                     isBidirectional: isBidirectional,
                     isBindingEnabled: isPropertyBindEnabled),
-            PropertyBindType.UpdateProperty => new PropertyBindUpdateProperty<TItemA, TItemB>(
+            PropertyBindType.UpdatePropertyNotify => new PropertyBinderUpdatePropertyNotify<TItemA, TItemB>(
                     sourceList: null,
                     targetList: null,
                     isBidirectional: isBidirectional,
                     isBindingEnabled: isPropertyBindEnabled),
+            PropertyBindType.UpdateCustomNotify => throw new InvalidOperationException("PropertyBindType.UpdateCustomNotify must use a constructor with ICustomPropertyMap as a parameter."),
             _ => throw new InvalidOperationException("Unreachable code")
         };
 
@@ -91,7 +94,26 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
         ReplaceListB(obvListB);
     }
 
+    public ObservableListBindProperty(
+     IObservableList<TItemA> obvListA,
+     IObservableList<TItemB> obvListB,
+     ICustomPropertyMap<TItemA, TItemB> customPropertyMap,
+     bool isBidirectional = true,
+     bool isPropertyBindEnabled = true
+     ) {
+        _bindTracker = new PropertyBinderUpdateCustom<TItemA, TItemB>(sourceList: null,
+                    targetList: null,
+                    customPropertyMap: customPropertyMap,
+                    isBidirectional: isBidirectional,
+                    isBindingEnabled: isPropertyBindEnabled
+            );
+        IsBidirectional = isBidirectional;
+        ReplaceListA(obvListA);
+        ReplaceListB(obvListB);
+    }
+
     ~ObservableListBindProperty() => Dispose();
+
     public void Dispose() { //todo come up with better name
         _bindTracker.UnbindAll();
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
@@ -213,37 +235,3 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     }
 }
 #endregion
-
-public enum PropertyBindType {
-    UpdateCollection,
-    UpdateProperty
-
-}
-/// Property code for property sync binding
-
-
-//private void CreatePropertySync(int index, TItemA itemA, TItemB itemB) {
-
-//    if (PropertyBinding == PropertyBindingType.ReplaceItem) {
-//        if (itemA is not INotifyPropertyChanged obvItemA) throw new InvalidOperationException("Item A can not be bound because it does not implement INotifyPropertyChanged");
-//        if (itemB is not INotifyPropertyChanged obvItemB) throw new InvalidOperationException("Item A can not be bound because it does not implement INotifyPropertyChanged");
-//        var tracker = new PropertyBindingTracker() { ItemA = itemA, ItemB = itemB, Index = index };
-
-//        PropertyBindingTrackerList.Add(tracker);
-//        if (IsPropertyBindOn) tracker.BindA();
-//        if (_isBindingItemBToItemA) tracker.BindB();
-//    }
-
-//    if (PropertyBinding == PropertyBindingType.ReplaceItem) {
-//        //todo - bug: On the removal of an item, or the reset of a list, it might be useful to remove the sync from the removed objects.
-//        if (!(itemA is INotifyPropertyChanged && itemB is INotifyPropertyChanged)) return;
-//        if (!(itemA is IPropertyChangedSyncHook || itemB is IPropertyChangedSyncHook)) return;
-
-//        var propertySyncNotifier = new NotifyPropertySync(
-//            (INotifyPropertyChanged)itemA,
-//            (INotifyPropertyChanged)itemB,
-//            IsPropertyBindOn,
-//            _isBindingItemBToItemA);
-//        //propertySyncNotifierList.Add(propertySyncNotifier);
-//    }
-//}

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Binding;
+namespace Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 
-public abstract class AbstractPropertyBindManager<TItemSource, TItemTarget> : IPropertyBindManager<TItemSource, TItemTarget>
+abstract internal class AbstractPropertyBinder<TItemSource, TItemTarget> : IPropertyBinder<TItemSource, TItemTarget>
     where TItemSource : class, INotifyPropertyChanged
     where TItemTarget : class, INotifyPropertyChanged {
 
@@ -13,9 +13,9 @@ public abstract class AbstractPropertyBindManager<TItemSource, TItemTarget> : IP
     private bool _isBidirectional;
     private bool _isBindingEnabled;
 
-    protected abstract void SourceItemChanged(TItemSource itemS, TItemTarget itemT);
+    protected abstract void SourceItemChanged(TItemSource itemS, TItemTarget itemT, object sender, PropertyChangedEventArgs args);
 
-    protected abstract void TargetItemChanged(TItemSource itemS, TItemTarget itemT);
+    protected abstract void TargetItemChanged(TItemSource itemS, TItemTarget itemT, object sender, PropertyChangedEventArgs args);
 
     /// <summary>
     /// If false changes will only propagate from the sourceList to the target list.
@@ -68,7 +68,7 @@ public abstract class AbstractPropertyBindManager<TItemSource, TItemTarget> : IP
 
     #region ctor
 
-    public AbstractPropertyBindManager(
+    public AbstractPropertyBinder(
         IObservableList<TItemSource> sourceList,
         IObservableList<TItemTarget> targetList,
         bool isBidirectional = true,
@@ -96,7 +96,6 @@ public abstract class AbstractPropertyBindManager<TItemSource, TItemTarget> : IP
     /// Removes bindings from all items.
     /// </summary>
     public void UnbindAll() {
-        if (!_isBindingEnabled && BindingDictionary.Count > 0) throw new Exception(); //todo: delete
         if (!_isBindingEnabled) return;
         foreach (var kvp in BindingDictionary) Unbind(kvp.Value.itemS, kvp.Key);
     }
@@ -108,8 +107,8 @@ public abstract class AbstractPropertyBindManager<TItemSource, TItemTarget> : IP
     /// <param name="itemT">The item type of the target list.</param>
     public void Bind(TItemSource itemS, TItemTarget itemT) {
         if (!_isBindingEnabled) return;
-        void eventS(object sender, PropertyChangedEventArgs args) => SourceItemChanged(itemS, itemT);
-        void eventT(object sender, PropertyChangedEventArgs args) => TargetItemChanged(itemS, itemT);
+        void eventS(object sender, PropertyChangedEventArgs args) => SourceItemChanged(itemS, itemT, sender, args);
+        void eventT(object sender, PropertyChangedEventArgs args) => TargetItemChanged(itemS, itemT, sender, args);
 
         var obvItemS = itemS as INotifyPropertyChanged;
         obvItemS.PropertyChanged += eventS;

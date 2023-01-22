@@ -59,11 +59,10 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ObservableListSync\NotifyPropertySyncChanged.cs" />
     <Compile Include="ObservableList\ObservableListControl.xaml.cs">
       <DependentUpon>ObservableListControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ObservableListSync\ObservableListSyncControl.xaml.cs">
+    <Compile Include="ObservableListBinder\ObservableListSyncControl.xaml.cs">
       <DependentUpon>ObservableListSyncControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="CodeExamples\ObservableListDemo.cs" />
@@ -80,8 +79,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ObservableListSync\TestModel.cs" />
-    <Compile Include="ObservableListSync\TestViewModel.cs" />
+    <Compile Include="ObservableListBinder\TestModel.cs" />
+    <Compile Include="ObservableListBinder\TestViewModel.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -107,7 +106,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ObservableListSync\ObservableListSyncControl.xaml">
+    <Page Include="ObservableListBinder\ObservableListSyncControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -2,15 +2,10 @@
 using System.Windows.Controls;
 using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
-    /// <summary>
-    /// Interaction logic for ObservableListSyncControl.xaml
-    /// </summary>
-    public partial class ObservableListSyncControl : UserControl {
+namespace Gstc.Collections.ObservableLists.Examples.ObservableListBinder {
 
-        /// <summary>
-        /// The synchronized observable list for viewmodel.
-        /// </summary>       
+    public partial class ObservableListBinderControl : UserControl {
+
         private readonly ObservableListBind<TestModel, TestViewModel> _obvListSync =
            new ObservableListBindFunc<TestModel, TestViewModel>(
                (sourceItem) => new TestViewModel(sourceItem),
@@ -20,7 +15,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListSync {
         public ObservableList<TestModel> SourceObvList = new ObservableList<TestModel>();
         public ObservableList<TestViewModel> DestObvList = new ObservableList<TestViewModel>();
 
-        public ObservableListSyncControl() {
+        public ObservableListBinderControl() {
             InitializeComponent();
             //Initializes example data
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Binding;
-public interface IPropertyBindManager<TItemSource, TItemTarget>
+namespace Gstc.Collections.ObservableLists.Binding.PropertyBinder;
+internal interface IPropertyBinder<TItemSource, TItemTarget>
     where TItemSource : class, INotifyPropertyChanged
     where TItemTarget : class {
     bool IsBidirectional { get; set; }

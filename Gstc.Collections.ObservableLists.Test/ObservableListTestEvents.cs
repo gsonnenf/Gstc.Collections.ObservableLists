@@ -33,7 +33,7 @@ public class ObservableListTestEvents : CollectionTestBase<TestItem> {
     [Test, NUnit.Framework.Description("Tests that all events are called in the correct order.")]
     public void TestCallOrderOfEvents(
         [ValueSource(nameof(ObservableListDataSource))] Func<IObservableList<TestItem>> obvListGenerator,
-        [ValueSource(nameof(StaticOperationListDataSource))] EventTestSet testSet) { //Todo: verify this is done via combinatorics
+        [ValueSource(nameof(StaticOperationListDataSource))] EventTestSet testSet) {
 
         IObservableList<TestItem> obvList = obvListGenerator();
         Console.WriteLine("Name: " + testSet.Name);

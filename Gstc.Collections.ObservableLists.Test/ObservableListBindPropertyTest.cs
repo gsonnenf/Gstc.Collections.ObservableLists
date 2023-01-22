@@ -1,18 +1,22 @@
-﻿using Gstc.Collections.ObservableLists.Test.MockObjects;
+﻿using Gstc.Collections.ObservableLists.Binding;
+using Gstc.Collections.ObservableLists.Test.MockObjects;
+using Gstc.Utility.UnitTest.Event;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
 public class ObservableListBindPropertyTest {
-    //TODO: Find a test situation where a two way notify might be used. It seems that any user written mapping between objects would trigger INotifyProperty without needing this.
 
     public static object[] DataSource_Empty => new object[] {
-       new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB())
     };
 
     public static object[] DataSource_Populated => new object[] {
-       new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(){ ItemA1 }, new ObservableList<ItemB>()),
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(){ ItemA1 }, new ObservableList<ItemB>()),
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(){ ItemA1 }, new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB())
+
     };
 
     #region Test Fixture
@@ -81,21 +85,29 @@ public class ObservableListBindPropertyTest {
         obvListBind.ObservableListB.Add(ItemB2);
         obvListBind.ObservableListB[0].MyNum = "100";
         obvListBind.ObservableListA[1].MyNum = 100;
-        Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
-        Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1"));
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
+            Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1"));
+        });
 
         //Test re-enabled
         obvListBind.IsPropertyBindingEnabled = true;
         obvListBind.ObservableListB[0].MyNum = "1000";
         obvListBind.ObservableListA[1].MyNum = 1000;
-        Assert.That(obvListBind.ObservableListA[1].MyNum, Is.EqualTo(1000));
-        Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1000"));
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[1].MyNum, Is.EqualTo(1000));
+            Assert.That(obvListBind.ObservableListB[1].MyNum, Is.EqualTo("1000"));
+        });
     }
 
-    [Test, Description("Tests and demonstrates behavior of uni-directional repeat cascade for repeat list items in A.")]
-    [TestCaseSource(nameof(DataSource_Empty))]
-    public void Cascade(ObservableListBindProperty_ItemAB obvListBind) {
+    [Test, Description("Tests and demonstrates behavior of uni-directional repeat cascade using UpdateCollection for repeat list items in A.")]
+    public void CascadeUpdateCollection() {
         ItemA itemA1 = ItemA1;
+
+        ObservableListBindProperty_ItemAB obvListBind = new(
+           obvListA: new ObservableList<ItemA>() { itemA1 },
+           obvListB: new ObservableList<ItemB>()
+           );
 
         obvListBind.ObservableListA.Add(itemA1);
         obvListBind.ObservableListA.Add(itemA1);
@@ -119,53 +131,119 @@ public class ObservableListBindPropertyTest {
             Assert.That(obvListBind.ObservableListB[0], Is.Not.EqualTo(obvListBind.ObservableListB[1]));
         });
     }
-    /*
-[Test, Description("Test that changes in item properties of one list propagate to the other if INotifyPropertyChanged is implemented on the TItem")]
-public void TestMethod_PropertyNotify() {
-   //Arrange
-   ObservableList<ItemS> sourceObvListB = new();
-   ObservableList<ItemBDest> destObvListB = new();
+    #region UpdateProperty
 
-   ObservableListBindingFunc<ItemBSource, ItemBDest> obvListSyncB = new(
-       (sourceItem) => new ItemBDest(sourceItem),
-       (destItem) => destItem.ItemBSourceItem,
-       sourceObvListB,
-       destObvListB,
-       true,
-       true
-   );
+    [Test, Description("Tests that property notify events are propogated from source to target on PropertyBindUpdateProperty.")]
+    public void UpdatePropertyTest_reflection() {
+        ObservableListBindProperty_ItemMVM obvListBind = new(
+            obvListA: new ObservableList<ItemModel>() { new ItemModel() { PhoneNumber = 8005551111 } },
+            obvListB: new ObservableList<ItemViewModel>(),
+            bindType: PropertyBindType.UpdatePropertyNotify
+            );
 
-   sourceObvListB.Add(new ItemBSource { MyNum = 10, MyStringLower = "x" });
-   destObvListB.Add(new ItemBDest { MyNum = "1000", MyStringUpper = "A" });
-   const string string0 = "First Synchronized String";
-   const string string1 = "Second Synchronized String";
+        AssertNotifyProperty testItemM = new(obvListBind.ObservableListA[0]);
+        AssertNotifyProperty testItemVM = new(obvListBind.ObservableListB[0]);
+        ItemModel ItemM1 = obvListBind.ObservableListA[0];
+        ItemViewModel ItemVM1 = obvListBind.ObservableListB[0];
 
-   //Add event checks
-   int sourceEventCount0 = 0;
-   int destEventCount0 = 0;
-   int sourceEventCount1 = 0;
-   int destEventCount1 = 0;
+        obvListBind.ObservableListA[0].PhoneNumber = 5055551111;
 
-   sourceObvListB[0].PropertyChanged += (_, _) => sourceEventCount0++;
-   destObvListB[0].PropertyChanged += (_, _) => destEventCount0++;
-   sourceObvListB[1].PropertyChanged += (_, _) => sourceEventCount1++;
-   destObvListB[1].PropertyChanged += (_, _) => destEventCount1++;
+        Assert.Multiple(() => {
+            Assert.That(testItemM.TestOnChangedTimesCalled(1), testItemM.ErrorMessages);
+            Assert.That(testItemVM.TestOnChangedTimesCalled(1), testItemVM.ErrorMessages);
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(ItemM1));
+            Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemVM1));
+            Assert.That(obvListBind.ObservableListA[0].PhoneNumber, Is.EqualTo(5055551111));
+            Assert.That(obvListBind.ObservableListB[0].PhoneNumber, Is.EqualTo("505-555-1111"));
 
-   //Act
-   sourceObvListB[0].MyNum = -1;
-   sourceObvListB[0].MyStringLower = string0.ToLower();
-   destObvListB[1].MyStringUpper = string1.ToUpper();
+        });
 
-   Assert.Multiple(() => {
-       Assert.That(destObvListB[0].MyNum, Is.EqualTo("-1"));
-       Assert.That(destObvListB[0].MyStringUpper, Is.EqualTo(string0.ToUpper()));
-       Assert.That(sourceObvListB[1].MyStringLower, Is.EqualTo(string1.ToLower()));
+        obvListBind.ObservableListB[0].PhoneNumber = "408-555-1111";
+        obvListBind.ObservableListB[0].PhoneNumber = "415-555-1111";
 
-       Assert.That(sourceEventCount0, Is.EqualTo(2));
-       Assert.That(destEventCount0, Is.EqualTo(2));
-       Assert.That(sourceEventCount1, Is.EqualTo(1));
-       Assert.That(destEventCount1, Is.EqualTo(1));
-   });
+        Assert.Multiple(() => {
+            Assert.That(testItemM.TestOnChangedTimesCalled(2), testItemM.ErrorMessages);
+            Assert.That(testItemVM.TestOnChangedTimesCalled(2), testItemVM.ErrorMessages);
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(ItemM1));
+            Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemVM1));
+            Assert.That(obvListBind.ObservableListA[0].PhoneNumber, Is.EqualTo(4155551111));
+            Assert.That(obvListBind.ObservableListB[0].PhoneNumber, Is.EqualTo("415-555-1111"));
+        });
+    }
+
+    [Test, Description("Tests that property notify events are propogated from source to target on PropertyBindUpdateProperty.")]
+    public void UpdatePropertyTest_INotifyPropertyChangedHook() {
+        ObservableListBindProperty_ItemMVMHook obvListBind = new(
+            obvListA: new ObservableList<ItemModelHook>() { new ItemModelHook() { PhoneNumber = 8005551111 } },
+            obvListB: new ObservableList<ItemViewModelHook>(),
+            bindType: PropertyBindType.UpdatePropertyNotify
+            );
+
+        AssertNotifyProperty testItemM = new(obvListBind.ObservableListA[0]);
+        AssertNotifyProperty testItemVM = new(obvListBind.ObservableListB[0]);
+        ItemModelHook ItemM1 = obvListBind.ObservableListA[0];
+        ItemViewModelHook ItemVM1 = obvListBind.ObservableListB[0];
+
+        obvListBind.ObservableListA[0].PhoneNumber = 5055551111;
+
+        Assert.Multiple(() => {
+            Assert.That(testItemM.TestOnChangedTimesCalled(1), testItemM.ErrorMessages);
+            Assert.That(testItemVM.TestOnChangedTimesCalled(1), testItemVM.ErrorMessages);
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(ItemM1));
+            Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemVM1));
+            Assert.That(obvListBind.ObservableListA[0].PhoneNumber, Is.EqualTo(5055551111));
+            Assert.That(obvListBind.ObservableListB[0].PhoneNumber, Is.EqualTo("505-555-1111"));
+        });
+
+        obvListBind.ObservableListB[0].PhoneNumber = "408-555-1111";
+        obvListBind.ObservableListB[0].PhoneNumber = "415-555-1111";
+
+        Assert.Multiple(() => {
+            Assert.That(testItemM.TestOnChangedTimesCalled(2), testItemM.ErrorMessages);
+            Assert.That(testItemVM.TestOnChangedTimesCalled(2), testItemVM.ErrorMessages);
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(ItemM1));
+            Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemVM1));
+            Assert.That(obvListBind.ObservableListA[0].PhoneNumber, Is.EqualTo(4155551111));
+            Assert.That(obvListBind.ObservableListB[0].PhoneNumber, Is.EqualTo("415-555-1111"));
+        });
+    }
+
+    #endregion
+
+    [Test, Description("Tests that property notify events are propogated from source to target on PropertyBindUpdateCustom with a custom map.")]
+    public void UpdateCustomTest() {
+        ObservableListBindProperty_ItemAB obvListBind = new(
+            obvListA: new ObservableList<ItemA>() { ItemA1 },
+            obvListB: new ObservableList<ItemB>(),
+            customPropertyMap: new CustomPropertyMapItemAB()
+            );
+
+        ItemA ItemAInitial = obvListBind.ObservableListA[0];
+        ItemB ItemBInitial = obvListBind.ObservableListB[0];
+
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(0));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("0"));
+        });
+
+        obvListBind.ObservableListA[0].MyNum = 10;
+
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(10));
+            Assert.That(obvListBind.ObservableListB[0].MyNum, Is.EqualTo("10"));
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(ItemAInitial));
+            Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemBInitial));
+        });
+
+        string testString = "NEW TEST STRING";
+        obvListBind.ObservableListB[0].MyStringUpper = testString;
+
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA[0].MyStringLower, Is.EqualTo(testString.ToLower()));
+            Assert.That(obvListBind.ObservableListB[0].MyStringUpper, Is.EqualTo(testString));
+            Assert.That(obvListBind.ObservableListA[0], Is.SameAs(ItemAInitial));
+            Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemBInitial));
+        });
+    }
 }
-*/
-}
+

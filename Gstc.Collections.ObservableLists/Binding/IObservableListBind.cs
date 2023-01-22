@@ -1,43 +1,47 @@
 ﻿namespace Gstc.Collections.ObservableLists.Binding;
+
+/// <summary>
+/// Interface for binding and converting between two obesrvable lists of different types.
+/// </summary>
+/// <typeparam name="TItemA">The type of items in the first list.</typeparam>
+/// <typeparam name="TItemB">The type of items in the second list.</typeparam>
 public interface IObservableListBind<TItemA, TItemB> {
     /// <summary>
-    /// Converts an item of type {TSource} to {TDestination}.
+    /// Converts an item of type {TItemA} to type {TItemB}.
     /// </summary>
-    /// <param name="item">The source {TSource} Item.</param>
-    /// <returns>A {TDestination} item.</returns>
+    /// <param name="item">The item to be converted.</param>
+    /// <returns>The converted item of type {TItemB}.</returns>
     public TItemB ConvertItem(TItemA item);
 
     /// <summary>
-    /// Converts an item of type {TDestination} to {TSource}.
+    /// Converts an item of type {TItemB} to type {TItemA}.
     /// </summary>
-    /// <param name="item">The source {TDestination} Item.</param>
-    /// <returns>A {TSource} item.</returns>
+    /// <param name="item">The item to be converted.</param>
+    /// <returns>The converted item of type {TItemA}.</returns>
     public TItemA ConvertItem(TItemB item);
 
     /// <summary>
-    /// todo: comments
+    /// Gets or sets a value indicating whether the conversion between {TItemA} and {TItemB} is bidirectional, or unidirectional 
+    /// from the designated SourceList to the target list.
     /// </summary>
     public bool IsBidirectional { get; set; }
 
     /// <summary>
-    /// A source observable collection of type {TSource} that will be synchronized to a destination collection of type {TDestination}.
-    /// Source Items are converted using your provided ConvertSourceToDestination(...) method and automatically added to the 
-    /// destination collection.
+    /// An IObservableList of type {TItemA} that will be synchronized to another IObservableList of type {TItemB}.
+    /// Items are converted using your provided ConvertItem(...) method.
     /// </summary>
     public IObservableList<TItemA> ObservableListA { get; set; }
 
     /// <summary>
-    /// A destination observable collection of type {TDestination} that will be synchronized to a source collection of type {TSource}.
-    /// On assignment, the destination list is cleared, and items from the source list are converted and added to the destination 
-    /// using your provided ConvertSourceToDestination(...) method. After assignment changes to the destination list are propagated to
-    /// the source list.
-    /// 
-    /// If you wish to propagate items from the destination list to the source list on assignment, use the ReplaceDestinationCopyToSource(...) method.
+    /// An IObservableList of type {TItemA} that will be synchronized to another IObservableList of type {TItemB}.
+    /// Items are converted using your provided ConvertItem(...) method.
     /// </summary>
     public IObservableList<TItemB> ObservableListB { get; set; }
 
     /// <summary>
-    /// todo: comments
+    /// Sets if ObservableListA or ObservableListB list will be the source or 'primary' list. The other list will be 
+    /// designated as the target list. If a list is replaced the source list will be copied to the target list, and
+    /// if bidirectional is false, changes are only allowed from the source list to the target list.
     /// </summary>
     public ListIdentifier SourceList { get; set; }
 }

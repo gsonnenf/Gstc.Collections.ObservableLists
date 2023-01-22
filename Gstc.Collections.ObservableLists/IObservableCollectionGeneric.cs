@@ -12,9 +12,14 @@ public interface IObservableCollection<TItem> :
     IObservableCollection {
     new int Count { get; } //Fixes ambiguity issue
     bool AllowReentrancy { set; }
-
-    //Todo: add a Refresh command that will simulate a replace operation without actually changing the underlying list.
-    //This is useful for when properties changed on an item, but you don't want to perform a replace on the underlying list.
+    /// <summary>
+    /// Triggers a INotifyPropertyChanged replaced event without making changes to the underlying list.
+    /// </summary>
+    /// <param name="index">The index to trigger the replace event.</param>
     void RefreshIndex(int index);
+    /// <summary>
+    /// Triggers a INotifyPropertyChanged reset event without making changes to the underlying list.
+    /// </summary>
+    /// <param name="index"></param>
     void RefreshAll();
 }

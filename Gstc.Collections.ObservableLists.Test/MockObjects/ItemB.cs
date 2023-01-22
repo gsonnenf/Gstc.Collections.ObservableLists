@@ -19,7 +19,7 @@ public class ItemB : INotifyPropertyChanged {
     }
     public string MyStringUpper {
         get => _myStringUpper;
-        set { _myStringUpper = value; OnPropertyChanged(nameof(_myStringUpper)); }
+        set { _myStringUpper = value; OnPropertyChanged(nameof(MyStringUpper)); }
     }
     public override bool Equals(object obj) {
         if (obj is not ItemB temp) return false;
