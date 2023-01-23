@@ -7,6 +7,15 @@ public class ObservableListBindProperty_ItemAB : ObservableListBindProperty<Item
     public ObservableListBindProperty_ItemAB(
         IObservableList<ItemA> obvListA,
         IObservableList<ItemB> obvListB,
+        PropertyBindType bindType,
+         bool isBidirectional = true,
+        bool isPropertyBindEnabled = true)
+        : base(obvListA, obvListB, bindType, isBidirectional, isPropertyBindEnabled) {
+    }
+
+    public ObservableListBindProperty_ItemAB(
+        IObservableList<ItemA> obvListA,
+        IObservableList<ItemB> obvListB,
         bool isBidirectional = true,
         bool isPropertyBindEnabled = true,
         PropertyBindType bindType = PropertyBindType.UpdateCollectionNotify)

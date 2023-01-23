@@ -91,14 +91,14 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         _observableListA = observableListA;
         RebindLists();
-        _observableListA.CollectionChanged += ListAChanged;
+        if (_observableListA != null) _observableListA.CollectionChanged += ListAChanged;
     }
 
     protected void ReplaceListB(IObservableList<TItemB> observableListB) {
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
         _observableListB = observableListB;
         RebindLists();
-        _observableListB.CollectionChanged += ListBChanged;
+        if (_observableListB != null) _observableListB.CollectionChanged += ListBChanged;
     }
 
     private void RebindLists() {

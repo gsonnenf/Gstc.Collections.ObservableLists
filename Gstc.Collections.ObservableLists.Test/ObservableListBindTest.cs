@@ -70,6 +70,7 @@ public class ObservableListBindTest {
         });
     }
 
+    //Todo: is this covered by the copy on initialization test above?
     [Test, Description("Tests initialization from constructor for ObservableListBindFunc")]
     public void CopyOnInitialize_ObservableListBindFunc() {
         //Func
@@ -337,6 +338,26 @@ public class ObservableListBindTest {
             Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(1));
         });
     }
-    //todo: Null list checks
+
+    [Test, Description("Tests that list doesn't fail when null.")]
+    public void NullTests(
+            [ValueSource(nameof(DataSource_Prepopulated))] Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator,
+            [Values] ListIdentifier testList
+        ) {
+        IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+
+        if (testList == ListIdentifier.ListA) obvListBind.ObservableListA = null;
+        if (testList == ListIdentifier.ListB) obvListBind.ObservableListB = null;
+
+        obvListBind.ObservableListA?.Add(ItemA1);
+        _ = (obvListBind.ObservableListA?.Remove(ItemA1));
+        obvListBind.ObservableListA?.Clear();
+
+        obvListBind.ObservableListB?.Add(ItemB1);
+        _ = (obvListBind.ObservableListB?.Remove(ItemB1));
+        obvListBind.ObservableListB?.Clear();
+
+    }
+
 }
 

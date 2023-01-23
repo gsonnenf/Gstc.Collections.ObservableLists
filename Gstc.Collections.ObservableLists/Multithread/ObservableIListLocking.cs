@@ -171,6 +171,7 @@ public class ObservableIListLocking<TItem, TList> :
         }
     }
     #endregion
+
     #region Method Overrides
     /// <summary>
     /// Indexes an element of the list. CollectionChanged and Replaced events are triggered on assignment.
