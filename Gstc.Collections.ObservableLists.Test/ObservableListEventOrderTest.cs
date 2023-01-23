@@ -59,7 +59,6 @@ public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
                 testEvent.AddCallback((_, args) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName + " : " + args.PropertyName));
                 testEvent.AddCallback((_, args) => {
                     if (args.PropertyName == "Count") Assert.That(testSet.IsCountChanged, "OnPropertyChanged: Count is not suppose to be called for method: " + testSet.Name);
-
                     if (args.PropertyName == "Item[]") callOrder = (callOrder == staticIndex) ? callOrder + 1
                     : throw new Exception(testSet.Name + ": Call order of " + eventName + " was not correct. " + staticIndex + " was expected, but " + callOrder + " was received.");
                 });
@@ -96,7 +95,7 @@ public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
             Name = "AddRange",
             EventOrderList = EventOrderList_AddRange,
             ArrangeAction = (_) => { },
-            ActAction = (obvList) => obvList.AddRange(new[] {StaticTestItem, StaticTestItem, StaticTestItem}),
+            ActAction = (obvList) => obvList.AddRange(new[] {StaticTestItem, StaticTestItem}),
             IsCountChanged = true
         },
         new EventTestSet {
@@ -128,6 +127,22 @@ public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
             IsCountChanged = false
         },
         //Todo: Add RefreshIndex and RefreshAll
+
+        new EventTestSet {
+            Name = "RefreshIndex",
+            EventOrderList = EventOrderList_Index,
+            ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
+            ActAction = (obvList) => obvList.RefreshIndex(0),
+            IsCountChanged = false
+        },
+
+        new EventTestSet {
+            Name = "RefreshAll",
+            EventOrderList = EventOrderList_Clear,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => obvList.RefreshAll(),
+            IsCountChanged = true
+        },
 
         new EventTestSet {
             Name = "Remove",
