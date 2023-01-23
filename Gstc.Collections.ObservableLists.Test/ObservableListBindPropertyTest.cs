@@ -33,7 +33,7 @@ public class ObservableListBindPropertyTest {
     #endregion
 
     [Test, Description("Tests that sync is ignored properly when one of the lists is null.")] //todo: give this a double check
-    public void NullList(
+    public void ReplaceList_WithNulls_DoesNotThrowExceptions(
      [ValueSource(nameof(DataSource_NullTest))] Func<ObservableListBindProperty_ItemAB> obvListBindGenerator,
      [Values] ListIdentifier testList) {
         ObservableListBindProperty_ItemAB obvListBind = obvListBindGenerator();
@@ -63,7 +63,7 @@ public class ObservableListBindPropertyTest {
 
     [Test, Description("Tests that property changes are propagated from one list item to the other for UpdateCollectionNotify and UpdateCustomNotify.")]
     [TestCaseSource(nameof(DataSource_Populated))]
-    public void BidirectionalSync(ObservableListBindProperty_ItemAB obvListBind) {
+    public void BidirectionalSync_ItemsSynchronizeAsExpected(ObservableListBindProperty_ItemAB obvListBind) {
         //Initialization
         Assert.Multiple(() => {
             Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(0));
@@ -107,7 +107,7 @@ public class ObservableListBindPropertyTest {
 
     [Test, Description("Tests that property bind is disabled when IsPropertyBindEnabled set.")]
     [TestCaseSource(nameof(DataSource_Empty))]
-    public void IsPropertyBindEnabled(ObservableListBindProperty_ItemAB obvListBind) {
+    public void IsPropertyBindEnabled_PropertiesSyncWhenEnabled_DoNotSyncWhenDisabled(ObservableListBindProperty_ItemAB obvListBind) {
 
         //tests constructor enabled
         obvListBind.ObservableListA.Add(ItemA1);
@@ -134,11 +134,9 @@ public class ObservableListBindPropertyTest {
         });
     }
 
-
     #region UpdateProperty
-
     [Test, Description("Tests that property notify events are propogated from source to target on PropertyBindType.UpdatePropertyNotify using INotifyPropertyChanged and reflection.")]
-    public void UpdatePropertyNotify_reflection() {
+    public void UpdatePropertyNotify_PropertiesSyncViaReflection() {
         ObservableListBindProperty_ItemMVM obvListBind = new(
             obvListA: new ObservableList<ItemModel>() { new ItemModel() { PhoneNumber = 8005551111 } },
             obvListB: new ObservableList<ItemViewModel>(),
@@ -176,7 +174,7 @@ public class ObservableListBindPropertyTest {
     }
 
     [Test, Description("Tests that property notify events are propagated from source to target on PropertyBindType.UpdatePropertyNotify using INotifyPropertyChangedHook.")]
-    public void UpdateProperty_INotifyPropertyChangedHook() {
+    public void UpdatePropertyNotify_PropertiesSyncViaINotifyPropertyChangedHook() {
         ObservableListBindProperty_ItemMVMHook obvListBind = new(
             obvListA: new ObservableList<ItemModelHook>() { new ItemModelHook() { PhoneNumber = 8005551111 } },
             obvListB: new ObservableList<ItemViewModelHook>(),
@@ -213,7 +211,7 @@ public class ObservableListBindPropertyTest {
     }
 
     [Test, Description("Tests that property notify events are propogated from source to target on PropertyBindUpdateCustom with a custom map.")]
-    public void UpdateCustom_CustomPropertyMap() {
+    public void UpdateCustomNotify_PropertiesSyncUsingCustomPropertyMap() {
         ObservableListBindProperty_ItemAB obvListBind = new(
             obvListA: new ObservableList<ItemA>() { ItemA1 },
             obvListB: new ObservableList<ItemB>(),
@@ -247,9 +245,10 @@ public class ObservableListBindPropertyTest {
             Assert.That(obvListBind.ObservableListB[0], Is.SameAs(ItemBInitial));
         });
     }
+    #endregion
 
     [Test, Description("Tests and demonstrates behavior of uni-directional repeat cascade resulting from repeat items in the same source list.")]
-    public void CascadeUpdateCollection() {
+    public void UpdateCollectionNotify_DemonstratesCascadeUpdateCollection_NewTargetItemsAreCreatedAsExpected() {
         ItemA itemA1 = ItemA1;
 
         ObservableListBindProperty_ItemAB obvListBind = new(

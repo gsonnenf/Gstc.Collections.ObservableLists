@@ -24,7 +24,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
     [Description("Tests functionality when upcast to ICollection<> interface.")]
-    public void CollectionInterfaceGenericTest(ICollection<TestItem> collection) {
+    public void UpcastToICollectionGeneric_MethodsWorkCorrectlyAndTriggerEvents(ICollection<TestItem> collection) {
         //Staging
         if (collection is not IObservableList<TestItem> obvList) throw new InvalidCastException("Collection does not support the IObservableList<TestItem> Interface");
 
@@ -88,7 +88,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
     [Description("Tests functionality when upcast to IList<> interface (those methods not found in ICollection<>)")]
-    public void ListInterfaceGenericTest(IList<TestItem> list) {
+    public void UpcastToIListGeneric_MethodsStillWorkAndTriggerEvents(IList<TestItem> list) {
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");
         InitPropertyCollectionTest(obvCollection);
 
@@ -114,7 +114,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
     [Description("Tests functionality when upcast to ICollection interface.")]
-    public void CollectionInterfaceTest(ICollection collection) {
+    public void UpcastToICollection_MethodsStillWork(ICollection collection) {
         if (collection is not IObservableList<TestItem> obvList) throw new InvalidCastException("Collection does not support the IObservable Interface");
         obvList.Add(Item1);
         obvList.Add(Item2);
@@ -159,7 +159,7 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     [Test]
     [TestCaseSource(nameof(StaticDataSourceIList))]
     [Description("Tests functionality when upcast to IList interface.")]
-    public void ListInterfaceTest(IList list) {
+    public void UpcstToIList_MethodsStillWorkAndTriggerEvents(IList list) {
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");
 
         //Add test

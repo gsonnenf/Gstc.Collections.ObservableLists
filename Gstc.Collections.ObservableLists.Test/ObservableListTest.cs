@@ -14,7 +14,7 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
 
     [Test]
     [Description("Test constructor initialization with list")]
-    public void TestMethod_Constructor() {
+    public void ConstructorInitialization_ObservableListInitializes() {
         List<TestItem> list = new() { Item1, Item2 };
 
         ObservableList<TestItem> obvList = new(list);
@@ -39,7 +39,7 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
 
     [Test]
     [Description("Tests event triggers on replace list.")]
-    public void TestMethod_InternalList_Replace() {
+    public void ReplaceInternalList_ListIsReplaced_TriggerNotifyEvents() {
         List<TestItem> list = new() { Item1, Item2 };
 
         ObservableList<TestItem> obvList = new();
@@ -73,8 +73,8 @@ public class ObservableListTest : CollectionTestBase<TestItem> {
         });
     }
 
-    [Test, Description("Tests the reset event for WPF data binding")]
-    public void TestMethod_AddRange_Wpf() {
+    [Test, Description("Tests that addRange triggers reset event instead of add event. Used for compatibility with WPF data binding.")]
+    public void AddRangeWithIsResetForAddRangeTrue_TriggersResetEventInsteadOfAddEvent() {
         ObservableList<TestItem> obvList = new() { IsResetForAddRange = true };
         obvList.Add(DefaultTestItem);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);

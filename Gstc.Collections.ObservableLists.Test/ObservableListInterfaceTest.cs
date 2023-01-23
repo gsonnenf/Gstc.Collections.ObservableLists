@@ -20,7 +20,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Add(IObservableList<TestItem> obvList) {
+    public void Add_ItemAdded_EventsTriggeredSuccessfully(IObservableList<TestItem> obvList) {
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Add(0, Item1));
 
         obvList.Add(Item1);
@@ -34,7 +34,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [TestCaseSource(nameof(StaticDataSource))]
     [Test, Description("Test AddRange")]
-    public void TestMethod_AddRange(IObservableList<TestItem> obvList) {
+    public void AddRange_ItemsAdded_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.Add(DefaultTestItem);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_AddRange3(1, Item1, Item2, Item3));
 
@@ -52,7 +52,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Clear(IObservableList<TestItem> obvList) {
+    public void Clear_ItemsCleared_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.Add(Item1);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
 
@@ -66,7 +66,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Index(IObservableList<TestItem> obvList) {
+    public void Index_ItemAtIndexReplaced_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.Add(Item1);
         obvList.Add(Item2);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Replace(1, Item2, Item3));
@@ -83,7 +83,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Insert(IObservableList<TestItem> obvList) {
+    public void Insert_ItemInserted_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.Add(Item1);
         obvList.Add(Item3);
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Add(1, Item2));
@@ -99,7 +99,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("Tests that move generated the appropriate events.")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Move(IObservableList<TestItem> obvList) {
+    public void Move_ItemMoved_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.AddRange(new[] { Item1, Item2, Item3 });
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Moved(Item2, 2, 1));
 
@@ -113,7 +113,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_RefreshIndex(IObservableList<TestItem> obvList) {
+    public void RefreshIndex_NotifyEventInvokedAtIndex(IObservableList<TestItem> obvList) {
         obvList.AddRange(new[] { Item1 });
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Replace(0, Item1, Item1));
 
@@ -127,7 +127,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_RefreshAll(IObservableList<TestItem> obvList) {
+    public void RefreshAll_NotifyEventInvoked(IObservableList<TestItem> obvList) {
         obvList.AddRange(new[] { Item1 });
         InitPropertyCollectionTest(obvList, AssertArgs.OnCollectionChanged_Reset);
 
@@ -142,7 +142,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_Remove(IObservableList<TestItem> obvList) {
+    public void Remove_ItemRemoved_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.Add(Item1);
         obvList.Add(Item2);
         obvList.Add(Item3);
@@ -160,7 +160,7 @@ public class ObservableListInterfaceTest : CollectionTestBase<TestItem> {
 
     [Test, Description("")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void TestMethod_RemoveAt(IObservableList<TestItem> obvList) {
+    public void RemoveAt_ItemRemovedAtIndex_NotifyEventsInvoked(IObservableList<TestItem> obvList) {
         obvList.Add(Item1);
         obvList.Add(Item2);
         obvList.Add(Item3);

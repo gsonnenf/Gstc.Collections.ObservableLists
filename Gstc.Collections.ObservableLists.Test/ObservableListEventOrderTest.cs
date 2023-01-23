@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Gstc.Collections.ObservableLists.Test;
 
 [TestFixture]
-public class ObservableListTestEvents : CollectionTestBase<TestItem> {
+public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
 
     public readonly static object[] ObservableListDataSource = {
         () => new ObservableList<TestItem>(), //A generator is needed. The static data souce is only called once per ValueSource method.

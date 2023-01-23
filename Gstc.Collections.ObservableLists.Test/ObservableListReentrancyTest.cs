@@ -22,7 +22,7 @@ public class ObservableListReentrancyTest {
 
     [Test, Description("Tests that reentrancy is allowed if AllowReentrancy is set to true")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void ReentrancySucceedTest(IObservableCollection<string> list) {
+    public void Reentrancy_Add_AllowReentrancyFlagTrue_ReentrancyIsAllowed(IObservableCollection<string> list) {
         int reentrancyCounter = 0;
         try {
             list.AllowReentrancy = true;
@@ -39,7 +39,7 @@ public class ObservableListReentrancyTest {
 
     [Test, Description("Tests that reentrancy triggers an error if AllowReentrancy is set to false")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void ReentrancyFailTest(IObservableCollection<string> list) {
+    public void Reentrancy_Add_AllowReentrancyFlagFalse_ReentrancyThrowsException(IObservableCollection<string> list) {
         list.AllowReentrancy = false;
         list.CollectionChanged += (_, args) => {
             if (list.Count > 10) return;
@@ -49,7 +49,7 @@ public class ObservableListReentrancyTest {
     }
 
     [Test, Description("Test for locking on multithread reentrancy when chaining thread calls.")]
-    public void ReentrancyMultithreadTest() {
+    public void Reentrancy_AddUsingMultipleThread_IsSuccessfulOrderedAndDoesNotDeadLock() {
         ObservableIListLocking<Thread, List<Thread>> list = new();
         int callCount = 0;
 
