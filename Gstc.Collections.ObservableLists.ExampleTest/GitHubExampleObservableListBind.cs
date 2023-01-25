@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Gstc.Collections.ObservableLists.Binding;
 using NUnit.Framework;
 
-namespace Gstc.Collections.ObservableLists.Test;
+namespace Gstc.Collections.ObservableLists.ExampleTest;
 
 [TestFixture]
 public class GitHubExampleObservableListBind {
