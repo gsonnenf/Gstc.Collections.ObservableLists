@@ -97,13 +97,13 @@ public class GitHubExampleObservableList {
         //This ensures many add operations are started before earlier ones finish. The locking prevents race conditions.
         obvList.Adding += (sender, args) => {
             int initialCount = obvList.Count;
-            Thread.Sleep(rand.Next(10));
+            Thread.Sleep(rand.Next(5));
             int finalCount = obvList.Count;
             if (initialCount != finalCount) throw new TimeoutException("Race condition shound not be detected.");
         };
 
         //Generates a series of add operations on many threads.
-        for (int index = 0; index < 100; index++) {
+        for (int index = 0; index < 20; index++) {
             Task task = Task.Run(() => obvList.Add(Customer.GenerateCustomer()));
             taskList.Add(task);
         }

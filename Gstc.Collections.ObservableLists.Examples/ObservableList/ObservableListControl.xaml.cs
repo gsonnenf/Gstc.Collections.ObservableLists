@@ -118,12 +118,10 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
                 if (args.NewItems != null) {
                     var customer = args.NewItems[0] as Customer;
                     message += ("Customer Added: " + customer.FirstName + " " + customer.LastName);
-                }
-                else if (args.OldItems != null) {
+                } else if (args.OldItems != null) {
                     var customer = args.OldItems[0] as Customer;
                     message += ("Customer Removed: " + customer.FirstName + " " + customer.LastName);
-                }
-                else message += "Reset";
+                } else message += "Reset";
 
                 AddToTextBox(message + "\n");
             };
