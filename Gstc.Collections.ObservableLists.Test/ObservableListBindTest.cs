@@ -10,42 +10,87 @@ public class ObservableListBindTest {
 
     #region Datasources
     public static object[] DataSource_Empty => new object[] {
-       ()=> new ObservableListBind_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
-       ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>() ),
-       ()=> new ObservableListBindFunc<ItemA, ItemB>(
-            (sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+        ()=> new ObservableListBind_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
+
+        ()=> new ObservableListBindFunc<ItemA, ItemB>(
+            ObservableListBind_ItemAB.ConvertItemAToB,
+            ObservableListBind_ItemAB.ConvertItemBToA,
             new ObservableList<ItemA>(),
             new ObservableList<ItemB>()),
+
+        ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>() ),
+
+        ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA>(),
+           new ObservableList<ItemB>()),
+
+        ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA>(),
+           new ObservableList<ItemB>(),
+           new CustomPropertyMapItemAB())
     };
 
     //Generator methods resolve issue with NUnit ValueSource using same object for each run
     public static object[] DataSource_Prepopulated => new object[] {
-       () => new ObservableListBind_ItemAB(
-           new ObservableList<ItemA>() {ItemA1},
-           new ObservableList<ItemB>() {ItemB1}
+        () => new ObservableListBind_ItemAB(
+           new ObservableList<ItemA> {ItemA1},
+           new ObservableList<ItemB> {ItemB1}
            ),
+
+        () => new ObservableListBindFunc<ItemA, ItemB>(
+             ObservableListBind_ItemAB.ConvertItemAToB,
+             ObservableListBind_ItemAB.ConvertItemBToA,
+             new ObservableList<ItemA> {ItemA1},
+             new ObservableList<ItemB> {ItemB1}
+            ),
+
        () => new ObservableListBindProperty_ItemAB(
-           new ObservableList<ItemA>() {ItemA1},
-           new ObservableList<ItemB>() {ItemB1}
+           new ObservableList<ItemA> {ItemA1},
+           new ObservableList<ItemB> {ItemB1}
            ),
-       () => new ObservableListBindFunc<ItemA, ItemB>(
-            (sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
-             new ObservableList<ItemA>() {ItemA1 },
-             new ObservableList<ItemB>() {ItemB1 }
-            )
+
+        ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA> {ItemA1},
+           new ObservableList<ItemB> {ItemB1}),
+
+        () => new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA> {ItemA1},
+           new ObservableList<ItemB> {ItemB1},
+           new CustomPropertyMapItemAB())
     };
 
     public static object[] DataSource_CopyInConstructor => new object[] {
-      new ObservableListBind_ItemAB(ItemA.GetSampleSourceItemAList(), new ObservableList<ItemB>()),
-      new ObservableListBindProperty_ItemAB( ItemA.GetSampleSourceItemAList(), new ObservableList<ItemB>()),
-      new ObservableListBindFunc<ItemA, ItemB>(
-            (sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() },
-            (destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() },
+        new ObservableListBind_ItemAB(ItemA.GetSampleSourceItemAList(), new ObservableList<ItemB>()),
+
+        new ObservableListBindFunc<ItemA, ItemB>(
+            ObservableListBind_ItemAB.ConvertItemAToB,
+            ObservableListBind_ItemAB.ConvertItemBToA,
             ItemA.GetSampleSourceItemAList(),
             new ObservableList<ItemB>()
-        )
+        ),
+
+        new ObservableListBindProperty_ItemAB( ItemA.GetSampleSourceItemAList(), new ObservableList<ItemB>()),
+
+        new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           ItemA.GetSampleSourceItemAList(),
+           new ObservableList<ItemB>()),
+
+        new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           ItemA.GetSampleSourceItemAList(),
+           new ObservableList<ItemB>(),
+           new CustomPropertyMapItemAB())
     };
     #endregion
 
@@ -76,7 +121,7 @@ public class ObservableListBindTest {
             [Values] ListIdentifier sourceList,
             [Values] ListIdentifier listOrder) {
         IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
-        if (sourceList != ListIdentifier.ListA && obvListBind is ObservableListBindProperty_ItemAB) {
+        if (sourceList != ListIdentifier.ListA && obvListBind is IObservableListBindProperty<ItemA, ItemB>) {
             _ = Assert.Throws<NotSupportedException>(() => obvListBind.SourceList = sourceList);
             return;
         }
@@ -156,7 +201,7 @@ public class ObservableListBindTest {
         IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
 
         //ObservableListBindProperty doesn't support changing source list.
-        if (sourceList != ListIdentifier.ListA && obvListBind is ObservableListBindProperty_ItemAB) {
+        if (sourceList != ListIdentifier.ListA && obvListBind is IObservableListBindProperty<ItemA, ItemB>) {
             _ = Assert.Throws<NotSupportedException>(() => obvListBind.SourceList = sourceList);
             return;
         }
@@ -192,7 +237,7 @@ public class ObservableListBindTest {
         IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
 
         //ObservableListBindProperty doesn't support changing source list.
-        if (sourceList != ListIdentifier.ListA && obvListBind is ObservableListBindProperty_ItemAB) {
+        if (sourceList != ListIdentifier.ListA && obvListBind is IObservableListBindProperty<ItemA, ItemB>) {
             _ = Assert.Throws<NotSupportedException>(() => obvListBind.SourceList = sourceList);
             return;
         }
@@ -225,7 +270,7 @@ public class ObservableListBindTest {
         IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
 
         //ObservableListBindProperty doesn't support changing source list.
-        if (sourceList != ListIdentifier.ListA && obvListBind is ObservableListBindProperty_ItemAB) {
+        if (sourceList != ListIdentifier.ListA && obvListBind is IObservableListBindProperty<ItemA, ItemB>) {
             _ = Assert.Throws<NotSupportedException>(() => obvListBind.SourceList = sourceList);
             return;
         }
@@ -275,7 +320,7 @@ public class ObservableListBindTest {
         IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
 
         //ObservableListBindProperty doesn't support changing source list.
-        if (sourceList != ListIdentifier.ListA && obvListBind is ObservableListBindProperty_ItemAB) {
+        if (sourceList != ListIdentifier.ListA && obvListBind is IObservableListBindProperty<ItemA, ItemB>) {
             _ = Assert.Throws<NotSupportedException>(() => obvListBind.SourceList = sourceList);
             return;
         }
@@ -308,7 +353,7 @@ public class ObservableListBindTest {
         IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
 
         //ObservableListBindProperty doesn't support changing source list.
-        if (sourceList != ListIdentifier.ListA && obvListBind is ObservableListBindProperty_ItemAB) {
+        if (sourceList != ListIdentifier.ListA && obvListBind is IObservableListBindProperty<ItemA, ItemB>) {
             _ = Assert.Throws<NotSupportedException>(() => obvListBind.SourceList = sourceList);
             return;
         }

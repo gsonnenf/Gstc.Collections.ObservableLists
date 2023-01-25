@@ -2,6 +2,10 @@
 
 namespace Gstc.Collections.ObservableLists.Test.MockObjects;
 public class ObservableListBind_ItemAB : ObservableListBind<ItemA, ItemB> {
+
+    public static ItemB ConvertItemAToB(ItemA itemA) => new ItemB { MyNum = itemA.MyNum.ToString(), MyStringUpper = itemA.MyStringLower.ToUpper() };
+    public static ItemA ConvertItemBToA(ItemB itemB) => new ItemA { MyNum = int.Parse(itemB.MyNum), MyStringLower = itemB.MyStringUpper.ToLower() };
+
     public ObservableListBind_ItemAB(
         IObservableList<ItemA> obvListA,
         IObservableList<ItemB> obvListB,
@@ -10,6 +14,6 @@ public class ObservableListBind_ItemAB : ObservableListBind<ItemA, ItemB> {
         : base(obvListA, obvListB, isBidirectional, sourceList) {
     }
 
-    public override ItemB ConvertItem(ItemA sourceItem) => new ItemB { MyNum = sourceItem.MyNum.ToString(), MyStringUpper = sourceItem.MyStringLower.ToUpper() };
-    public override ItemA ConvertItem(ItemB destItem) => new ItemA { MyNum = int.Parse(destItem.MyNum), MyStringLower = destItem.MyStringUpper.ToLower() };
+    public override ItemB ConvertItem(ItemA itemA) => ConvertItemAToB(itemA);
+    public override ItemA ConvertItem(ItemB itemB) => ConvertItemBToA(itemB);
 }

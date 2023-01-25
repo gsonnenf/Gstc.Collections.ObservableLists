@@ -10,18 +10,58 @@ namespace Gstc.Collections.ObservableLists.Test;
 public class ObservableListBindPropertyTest {
 
     public static object[] DataSource_Empty => new object[] {
-       new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), PropertyBindType.UpdateCollectionNotify),
-       new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB())
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>()),
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB()),
+
+        new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA>(),
+           new ObservableList<ItemB>()),
+
+        new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA>(),
+           new ObservableList<ItemB>(),
+           new CustomPropertyMapItemAB())
     };
 
     public static object[] DataSource_Populated => new object[] {
-        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(){ ItemA1 }, new ObservableList<ItemB>(), PropertyBindType.UpdateCollectionNotify),
-        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(){ ItemA1 }, new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB())
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA> {ItemA1}, new ObservableList<ItemB>()),
+        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA> {ItemA1}, new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB()),
+
+        new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA> {ItemA1},
+           new ObservableList<ItemB>()
+           ),
+
+        new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA> {ItemA1},
+           new ObservableList<ItemB>(),
+           new CustomPropertyMapItemAB())
     };
     public static object[] DataSource_NullTest => new object[] {
-       ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), PropertyBindType.UpdatePropertyNotify),
-       ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), PropertyBindType.UpdateCollectionNotify),
-       ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB())
+        ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), PropertyBindType.UpdatePropertyNotify),
+        ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), PropertyBindType.UpdateCollectionNotify),
+        ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB()),
+
+        ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA>(),
+           new ObservableList<ItemB>()),
+
+        ()=>new ObservableListBindPropertyFunc<ItemA,ItemB>(
+           ObservableListBindProperty_ItemAB.ConvertItemAToB,
+           ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new ObservableList<ItemA>(),
+           new ObservableList<ItemB>(),
+           new CustomPropertyMapItemAB())
     };
 
     #region Test Fixture
@@ -34,9 +74,9 @@ public class ObservableListBindPropertyTest {
 
     [Test, Description("Tests that sync is ignored properly when one of the lists is null.")]
     public void ReplaceList_WithNulls_DoesNotThrowExceptions(
-     [ValueSource(nameof(DataSource_NullTest))] Func<ObservableListBindProperty_ItemAB> obvListBindGenerator,
+     [ValueSource(nameof(DataSource_NullTest))] Func<IObservableListBindProperty<ItemA, ItemB>> obvListBindGenerator,
      [Values] ListIdentifier testList) {
-        ObservableListBindProperty_ItemAB obvListBind = obvListBindGenerator();
+        IObservableListBindProperty<ItemA, ItemB> obvListBind = obvListBindGenerator();
         if (testList == ListIdentifier.ListA) obvListBind.ObservableListA = null;
         if (testList == ListIdentifier.ListB) obvListBind.ObservableListB = null;
 
@@ -63,7 +103,7 @@ public class ObservableListBindPropertyTest {
 
     [Test, Description("Tests that property changes are propagated from one list item to the other for UpdateCollectionNotify and UpdateCustomNotify.")]
     [TestCaseSource(nameof(DataSource_Populated))]
-    public void BidirectionalSync_ItemsSynchronizeAsExpected(ObservableListBindProperty_ItemAB obvListBind) {
+    public void BidirectionalSync_ItemsSynchronizeAsExpected(IObservableListBindProperty<ItemA, ItemB> obvListBind) {
         //Initialization
         Assert.Multiple(() => {
             Assert.That(obvListBind.ObservableListA[0].MyNum, Is.EqualTo(0));
@@ -107,7 +147,7 @@ public class ObservableListBindPropertyTest {
 
     [Test, Description("Tests that property bind is disabled when IsPropertyBindEnabled set.")]
     [TestCaseSource(nameof(DataSource_Empty))]
-    public void IsPropertyBindEnabled_PropertiesSyncWhenEnabled_DoNotSyncWhenDisabled(ObservableListBindProperty_ItemAB obvListBind) {
+    public void IsPropertyBindEnabled_PropertiesSyncWhenEnabled_DoNotSyncWhenDisabled(IObservableListBindProperty<ItemA, ItemB> obvListBind) {
 
         //tests constructor enabled
         obvListBind.ObservableListA.Add(ItemA1);
@@ -135,13 +175,26 @@ public class ObservableListBindPropertyTest {
     }
 
     #region UpdateProperty
+    public static object[] DataSource_UpdatePropertyNotify => new object[] {
+        new ObservableListBindProperty_ItemMVM(
+            new ObservableList<ItemModel>(),
+            new ObservableList<ItemViewModel>(),
+            PropertyBindType.UpdatePropertyNotify),
+
+        new ObservableListBindPropertyFunc<ItemModel,ItemViewModel>(
+           ObservableListBindProperty_ItemMVM.ConvertItemMToVM,
+           ObservableListBindProperty_ItemMVM.ConvertItemVMToM,
+           new ObservableList<ItemModel>(),
+           new ObservableList<ItemViewModel>(),
+           PropertyBindType.UpdatePropertyNotify)
+    };
+
+
     [Test, Description("Tests that property notify events are propogated from source to target on PropertyBindType.UpdatePropertyNotify using INotifyPropertyChanged and reflection.")]
-    public void UpdatePropertyNotify_PropertiesSyncViaReflection() {
-        ObservableListBindProperty_ItemMVM obvListBind = new(
-            obvListA: new ObservableList<ItemModel>() { new ItemModel() { PhoneNumber = 8005551111 } },
-            obvListB: new ObservableList<ItemViewModel>(),
-            bindType: PropertyBindType.UpdatePropertyNotify
-            );
+    [TestCaseSource(nameof(DataSource_UpdatePropertyNotify))]
+    public void UpdatePropertyNotify_PropertiesSyncViaReflection(IObservableListBindProperty<ItemModel, ItemViewModel> obvListBind) {
+
+        obvListBind.ObservableListA.Add(new ItemModel { PhoneNumber = 8005551111 });
 
         AssertNotifyProperty testItemM = new(obvListBind.ObservableListA[0]);
         AssertNotifyProperty testItemVM = new(obvListBind.ObservableListB[0]);
@@ -173,13 +226,25 @@ public class ObservableListBindPropertyTest {
         });
     }
 
+    public static object[] DataSource_UpdatePropertyNotifyHook => new object[] {
+        new ObservableListBindProperty_ItemMVMHook(
+            new ObservableList<ItemModelHook>(),
+            new ObservableList<ItemViewModelHook>(),
+            PropertyBindType.UpdatePropertyNotify),
+
+        new ObservableListBindPropertyFunc<ItemModelHook,ItemViewModelHook>(
+           ObservableListBindProperty_ItemMVMHook.ConvertItemMToVM,
+           ObservableListBindProperty_ItemMVMHook.ConvertItemVMToM,
+           new ObservableList<ItemModelHook>(),
+           new ObservableList<ItemViewModelHook>(),
+           PropertyBindType.UpdatePropertyNotify)
+    };
+
     [Test, Description("Tests that property notify events are propagated from source to target on PropertyBindType.UpdatePropertyNotify using INotifyPropertyChangedHook.")]
-    public void UpdatePropertyNotify_PropertiesSyncViaINotifyPropertyChangedHook() {
-        ObservableListBindProperty_ItemMVMHook obvListBind = new(
-            obvListA: new ObservableList<ItemModelHook>() { new ItemModelHook() { PhoneNumber = 8005551111 } },
-            obvListB: new ObservableList<ItemViewModelHook>(),
-            bindType: PropertyBindType.UpdatePropertyNotify
-            );
+    [TestCaseSource(nameof(DataSource_UpdatePropertyNotifyHook))]
+    public void UpdatePropertyNotify_PropertiesSyncViaINotifyPropertyChangedHook(IObservableListBindProperty<ItemModelHook, ItemViewModelHook> obvListBind) {
+
+        obvListBind.ObservableListA.Add(new ItemModelHook { PhoneNumber = 8005551111 });
 
         AssertNotifyProperty testItemM = new(obvListBind.ObservableListA[0]);
         AssertNotifyProperty testItemVM = new(obvListBind.ObservableListB[0]);
@@ -247,7 +312,7 @@ public class ObservableListBindPropertyTest {
     }
     #endregion
 
-    [Test, Description("Tests and demonstrates behavior of uni-directional repeat cascade resulting from repeat items in the same source list.")]
+    [Test, Description("Special test to demonstrate behavior of uni-directional repeat cascade resulting from repeat items in the same source list.")]
     public void UpdateCollectionNotify_DemonstratesCascadeUpdateCollection_NewTargetItemsAreCreatedAsExpected() {
         ItemA itemA1 = ItemA1;
 

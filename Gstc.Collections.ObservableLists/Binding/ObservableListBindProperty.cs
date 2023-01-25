@@ -6,9 +6,6 @@ using Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
-/// 
-/// 
-/// /// Used in conjunction with the 
 /// INotifyPropertySyncChanged interface, this class can also provide synchronization for notify events properties
 /// within an item of {TSource} and {TDestination}. If a PropertyChanged event is triggered on an item in {TSource}
 /// the class can trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
@@ -16,7 +13,7 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// </summary>
 /// <typeparam name="TItemA"></typeparam>
 /// <typeparam name="TItemB"></typeparam>
-public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObservableListBind<TItemA, TItemB>
+public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObservableListBindProperty<TItemA, TItemB>
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
 
@@ -26,7 +23,7 @@ public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObse
     #endregion
 
     #region Fields
-    private IPropertyBinder<TItemA, TItemB> _bindTracker;
+    internal IPropertyBinder<TItemA, TItemB> _bindTracker;
     private bool _isSynchronizationInProgress;
     private IObservableList<TItemA> _observableListA;
     private IObservableList<TItemB> _observableListB;
@@ -65,14 +62,54 @@ public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObse
     #endregion
 
     #region ctor
-
+    /// <summary>
+    /// Constructor for ObservableListBindProperty for a bind type of UpdateCollectionNotify or UpdatePropertyNotify. For UpdateCustomNotify use a different constructor.
+    /// 
+    ///  <br/><br/>UpdateCollectionNotify:On PropertyChanged this will remove the corresponding bound item from the other list and add a newly created item to the other list using ConvertItem(...).
+    /// <br/><br/>UpdatePropertyNotify: On PropertyChanged this will trigger a PropertyChanged event on the corresponding bound item. This class does not attempt to change the property. 
+    /// <br/><br/>UpdateCustomNotify: On PropertyChanged this will utilize a user provided ICustomPropertyMap to update the property on the corresponding bound item.
+    /// </summary>
+    /// <param name="obvListA">The source list.</param>
+    /// <param name="obvListB">The target list.</param>
+    /// <param name="bindType">A bind type of PropertyBindType.UpdateCollectionNotify or PropertyBindType.UpdatePropertyNotify.</param>
+    /// <param name="isBidirectional">Sets if changes to the target list is allowed and propagated back to the source.</param>
+    /// <param name="isPropertyBindEnabled">If true, will turn on the property binding method of the provided bind type.</param>
     public ObservableListBindProperty(
      IObservableList<TItemA> obvListA,
      IObservableList<TItemB> obvListB,
      PropertyBindType bindType = PropertyBindType.UpdateCollectionNotify,
      bool isBidirectional = true,
      bool isPropertyBindEnabled = true
-     ) {
+     ) => Constructor1(obvListA, obvListB, bindType, isBidirectional, isPropertyBindEnabled);
+
+    /// <summary>
+    /// Constructor for ObservableListBindProperty for a bind type of UpdateCustomNotify. For UpdateCollectionNotify or UpdatePropertyNotify use a different constructor.
+    /// 
+    /// <br/><br/>UpdateCustomNotify: On PropertyChanged this will utilize a user provided ICustomPropertyMap to update the property on the corresponding bound item.
+    /// </summary>
+    /// <param name="obvListA">The source list.</param>
+    /// <param name="obvListB">The target list.</param>
+    /// <param name="customPropertyMap">A user provided map between properties on ItemA and ItemB that will update the property on a cooresponding bound object.</param>
+    /// <param name="isBidirectional">Sets if changes to the target list is allowed and propagated back to the source.</param>
+    /// <param name="isPropertyBindEnabled">If true, will turn on the property binding method of the provided bind type.</param>
+    public ObservableListBindProperty(
+     IObservableList<TItemA> obvListA,
+     IObservableList<TItemB> obvListB,
+     ICustomPropertyMap<TItemA, TItemB> customPropertyMap,
+     bool isBidirectional = true,
+     bool isPropertyBindEnabled = true
+     ) => Constructor2(obvListA, obvListB, customPropertyMap, isBidirectional, isPropertyBindEnabled);
+
+    /// <summary>
+    /// Derived classes are responsible for initialization.
+    /// </summary>
+    protected ObservableListBindProperty() { }
+    //Allows derived member ObservableListBindPropertyFunc to access constructor after ConvertItem assignment.
+    protected void Constructor1(IObservableList<TItemA> obvListA,
+    IObservableList<TItemB> obvListB,
+    PropertyBindType bindType,
+    bool isBidirectional,
+    bool isPropertyBindEnabled) {
         _bindTracker = bindType switch {
             PropertyBindType.UpdateCollectionNotify =>
                 new PropertyBinderUpdateCollectionNotify<TItemA, TItemB>(
@@ -94,19 +131,18 @@ public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObse
         ReplaceListB(obvListB);
     }
 
-    public ObservableListBindProperty(
-     IObservableList<TItemA> obvListA,
+    //Allows derived member ObservableListBindPropertyFunc to access constructor after ConvertItem assignment.
+    protected void Constructor2(IObservableList<TItemA> obvListA,
      IObservableList<TItemB> obvListB,
      ICustomPropertyMap<TItemA, TItemB> customPropertyMap,
-     bool isBidirectional = true,
-     bool isPropertyBindEnabled = true
-     ) {
+     bool isBidirectional,
+     bool isPropertyBindEnabled) {
         _bindTracker = new PropertyBinderUpdateCustom<TItemA, TItemB>(sourceList: null,
-                    targetList: null,
-                    customPropertyMap: customPropertyMap,
-                    isBidirectional: isBidirectional,
-                    isBindingEnabled: isPropertyBindEnabled
-            );
+                   targetList: null,
+                   customPropertyMap: customPropertyMap,
+                   isBidirectional: isBidirectional,
+                   isBindingEnabled: isPropertyBindEnabled
+           );
         IsBidirectional = isBidirectional;
         ReplaceListA(obvListA);
         ReplaceListB(obvListB);

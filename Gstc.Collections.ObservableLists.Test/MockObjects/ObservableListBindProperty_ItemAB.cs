@@ -4,6 +4,9 @@ using Gstc.Collections.ObservableLists.Binding;
 namespace Gstc.Collections.ObservableLists.Test.MockObjects;
 public class ObservableListBindProperty_ItemAB : ObservableListBindProperty<ItemA, ItemB> {
 
+    public static ItemB ConvertItemAToB(ItemA itemA) => new() { MyNum = itemA.MyNum.ToString(), MyStringUpper = itemA.MyStringLower.ToUpper() };
+    public static ItemA ConvertItemBToA(ItemB itemB) => new() { MyNum = int.Parse(Regex.Replace(itemB.MyNum, "[^0-9]", "")), MyStringLower = itemB.MyStringUpper.ToLower() };
+
     public ObservableListBindProperty_ItemAB(
         IObservableList<ItemA> obvListA,
         IObservableList<ItemB> obvListB,
@@ -31,6 +34,6 @@ public class ObservableListBindProperty_ItemAB : ObservableListBindProperty<Item
         : base(obvListA, obvListB, customPropertyMap, isBidirectional, isPropertyBindEnabled) {
     }
 
-    public override ItemB ConvertItem(ItemA itemA) => new() { MyNum = itemA.MyNum.ToString(), MyStringUpper = itemA.MyStringLower.ToUpper() };
-    public override ItemA ConvertItem(ItemB itemB) => new() { MyNum = int.Parse(Regex.Replace(itemB.MyNum, "[^0-9]", "")), MyStringLower = itemB.MyStringUpper.ToLower() };
+    public override ItemB ConvertItem(ItemA itemA) => ConvertItemAToB(itemA);
+    public override ItemA ConvertItem(ItemB itemB) => ConvertItemBToA(itemB);
 }

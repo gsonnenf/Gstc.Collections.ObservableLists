@@ -65,7 +65,6 @@
     <Compile Include="ObservableListBinder\ObservableListSyncControl.xaml.cs">
       <DependentUpon>ObservableListSyncControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CodeExamples\ObservableListDemo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
