@@ -2,8 +2,9 @@
 
 namespace Gstc.Collections.ObservableLists.Binding;
 
+//Todo: Update all comments here
 /// <summary>
-/// The ObservableListSynchronizerFunc is a concrete implementation of ObservableListSynchronizer that
+/// The ObservableListBindFunc is a concrete implementation of ObservableListSynchronizer that
 /// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 
 /// in a method call.
 /// 
@@ -32,7 +33,7 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
     public override TItemA ConvertItem(TItemB item) => _convertItemBTItemA(item);
 
     /// <summary>
-    /// The ObservableListSynchronizerFunc is a concrete implementation of ObservableListSynchronizer that
+    /// The ObservableListBindFunc is a concrete implementation of ObservableListBindFunc that
     /// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 
     /// in a method call.
     /// 
@@ -64,7 +65,7 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
     }
 
     /// <summary>
-    /// The ObservableListSynchronizerFunc is a concrete implementation of ObservableListSynchronizer that
+    /// The ObservableListBindFunc is a concrete implementation of ObservableBind that
     /// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 
     /// in a method call.
     /// 

@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Gstc.Collections.ObservableLists.Multithread;
 
+//Todo: review comment
 /// <summary>
 /// ObservableIListLocking{TItem, TList{TItem}} is an observable locking list wrapper which has an internal TList{TItem} that serves as 
 /// the internal collection and is specified by the user. The list triggers observable events before and after write operations, and 
@@ -83,14 +84,14 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// A flag that will call the reset action instead of add action. This is primarily for
-    /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
+    /// A flag that will set AddRange to trigger a reset action, instead of a multi-item add action. This is primarily for
+    /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple new items elements.
     /// </summary>
     public bool IsResetForAddRange { get; set; }
+
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
     /// </summary>
-
     public TList List {
         get => _list;
         set {
@@ -114,25 +115,25 @@ public class ObservableIListLocking<TItem, TList> :
 
     #region Constructor
     /// <summary>
-    /// Creates an observable list. The observable list is backed internally by a new TList{T}.
+    /// Creates an ObservableIListLocking. The observable list is backed internally by a new TList{T}.
     /// </summary>
     public ObservableIListLocking() => _list = new TList();
 
     /// <summary>
-    /// Creates an observable list using the list supplied in the constructor. Events are triggered
-    /// when using the ObservableList{T} or a downcast version of the observable list. They will not be
-    /// triggered if using your provided list directly.
+    /// Creates an ObservableIListLocking{T} using the list supplied in the constructor. Locking and events are triggered
+    /// when using the ObservableIListLocking{T} or a upcast version of the observable list. They will not be
+    /// triggered if using the provided list methods directly.
     /// </summary>
-    /// <param name="list">List to wrap with observable list.</param>
+    /// <param name="list">List to wrap with ObservableIListLocking{T}.</param>
     public ObservableIListLocking(TList list) => _list = list;
     #endregion
 
     #region Method
 
     /// <summary>
-    /// Adds a list of items and triggers a single CollectionChanged and Add event. 
+    /// Adds a collection of item to the list. CollectionChanging, CollectionChanged, PropertyChanged, Adding, Added event are triggered.
     /// </summary>
-    /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
+    /// <param name="items">Collection of items to add.</param>
     public void AddRange(IEnumerable<TItem> items) {
         using (_monitor.CheckReentrancy()) {
             lock (SyncRootEvents) {
@@ -149,10 +150,10 @@ public class ObservableIListLocking<TItem, TList> :
         }
     }
     /// <summary>
-    /// Moves an item to a new index. CollectionChanged and Moved event are triggered.
+    /// Moves an item to a new index. CollectionChanging, CollectionChanged, PropertyChanged, Moving, Moved event are triggered.
     /// </summary>
-    /// <param name="oldIndex"></param>
-    /// <param name="newIndex"></param>
+    /// <param name="oldIndex">Current index of item</param>
+    /// <param name="newIndex">Desired index of item</param>
     public void Move(int oldIndex, int newIndex) {
         using (_monitor.CheckReentrancy()) {
             lock (SyncRootEvents) {
@@ -174,9 +175,8 @@ public class ObservableIListLocking<TItem, TList> :
 
     #region Method Overrides
     /// <summary>
-    /// Indexes an element of the list. CollectionChanged and Replaced events are triggered on assignment.
-    /// </summary>
-    /// <param name="index"></param>
+    /// Indexes an element of the list. CollectionChanging, CollectionChanged, PropertyChanged, Replacing, Replaced event are triggered.
+    /// <param name="index">Index of item to replace.</param>
     /// <returns></returns>
     public override TItem this[int index] {
         get {
@@ -199,9 +199,9 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// Adds an item to the list. CollectionChanged and Added event are triggered.
+    /// Adds an item to the list. CollectionChanging, CollectionChanged, PropertyChanged, Adding, Added event are triggered.
     /// </summary>
-    /// <param name="item">Item to add</param>
+    /// <param name="item">Item to add.</param>
     public override void Add(TItem item) {
         using (_monitor.CheckReentrancy()) {
             lock (SyncRootEvents) {
@@ -218,7 +218,7 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// Clears all item from the list. CollectionChanged and Reset event are triggered.
+    /// Clears all item from the list. CollectionChanging, CollectionChanged, PropertyChanged, Resetting, Reset event are triggered.
     /// </summary>
     public override void Clear() {
         using (_monitor.CheckReentrancy()) {
@@ -262,10 +262,10 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// Inserts an item at a specific index. CollectionChanged and Added event are triggered.
+    /// Inserts an item at a specific index. CollectionChanging, CollectionChanged, PropertyChanged, Adding, Added event are triggered.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
+    /// <param name="index">Index to insert item.</param>
+    /// <param name="item">Item to add.</param>
     public override void Insert(int index, TItem item) {
         using (_monitor.CheckReentrancy()) {
             lock (SyncRootEvents) {
@@ -281,7 +281,7 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanged and Moved events are triggered.
+    /// Searches for the specified object and removes the first occurrence if it exists. CollectionChanging, CollectionChanged, PropertyChanged, Removing, Removed event are triggered.
     /// </summary>
     /// <param name="item">Item to remove.</param>
     /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
@@ -304,7 +304,7 @@ public class ObservableIListLocking<TItem, TList> :
     }
 
     /// <summary>
-    /// Removes item at specific index. CollectionChanged and Removed events are triggered.
+    /// Removes item at specific index. CollectionChanging, CollectionChanged, PropertyChanged, Removing, Removed event are triggered.
     /// </summary>
     /// <param name="index"></param>
     public override void RemoveAt(int index) {

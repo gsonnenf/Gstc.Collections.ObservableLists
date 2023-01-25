@@ -2,6 +2,11 @@
 using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Binding;
+/// <summary>
+/// todo: Add description
+/// </summary>
+/// <typeparam name="TItemA"></typeparam>
+/// <typeparam name="TItemB"></typeparam>
 public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBindProperty<TItemA, TItemB>
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
@@ -23,6 +28,16 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
         Constructor1(obvListA, obvListB, bindType, isBidirectional, isPropertyBindEnabled);
     }
 
+    /// <summary>
+    /// todo: Add description
+    /// </summary>
+    /// <param name="convertItemAToB"></param>
+    /// <param name="convertItemBToA"></param>
+    /// <param name="obvListA"></param>
+    /// <param name="obvListB"></param>
+    /// <param name="customPropertyMap"></param>
+    /// <param name="isBidirectional"></param>
+    /// <param name="isPropertyBindEnabled"></param>
     public ObservableListBindPropertyFunc(
         Func<TItemA, TItemB> convertItemAToB,
         Func<TItemB, TItemA> convertItemBToA,

@@ -4,7 +4,7 @@ namespace Gstc.Collections.ObservableLists.ComponentModel;
 
 public interface INotifyCollectionChanging {
     /// <summary>
-    /// Occurs before a collection change.
+    /// Event that is triggered before the target collection is changed.
     /// </summary>
     event NotifyCollectionChangedEventHandler CollectionChanging;
 }

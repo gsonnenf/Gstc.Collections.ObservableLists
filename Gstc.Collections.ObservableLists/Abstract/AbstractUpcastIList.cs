@@ -5,7 +5,8 @@ using System.Collections.Generic;
 namespace Gstc.Collections.ObservableLists.Abstract;
 
 /// <summary>
-/// A base class to assist in the down casting of ObservableList{T} to its base interfaces and still provide notification.
+/// AbstractListUpcast provides upcast functionality for observable lists. This allows observable lists to be upcast (e.g. IList{T}) 
+/// and still provide notification functionality.
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
 public abstract class AbstractListUpcast<TItem> :

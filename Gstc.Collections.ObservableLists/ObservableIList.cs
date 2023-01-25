@@ -115,7 +115,7 @@ public class ObservableIList<TItem, TList> :
 
     /// <summary>
     /// Creates an observable list using the list supplied in the constructor. Events are triggered
-    /// when using the ObservableList{T} or a downcast version of the observable list. They will not be
+    /// when using the ObservableIList{T} or a downcast version of the observable list. They will not be
     /// triggered if using your provided list directly.
     /// </summary>
     /// <param name="list">List to wrap with observable list.</param>
@@ -124,7 +124,7 @@ public class ObservableIList<TItem, TList> :
     #endregion
 
     #region Methods
-
+    //Todo: update these from OberservableIListLocking
     /// <summary>
     /// Adds a list of items and triggers a single CollectionChanged and Add event. 
     /// </summary>

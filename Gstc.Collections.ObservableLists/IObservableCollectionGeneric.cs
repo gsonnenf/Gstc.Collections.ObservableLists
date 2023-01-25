@@ -10,7 +10,13 @@ namespace Gstc.Collections.ObservableLists;
 public interface IObservableCollection<TItem> :
     ICollection<TItem>,
     IObservableCollection {
+    /// <summary>
+    /// Returns the number of items in the Collection.
+    /// </summary>
     new int Count { get; } //Fixes ambiguity issue
+    /// <summary>
+    /// Allows a CollectionChanged and other events to recursively make changes to the list.
+    /// </summary>
     bool AllowReentrancy { set; }
     /// <summary>
     /// Triggers a INotifyPropertyChanged replaced event without making changes to the underlying list.

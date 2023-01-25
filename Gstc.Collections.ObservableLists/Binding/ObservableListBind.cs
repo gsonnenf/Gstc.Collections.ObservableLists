@@ -4,18 +4,19 @@ using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Binding;
 
+//Todo: fix this comment.
 /// <summary>
 /// The ObservableListBinding provides syncing between two ObservableLists of different types 
 /// {TItemA} and {TItemB}. Add, Remove, clear, etc on one list is converted and propagated to the other.
-/// 
+/// <br/><br/>
 /// The binding requires one list to be the source, which will provide data if either list is replaced. The binding 
 /// can be operated in unidirectional or bidirectional mode. In unidirectional mode the source list can be modified
 /// and the target list will throw an error if there is an attempt to modify it. In bidirectional, changes are propogated
 /// in either direction.
-/// 
+/// <br/><br/>
 /// The developer is required to provide a ConvertItem(...) that converts between each type. For single direction mode, 
 /// the unused direction can safely be implemented as ConvertItem(...) => throw new NotSupportedException();
-/// 
+/// <br/><br/>
 /// Author: Greg Sonnenfeld
 /// Copyright 2019-2023
 /// </summary>
@@ -49,6 +50,11 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
     #endregion
 
     #region Ctor
+    /// <summary>
+    /// todo: Add description
+    /// </summary>
+    /// <param name="isBidirectional"></param>
+    /// <param name="sourceList"></param>
     protected ObservableListBind(
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
@@ -57,6 +63,13 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
         IsBidirectional = isBidirectional;
     }
 
+    /// <summary>
+    /// todo: Add description
+    /// </summary>
+    /// <param name="obvListA"></param>
+    /// <param name="obvListB"></param>
+    /// <param name="isBidirectional"></param>
+    /// <param name="sourceList"></param>
     protected ObservableListBind(
         IObservableList<TItemA> obvListA,
         IObservableList<TItemB> obvListB,
@@ -71,9 +84,6 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
 
     ~ObservableListBind() => ReleaseAll();
 
-    /// <summary>
-    /// Removes all lists, bindings and events.
-    /// </summary>
     public void ReleaseAll() {
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
@@ -83,10 +93,6 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
     #endregion
 
     #region Replace Source or destination
-    /// <summary>
-    /// Replaces the source collection, then clears and synchronizes the destination collection with the newly added source collection.
-    /// </summary>
-    /// <param name="observableListA"></param>
     protected void ReplaceListA(IObservableList<TItemA> observableListA) {
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         _observableListA = observableListA;
@@ -124,13 +130,7 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
     #endregion
 
     #region Collection Mapping
-    //TODO - Feature: Add an optional dispatcher method to execute update code on a UI thread.
-    /// <summary>
-    /// Event handler for OnCollectionChanged for ObservableListA. Propogates changes to ObservableListB.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
+    //todo: - Feature: Add an optional dispatcher method to execute update code on a UI thread.
     private void ListAChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (_isSynchronizationInProgress || _observableListB == null) return;
         if (IsBidirectional == false && !(SourceList == ListIdentifier.ListA)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to false.");

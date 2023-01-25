@@ -1,5 +1,4 @@
-﻿#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -27,14 +27,14 @@ public interface IObservableListBind<TItemA, TItemB> {
     public bool IsBidirectional { get; set; }
 
     /// <summary>
-    /// An IObservableList of type {TItemA} that will be synchronized to another IObservableList of type {TItemB}.
-    /// Items are converted using your provided ConvertItem(...) method.
+    /// An IObservableList{TItemA} that will be synchronized to the IObservableList{TItemB}.
+    /// Items are converted using the provided ConvertItem(...) method.
     /// </summary>
     public IObservableList<TItemA> ObservableListA { get; set; }
 
     /// <summary>
-    /// An IObservableList of type {TItemA} that will be synchronized to another IObservableList of type {TItemB}.
-    /// Items are converted using your provided ConvertItem(...) method.
+    /// An IObservableList{TItemB} that will be synchronized to the IObservableList{TItemA}.
+    /// Items are converted using the provided ConvertItem(...) method.
     /// </summary>
     public IObservableList<TItemB> ObservableListB { get; set; }
 
@@ -44,4 +44,10 @@ public interface IObservableListBind<TItemA, TItemB> {
     /// if bidirectional is false, changes are only allowed from the source list to the target list.
     /// </summary>
     public ListIdentifier SourceList { get; set; }
+
+    /// <summary>
+    /// Removes all lists, bindings and events.
+    /// </summary>
+    public void ReleaseAll();
+
 }

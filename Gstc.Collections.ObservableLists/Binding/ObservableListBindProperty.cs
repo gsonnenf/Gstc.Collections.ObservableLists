@@ -13,7 +13,7 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// </summary>
 /// <typeparam name="TItemA"></typeparam>
 /// <typeparam name="TItemB"></typeparam>
-public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObservableListBindProperty<TItemA, TItemB>
+public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableListBindProperty<TItemA, TItemB>
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
 
@@ -53,6 +53,9 @@ public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObse
         set => ReplaceListB(value);
     }
 
+    /// <summary>
+    /// ObservableListBindProperty only allows ListA to be the Source List. Do not set this proprty.
+    /// </summary>
     public ListIdentifier SourceList {
         get => ListIdentifier.ListA;
         set {

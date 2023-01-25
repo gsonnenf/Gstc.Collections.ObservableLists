@@ -3,7 +3,7 @@
 namespace Gstc.Collections.ObservableLists.ComponentModel;
 
 /// <summary>
-/// Provides a set of events that will be triggered by changes to a List.
+/// Provides a set of events that will be triggered after a List has been changed..
 /// </summary>
 public interface INotifyListChangingEvents : INotifyCollectionChanging {
 

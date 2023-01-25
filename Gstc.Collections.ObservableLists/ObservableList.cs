@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0079 // Remove unneessary suppression
-#pragma warning disable CA1001 // Types that own disposable fields should be disposable
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
