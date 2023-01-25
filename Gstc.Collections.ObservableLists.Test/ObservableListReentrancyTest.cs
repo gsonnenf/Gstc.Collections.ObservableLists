@@ -21,7 +21,7 @@ public class ObservableListReentrancyTest {
 
     [Test, Description("Tests that reentrancy is allowed if AllowReentrancy is set to true")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void ReentrancySuccess_AddWithAllowReentrancyFlagTrue_ReentrancyIsAllowed(IObservableCollection<string> obvList) {
+    public void ReentrancySuccess_AddAllowReentrancyTrue_ReentrancyIsAllowed(IObservableCollection<string> obvList) {
         int reentrancyCounter = 0;
 
         //ObservableIListLocking does not support single thread reentrnacy
@@ -45,7 +45,7 @@ public class ObservableListReentrancyTest {
 
     [Test, Description("Tests that reentrancy triggers an error if AllowReentrancy is set to false")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void ReentrancyFailure_AddWithAllowReentrancyFlagFalse_ReentrancyThrowsException(IObservableCollection<string> obvList) {
+    public void ReentrancyFailure_AddAllowReentrancyFalse_ReentrancyThrowsException(IObservableCollection<string> obvList) {
 
         obvList.AllowReentrancy = false;
 
@@ -106,5 +106,29 @@ public class ObservableListReentrancyTest {
         lastThreadExecuted = true; //Releases spin lock.
         Task.WaitAll(taskList.ToArray());//Keeps test running until all threads release.
         Assert.That(collectionChangedCounter, Is.EqualTo(10));
+    }
+
+    [Test, Description("Tests the locking of the ObservableIListLocking.")]
+    public void MultiThread_AddOperationWithLocks_AddsAreAtomic() {
+        ObservableIListLocking<string, List<string>> obvList = new();
+
+        List<Task> taskList = new();
+        Random rand = new(0);
+
+        //Event demonstrates that count of list does not change while locked.
+        obvList.Adding += (sender, args) => {
+            int initialCount = obvList.Count;
+            Thread.Sleep(rand.Next(10));
+            int finalCount = obvList.Count;
+            if (initialCount != finalCount) throw new TimeoutException("Race condition detected.");
+        };
+
+        for (int index = 0; index < 10; index++) {
+            Task task = Task.Run(() => obvList.Add("a"));
+            taskList.Add(task);
+        }
+
+        Task.WaitAll(taskList.ToArray());
+
     }
 }
