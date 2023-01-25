@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using Gstc.Collections.ObservableLists.Multithread;
@@ -22,110 +21,90 @@ public class ObservableListReentrancyTest {
 
     [Test, Description("Tests that reentrancy is allowed if AllowReentrancy is set to true")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void Reentrancy_Add_AllowReentrancyFlagTrue_ReentrancyIsAllowed(IObservableCollection<string> list) {
+    public void ReentrancySuccess_AddWithAllowReentrancyFlagTrue_ReentrancyIsAllowed(IObservableCollection<string> obvList) {
         int reentrancyCounter = 0;
-        try {
-            list.AllowReentrancy = true;
-            list.CollectionChanged += (_, args) => {
-                if (list.Count > 10) return;
-                if (args.Action == NotifyCollectionChangedAction.Add) list.Add("This add should cause reentrancy.");
-                reentrancyCounter++;
-            };
-            list.Add("My reentrancy trigger");
+
+        //ObservableIListLocking does not support single thread reentrnacy
+        if (obvList is ObservableIListLocking<string, List<string>>) {
+            NotSupportedException e = Assert.Throws<NotSupportedException>(() => obvList.AllowReentrancy = true);
+            Console.WriteLine(e.Message);
+            return;
         }
-        catch (NotSupportedException e) { Console.WriteLine(e.Message); } //allows not NotSupportedException if your list isn't compatible with AllowReentrancy
+        obvList.AllowReentrancy = true;
+        obvList.CollectionChanged += (_, args) => {
+            if (obvList.Count > 10) return;
+            obvList.Add("Reentrancy trigger");
+            reentrancyCounter++;
+        };
+
+        obvList.Add("Event trigger");
+
+        Assert.That(reentrancyCounter, Is.EqualTo(10));
         Console.WriteLine(reentrancyCounter);
     }
 
     [Test, Description("Tests that reentrancy triggers an error if AllowReentrancy is set to false")]
     [TestCaseSource(nameof(StaticDataSource))]
-    public void Reentrancy_Add_AllowReentrancyFlagFalse_ReentrancyThrowsException(IObservableCollection<string> list) {
-        list.AllowReentrancy = false;
-        list.CollectionChanged += (_, args) => {
-            if (list.Count > 10) return;
-            if (args.Action == NotifyCollectionChangedAction.Add) list.Add("This add should cause reentrancy.");
+    public void ReentrancyFailure_AddWithAllowReentrancyFlagFalse_ReentrancyThrowsException(IObservableCollection<string> obvList) {
+
+        obvList.AllowReentrancy = false;
+
+        obvList.CollectionChanged += (_, args) => {
+            if (obvList.Count > 10) return;
+            obvList.Add("Reentrancy trigger");
         };
-        _ = Assert.Throws<InvalidOperationException>(() => list.Add("This add should start test."));
+        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => obvList.Add("Event trigger"));
+        Console.WriteLine(e.Message);
     }
 
-    [Test, Description("Test for locking on multithread reentrancy when chaining thread calls.")]
-    public void Reentrancy_AddUsingMultipleThread_IsSuccessfulOrderedAndDoesNotDeadLock() {
-        ObservableIListLocking<Thread, List<Thread>> list = new();
-        int callCount = 0;
+    [Test, Description("Tests that ObservableIListLocking allows multithread access to list without an error.")]
+    [Timeout(1000)]
+    public void ReentrancyMultithreadSucess_MultipleThreadsRaisingEvents_Success() {
+        List<Thread> threadList = new();
+        ObservableIListLocking<int, List<int>> obvList = new();
+        bool lastThreadExecuted = false;
+        int collectionChangedCounter = 0;
 
-        void AddList() { // Callbacks to create new threads recursively.
-            if (callCount > 10) return;
-            _ = Interlocked.Increment(ref callCount);
-            Thread newThread = new(AddList);
-            Console.WriteLine("Approaching lock:" + Environment.CurrentManagedThreadId);
-            list.Add(newThread);
-            newThread.Join();
-            Console.WriteLine("Thread exiting:" + Environment.CurrentManagedThreadId);
-        }
-
-        list.CollectionChanged += (_, args) => {
-            Console.WriteLine("Enter Lock:" + Environment.CurrentManagedThreadId);
-            if (args.NewItems![0] is not Thread thread) throw new NullReferenceException("Not a thread");
-            thread.Start();
-            Thread.Sleep(50); //Allows started thread to hit lock before releasing lock.
-            Console.WriteLine("Exit Lock:" + Environment.CurrentManagedThreadId);
-        };
-        AddList();
-        Console.WriteLine("Count of Threads: " + callCount);
-    }
-
-    //TODO: Verify this works.
-    [Test, Description("Test for locking on multithread reentrancy using Task")]
-    public async Task ReentrancyMultithreadTest_Task() {
-        ObservableIListLocking<Task, List<Task>> list = new();
-        int callCount = 0;
-
-        //creates stack of threads to access 
-        async Task<(int start, int end)> AddListAsync() {
-            //await Task.Delay(5000); //Allows started thread to hit lock before releasing lock.
-            DateTime start = DateTime.Now;
-            if (callCount > 10) return new(start.Millisecond, DateTime.Now.Millisecond);
-            int currentCount = Interlocked.Increment(ref callCount);
-            Console.WriteLine("currentCount:" + currentCount);
-            Task<(int start, int end)> newTask = new(() => { return (0, 0); });
-            //Console.WriteLine("Approaching lock:" + Environment.CurrentManagedThreadId);
-            list.Add(newTask);
-            (int start, int end) priorTime = await newTask;
-
-            //Console.WriteLine("Thread exiting:" + Environment.CurrentManagedThreadId);
-            return new(start.Millisecond, DateTime.Now.Millisecond);
-        }
-
-        list.CollectionChanged += (_, args) => {
-            //Console.WriteLine("Enter Lock:" + Environment.CurrentManagedThreadId);
-            if (args.NewItems![0] is not Task newTask) throw new NullReferenceException("Not a task.");
-            newTask.Start();
-            //Console.WriteLine("Exit Lock:" + Environment.CurrentManagedThreadId);
+        obvList.CollectionChanged += (_, _) => {
+            while (!lastThreadExecuted) Thread.Sleep(1); //Spinlock until all events queued behind lock.
+            collectionChangedCounter++;
         };
 
-        Task<(int start, int end)> time = AddListAsync();
-        await time;
-        Console.WriteLine("Count of Threads: " + callCount);
-    }
-
-    //Todo: finish this test and then delete.
-    [Test]
-    public async Task Temp() {
-        static async Task Wait() {
-            Console.WriteLine("start:" + DateTime.Now.Millisecond);
-            await Task.Delay(500);
-            Console.WriteLine("end:" + DateTime.Now.Millisecond);
+        for (int index = 0; index < 10; index++) { //Queues multiple adds up to lock.
+            Thread newThread = new(() => obvList.Add(index));
+            newThread.Start();
+            threadList.Add(newThread);
         }
 
-        Task task = new(() => Console.WriteLine("hi"));
-        Task task2 = new(() => {
-            Console.WriteLine("start:" + DateTime.Now.Millisecond);
-            Task.Delay(500);
-            Console.WriteLine("end:" + DateTime.Now.Millisecond);
-        });
-        //task2.Start();
-        await Wait();
-        Console.WriteLine("exit:" + DateTime.Now.Millisecond);
+        Thread.Sleep(100);
+        Assert.That(collectionChangedCounter, Is.EqualTo(0));
+        lastThreadExecuted = true; //Releases spin lock.
+        threadList.ForEach(thread => thread.Join()); //Keeps test running until all threads release.
+        Assert.That(collectionChangedCounter, Is.EqualTo(10));
     }
-    //TODO: Add unit test for Task instead similar to Thread.
+
+    [Test, Description("Tests that ObservableIListLocking allows multithread access to list without an error.")]
+    [Timeout(1000)]
+    public void ReentrancyMultithreadSucess_MultipleTasksRaisingEvents_Success() {
+        List<Task> taskList = new();
+        ObservableIListLocking<int, List<int>> obvList = new();
+        bool lastThreadExecuted = false;
+        int collectionChangedCounter = 0;
+
+        obvList.CollectionChanged += (_, _) => {
+            while (!lastThreadExecuted) Thread.Sleep(1); //Spinlock until all events queued behind lock.
+            collectionChangedCounter++;
+        };
+
+        for (int index = 0; index < 10; index++) { //Queues multiple adds up to lock.
+            Task task = Task.Run(() => obvList.Add(index));
+            taskList.Add(task);
+        }
+
+        Thread.Sleep(100);
+        Assert.That(collectionChangedCounter, Is.EqualTo(0));
+        lastThreadExecuted = true; //Releases spin lock.
+        Task.WaitAll(taskList.ToArray());//Keeps test running until all threads release.
+        Assert.That(collectionChangedCounter, Is.EqualTo(10));
+    }
 }

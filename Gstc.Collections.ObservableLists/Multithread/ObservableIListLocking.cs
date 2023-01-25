@@ -357,7 +357,7 @@ public class ObservableIListLocking<TItem, TList> :
 
     public bool AllowReentrancy {
         set {
-            if (value) throw new NotSupportedException("Single thread reentrancy not permitted as it would cause a deadlock.");
+            if (value) throw new NotSupportedException("Single thread reentrancy not permitted as it would cause a deadlock. Multithread reentrancy is required.");
         }
     }
 
