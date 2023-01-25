@@ -32,7 +32,7 @@ public class ObservableListBindPropertyTest {
 
     #endregion
 
-    [Test, Description("Tests that sync is ignored properly when one of the lists is null.")] //todo: give this a double check
+    [Test, Description("Tests that sync is ignored properly when one of the lists is null.")]
     public void ReplaceList_WithNulls_DoesNotThrowExceptions(
      [ValueSource(nameof(DataSource_NullTest))] Func<ObservableListBindProperty_ItemAB> obvListBindGenerator,
      [Values] ListIdentifier testList) {

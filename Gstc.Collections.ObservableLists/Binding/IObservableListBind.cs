@@ -44,4 +44,5 @@ public interface IObservableListBind<TItemA, TItemB> {
     /// if bidirectional is false, changes are only allowed from the source list to the target list.
     /// </summary>
     public ListIdentifier SourceList { get; set; }
+
 }

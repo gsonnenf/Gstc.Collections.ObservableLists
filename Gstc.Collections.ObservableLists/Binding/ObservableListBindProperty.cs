@@ -112,9 +112,9 @@ public abstract partial class ObservableListBindProperty<TItemA, TItemB> : IObse
         ReplaceListB(obvListB);
     }
 
-    ~ObservableListBindProperty() => Dispose();
+    ~ObservableListBindProperty() => ReleaseAll();
 
-    public void Dispose() { //todo come up with better name
+    public void ReleaseAll() {
         _bindTracker.UnbindAll();
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;

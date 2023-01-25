@@ -14,6 +14,6 @@ public interface INotifyPropertyChangedHook : INotifyPropertyChanged {
     /// <param name="sender"></param>
     /// <param name="args"></param>
     void OnPropertyChanged(object sender, PropertyChangedEventArgs args);
-    void OnPropertyChanged([CallerMemberName] string propertyName = null); //Todo: Should i include this?
+    void OnPropertyChanged([CallerMemberName] string propertyName = null); //Todo: Decide which signatures should be included in release.
 
 }

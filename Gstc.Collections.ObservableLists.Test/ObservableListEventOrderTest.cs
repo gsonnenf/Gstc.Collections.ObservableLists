@@ -58,7 +58,7 @@ public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
                 testEventList.Add(testEvent);
                 testEvent.AddCallback((_, args) => Console.WriteLine("Expected: " + staticIndex + ": Call: " + callOrder + " : " + eventName + " : " + args.PropertyName));
                 testEvent.AddCallback((_, args) => {
-                    if (args.PropertyName == "Count") Assert.That(testSet.IsCountChanged, "OnPropertyChanged: Count is not suppose to be called for method: " + testSet.Name);
+                    if (args.PropertyName == "Count") Assert.That(testSet.IsCountChanged, "OnPropertyChanged: Count is should not be called for method: " + testSet.Name);
                     if (args.PropertyName == "Item[]") callOrder = (callOrder == staticIndex) ? callOrder + 1
                     : throw new Exception(testSet.Name + ": Call order of " + eventName + " was not correct. " + staticIndex + " was expected, but " + callOrder + " was received.");
                 });
@@ -126,7 +126,6 @@ public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
             ActAction = (obvList) => obvList.Move(1,0),
             IsCountChanged = false
         },
-        //Todo: Add RefreshIndex and RefreshAll
 
         new EventTestSet {
             Name = "RefreshIndex",
@@ -157,13 +156,24 @@ public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
             ArrangeAction = (obvList) => obvList.Add(StaticTestItem),
             ActAction = (obvList) => obvList.RemoveAt(0),
             IsCountChanged = true
-        }
+        },
+
+        new EventTestSet {
+            Name = "ReplaceInternalList",
+            EventOrderList = EventOrderList_Clear,
+            ArrangeAction = (_) => { },
+            ActAction = (obvList) => {
+                if (obvList is ObservableList<TestItem> list) list.List = new();
+                else if (obvList is ObservableIList<TestItem, List<TestItem>> iList) iList.List = new();
+                else if (obvList is ObservableIListLocking<TestItem,List<TestItem>> ilistLocking) ilistLocking.List = new();
+                else throw new NotSupportedException("A list type that was not expected was encountered.");
+            },
+            IsCountChanged = true
+        },
     };
         #endregion
 
         #region Orders of Events for different list methods
-
-        //TODO: find good way to test obvList.List
         public static List<string> EventOrderList_Add => new() {
         nameof(IObservableList<TestItem>.CollectionChanging),
         nameof(IObservableList<TestItem>.Adding),

@@ -69,12 +69,12 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
         ReplaceListB(obvListB);
     }
 
-    ~ObservableListBind() => Dispose();
+    ~ObservableListBind() => ReleaseAll();
 
     /// <summary>
-    /// Releases all events associated with the list.
+    /// Removes all lists, bindings and events.
     /// </summary>
-    public void Dispose() { //todo: come up with better name
+    public void ReleaseAll() {
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
         _observableListA = null;
