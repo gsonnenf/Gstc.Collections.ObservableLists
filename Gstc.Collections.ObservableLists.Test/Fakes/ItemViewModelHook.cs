@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 public class ItemViewModelHook : INotifyPropertyChangedHook {
     #region Notify
     public event PropertyChangedEventHandler PropertyChanged;

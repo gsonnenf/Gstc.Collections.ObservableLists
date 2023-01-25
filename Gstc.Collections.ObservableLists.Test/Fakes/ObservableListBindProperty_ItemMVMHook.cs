@@ -1,6 +1,6 @@
 ﻿using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 internal class ObservableListBindProperty_ItemMVMHook : ObservableListBindProperty<ItemModelHook, ItemViewModelHook> {
 
     public static ItemViewModelHook ConvertItemMToVM(ItemModelHook itemM) => new(itemM);

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text.RegularExpressions;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 public class ItemViewModel : INotifyPropertyChanged {
     #region Notify
     public event PropertyChangedEventHandler PropertyChanged;

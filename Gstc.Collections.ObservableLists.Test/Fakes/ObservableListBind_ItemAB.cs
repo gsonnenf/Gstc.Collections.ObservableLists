@@ -1,6 +1,6 @@
 ﻿using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 public class ObservableListBind_ItemAB : ObservableListBind<ItemA, ItemB> {
 
     public static ItemB ConvertItemAToB(ItemA itemA) => new ItemB { MyNum = itemA.MyNum.ToString(), MyStringUpper = itemA.MyStringLower.ToUpper() };

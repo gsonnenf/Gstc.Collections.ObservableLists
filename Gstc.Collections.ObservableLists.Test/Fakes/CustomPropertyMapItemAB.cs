@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 internal class CustomPropertyMapItemAB : ICustomPropertyMap<ItemA, ItemB> {
 
     public void PropertyChangedSourceToTarget(PropertyChangedEventArgs args, ItemA itemA, ItemB itemB) {

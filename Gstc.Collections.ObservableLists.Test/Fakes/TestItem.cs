@@ -1,6 +1,6 @@
 ﻿using AutoFixture;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 
 /// <summary>
 /// A Test item used in these tests

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 
 public class ItemB : INotifyPropertyChanged {
     public static ObservableList<ItemB> GetSampleDestItemAList() =>
@@ -23,7 +23,7 @@ public class ItemB : INotifyPropertyChanged {
     }
     public override bool Equals(object obj) {
         if (obj is not ItemB temp) return false;
-        return (temp.MyNum == MyNum && temp.MyStringUpper == MyStringUpper);
+        return temp.MyNum == MyNum && temp.MyStringUpper == MyStringUpper;
     }
 
     #region Notify

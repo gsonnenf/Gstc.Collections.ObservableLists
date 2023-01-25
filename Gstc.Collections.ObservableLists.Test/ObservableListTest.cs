@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.Multithread;
-using Gstc.Collections.ObservableLists.Test.MockObjects;
+using Gstc.Collections.ObservableLists.Test.Fakes;
 using Gstc.Collections.ObservableLists.Test.Tools;
 using NUnit.Framework;
 

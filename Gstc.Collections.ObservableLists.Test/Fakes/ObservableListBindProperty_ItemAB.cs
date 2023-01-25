@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 public class ObservableListBindProperty_ItemAB : ObservableListBindProperty<ItemA, ItemB> {
 
     public static ItemB ConvertItemAToB(ItemA itemA) => new() { MyNum = itemA.MyNum.ToString(), MyStringUpper = itemA.MyStringLower.ToUpper() };

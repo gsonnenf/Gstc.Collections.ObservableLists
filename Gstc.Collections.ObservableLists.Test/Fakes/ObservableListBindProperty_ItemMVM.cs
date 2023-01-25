@@ -1,6 +1,6 @@
 ﻿using Gstc.Collections.ObservableLists.Binding;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 internal class ObservableListBindProperty_ItemMVM : ObservableListBindProperty<ItemModel, ItemViewModel> {
 
     public static ItemViewModel ConvertItemMToVM(ItemModel itemM) => new(itemM);

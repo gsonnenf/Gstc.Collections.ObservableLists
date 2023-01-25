@@ -1,6 +1,6 @@
 ﻿using System;
 using Gstc.Collections.ObservableLists.Binding;
-using Gstc.Collections.ObservableLists.Test.MockObjects;
+using Gstc.Collections.ObservableLists.Test.Fakes;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;

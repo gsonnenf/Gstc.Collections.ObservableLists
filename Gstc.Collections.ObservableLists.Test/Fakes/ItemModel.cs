@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Gstc.Collections.ObservableLists.Test.MockObjects;
+namespace Gstc.Collections.ObservableLists.Test.Fakes;
 public class ItemModel : INotifyPropertyChanged {
     #region Notify
     public event PropertyChangedEventHandler PropertyChanged;
