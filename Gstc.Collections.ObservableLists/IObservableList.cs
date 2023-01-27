@@ -18,7 +18,6 @@ public interface IObservableList<TItem> :
     //Note: IList has been removed from the IObservableList. It causes an issue where the the Add(object) method can't be hidden behind an explicit interface.
     // This creates an Add(object) overload that does generate compile time errors, but will create runtime errors instead.
 
-
     new int Count { get; } // 'new' fixes ambiguity between IList and ICollection{T}
     new bool IsReadOnly { get; }
     new void Clear();

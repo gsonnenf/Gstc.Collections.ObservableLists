@@ -52,10 +52,10 @@ public class GitHubExampleObservableListBind {
         /// conversion functions in the constructor.
         IObservableListBind<PhoneModel, PhoneViewModel> obvBindPhoneFunc
             = new ObservableListBindFunc<PhoneModel, PhoneViewModel>(
-                convertItemAToItemB: (item) => new PhoneViewModel() { PhoneString = item.PhoneNumber.ToString("###-###-####") },
-                convertItemBtoItemA: (item) => new PhoneModel() { PhoneNumber = long.Parse(Regex.Replace(item.PhoneString, "[^0-9]", "")) },
-                obvListA: new() { new PhoneModel() { PhoneNumber = 1112223333 } },
-                obvListB: new(),
+                convertItemAToB: (item) => new PhoneViewModel() { PhoneString = item.PhoneNumber.ToString("###-###-####") },
+                convertItemBToA: (item) => new PhoneModel() { PhoneNumber = long.Parse(Regex.Replace(item.PhoneString, "[^0-9]", "")) },
+                observableListA: new ObservableList<PhoneModel>() { new PhoneModel() { PhoneNumber = 1112223333 } },
+                observableListB: new ObservableList<PhoneViewModel>(),
                 isBidirectional: false,
                 sourceList: ListIdentifier.ListA
             );

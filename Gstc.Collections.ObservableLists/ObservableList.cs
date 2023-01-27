@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable IDE0079 // Remove unneessary suppression
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -121,7 +123,7 @@ public class ObservableList<TItem> :
     #endregion
 
     #region Methods IObservableList<>
-
+    //Todo: Update comments from ObservableIListLocking.
     /// <summary>
     /// Adds a list of items and triggers a single CollectionChanged and Add event. 
     /// </summary>
