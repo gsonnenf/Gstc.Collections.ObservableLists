@@ -7,8 +7,8 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// one item when a property on the other item has triggered an NotifyPropertyChanged event. This is used
 /// in the ObservableBindProperty<,> class for its UpdateCustomNotify property binding type. 
 /// </summary>
-/// <typeparam name="TItemSource"></typeparam>
-/// <typeparam name="TItemTarget"></typeparam>
+/// <typeparam name="TItemSource">The type of source to be mapped onto the target</typeparam>
+/// <typeparam name="TItemTarget">The type of target to be mapped onto the source</typeparam>
 public interface ICustomPropertyMap<TItemSource, TItemTarget> {
     void PropertyChangedSourceToTarget(PropertyChangedEventArgs args, TItemSource itemS, TItemTarget itemT);
     void PropertyChangedTargetToSource(PropertyChangedEventArgs args, TItemTarget itemT, TItemSource itemS);

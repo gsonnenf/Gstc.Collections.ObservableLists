@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
-/// This interface allows external triggering of PropertyChanged events. This is used with the ObservableListBindProperty class for its UpdateNotifyProperty bind type.
+/// This interface's methods allows external triggering of PropertyChanged events. This is used with the ObservableListBindProperty class for the UpdateNotifyProperty bind type.
 /// </summary>
 public interface INotifyPropertyChangedHook : INotifyPropertyChanged {
     /// <summary>

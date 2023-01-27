@@ -1,7 +1,7 @@
 ﻿namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
-/// Interface for binding and converting between two obesrvable lists of different types.
+/// Interface for binding between two observable lists of different types.
 /// </summary>
 /// <typeparam name="TItemA">The type of items in the first list.</typeparam>
 /// <typeparam name="TItemB">The type of items in the second list.</typeparam>

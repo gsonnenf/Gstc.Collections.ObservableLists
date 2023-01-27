@@ -4,24 +4,21 @@ using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Binding;
 
-//Todo: fix this comment.
 /// <summary>
-/// The ObservableListBinding provides syncing between two ObservableLists of different types 
-/// {TItemA} and {TItemB}. Add, Remove, clear, etc on one list is converted and propagated to the other.
+/// The <see cref="ObservableListBind{TItemA, TItemB}"/> provides data binding between a pair of <see cref="IObservableList{TItemA}"/>, 
+/// <see cref="ObservableListA{TItemA}"/> and <see cref="ObservableListB{TItemB}"/>
+/// A user defined map between <see cref="{TItemA}"/> and <see cref="{TItemB}"/> is defined in the ConvertItem(..) methods. 
 /// <br/><br/>
-/// The binding requires one list to be the source, which will provide data if either list is replaced. The binding 
-/// can be operated in unidirectional or bidirectional mode. In unidirectional mode the source list can be modified
-/// and the target list will throw an error if there is an attempt to modify it. In bidirectional, changes are propogated
-/// in either direction.
-/// <br/><br/>
-/// The developer is required to provide a ConvertItem(...) that converts between each type. For single direction mode, 
-/// the unused direction can safely be implemented as ConvertItem(...) => throw new NotSupportedException();
+/// The binding can be set to unidirectional mode or bidirectional mode, with the SourceList property specifying the source list.
+/// In bidirectional mode, changes are propogated in both directions, In unidirectional mode only the source list can be modified and
+/// the target list will throw an exception if externally modified. When replacing either list, the source list items are convertd
+/// onto the target list.
 /// <br/><br/>
 /// Author: Greg Sonnenfeld
-/// Copyright 2019-2023
+/// Copyright 2019 to 2023
 /// </summary>
-/// <typeparam name="TItemA">The source or model list type.</typeparam>
-/// <typeparam name="TItemB">The destination or viewmodel list type.</typeparam>
+/// <typeparam name="TItemA">The item type of <see cref="ObservableListA{TItemA}"/> to be bound on onto <see cref="ObservableListB{TItemB}"/></typeparam>
+/// <typeparam name="TItemB">The item type of <see cref="ObservableListB{TItemB}"/> to be bound on onto <see cref="ObservableListA{TItemA}"/></typeparam>
 public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<TItemA, TItemB> {
     public abstract TItemB ConvertItem(TItemA item);
     public abstract TItemA ConvertItem(TItemB item);
@@ -51,35 +48,40 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
 
     #region Ctor
     /// <summary>
-    /// todo: Add description
+    /// Constructor initializes ObservableListBindFunc{TItemA,TItemB} with a user provided ObservableListA and ObservableListB.
+    /// <br/><br/>
+    /// <inheritdoc cref="ObservableListBind{TItemA, TItemB}"/> 
     /// </summary>
-    /// <param name="isBidirectional"></param>
-    /// <param name="sourceList"></param>
+    /// <param name="observableListA">User provided ObservableListA</param>
+    /// <param name="observableListB">User provided ObservableListB</param>
+    /// <param name="isBidirectional">Specifies if changes are propagated in both directions or only from source list to target list</param>
+    /// <param name="sourceList">1Specifies if ObservableListA or ObservableListB will be the source list.</param>
     protected ObservableListBind(
+        IObservableList<TItemA> observableListA,
+        IObservableList<TItemB> observableListB,
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
         SourceList = sourceList;
         IsBidirectional = isBidirectional;
+        ReplaceListA(observableListA);
+        ReplaceListB(observableListB);
     }
 
     /// <summary>
-    /// todo: Add description
+    /// Constructor initializes ObservableListBind{TItemA,TItemB} with ObservableListA and ObservableListB null. 
+    /// These can be assigned using the ObservableListA and ObservableListB properties.
+    /// <br/><br/>
+    /// <inheritdoc cref="ObservableListBind{TItemA, TItemB}"/> 
     /// </summary>
-    /// <param name="obvListA"></param>
-    /// <param name="obvListB"></param>
-    /// <param name="isBidirectional"></param>
-    /// <param name="sourceList"></param>
+    /// <param name="isBidirectional"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(bool, ListIdentifier)" path="/param[@name='isBidirectional']"/> </param>
+    /// <param name="sourceList"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(bool, ListIdentifier)" path="/param[@name='sourceList']"/> </param>
     protected ObservableListBind(
-        IObservableList<TItemA> obvListA,
-        IObservableList<TItemB> obvListB,
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
         SourceList = sourceList;
         IsBidirectional = isBidirectional;
-        ReplaceListA(obvListA);
-        ReplaceListB(obvListB);
     }
 
     ~ObservableListBind() => ReleaseAll();

@@ -6,13 +6,19 @@ using Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
-/// INotifyPropertySyncChanged interface, this class can also provide synchronization for notify events properties
-/// within an item of {TSource} and {TDestination}. If a PropertyChanged event is triggered on an item in {TSource}
-/// the class can trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
-/// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
+/// The <see cref="ObservableListBindProperty{TItemA, TItemB}"/> provides data binding between a pair of <see cref="IObservableList{TItemA}"/>.
+/// A user defined map between <see cref="{TItemA}"/> and <see cref="{TItemB}"/> is defined in the ConvertItem(..) methods. Different methods of 
+/// mapping between properties on the items are provided by the <seealso cref="PropertyBindType"/>.
+/// <br/><br/>
+/// The binding can be set to unidirectional mode or bidirectional mode, and the source list is always ObservableListA.
+/// In bidirectional mode, changes are propogated in both directions, In unidirectional mode only the source list can be modified and
+/// the target list will throw an exception if externally modified. When replacing either list, the source list items are used as the 
+/// source for the target list. 
+/// <br/><br/>
+/// Author: Greg Sonnenfeld Copyright 2019 to 2023
 /// </summary>
-/// <typeparam name="TItemA"></typeparam>
-/// <typeparam name="TItemB"></typeparam>
+/// <typeparam name="TItemA">The item type of <see cref="ObservableListA{TItemA}"/> to be bound on onto <see cref="ObservableListB{TItemB}"/></typeparam>
+/// <typeparam name="TItemB">The item type of <see cref="ObservableListB{TItemB}"/> to be bound on onto <see cref="ObservableListA{TItemA}"/></typeparam>
 public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableListBindProperty<TItemA, TItemB>
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
@@ -54,7 +60,7 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     }
 
     /// <summary>
-    /// ObservableListBindProperty only allows ListA to be the Source List. Do not set this proprty.
+    /// Do not set this property. ObservableListBindProperty only allows ListA to be the Source List. This may be added in a future version.
     /// </summary>
     public ListIdentifier SourceList {
         get => ListIdentifier.ListA;
@@ -66,16 +72,15 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
 
     #region ctor
     /// <summary>
-    /// Constructor for ObservableListBindProperty for a bind type of UpdateCollectionNotify or UpdatePropertyNotify. For UpdateCustomNotify use a different constructor.
-    /// 
-    ///  <br/><br/>UpdateCollectionNotify:On PropertyChanged this will remove the corresponding bound item from the other list and add a newly created item to the other list using ConvertItem(...).
-    /// <br/><br/>UpdatePropertyNotify: On PropertyChanged this will trigger a PropertyChanged event on the corresponding bound item. This class does not attempt to change the property. 
-    /// <br/><br/>UpdateCustomNotify: On PropertyChanged this will utilize a user provided ICustomPropertyMap to update the property on the corresponding bound item.
+    /// <br/>Constructor for <see cref="ObservableListBindProperty{TItemA, TItemB}"/> for a <see cref="PropertyBindType"/> of UpdateCollectionNotify or UpdatePropertyNotify. For UpdateCustomNotify use a different constructor.
+    /// <br/><br/>
+    /// <br/><br/>UpdateCollectionNotify - <inheritdoc cref="PropertyBindType.UpdateCollectionNotify"/>
+    /// <br/><br/>UpdatePropertyNotify - <inheritdoc cref="PropertyBindType.UpdatePropertyNotify"/>
     /// </summary>
     /// <param name="obvListA">The source list.</param>
     /// <param name="obvListB">The target list.</param>
-    /// <param name="bindType">A bind type of PropertyBindType.UpdateCollectionNotify or PropertyBindType.UpdatePropertyNotify.</param>
-    /// <param name="isBidirectional">Sets if changes to the target list is allowed and propagated back to the source.</param>
+    /// <param name="bindType">A PropertyBindType of UpdateCollectionNotify or UpdatePropertyNotify.</param>
+    /// <param name="isBidirectional"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='isBidirectional']"/> </param>
     /// <param name="isPropertyBindEnabled">If true, will turn on the property binding method of the provided bind type.</param>
     public ObservableListBindProperty(
      IObservableList<TItemA> obvListA,
@@ -86,25 +91,25 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
      ) => Constructor1(obvListA, obvListB, bindType, isBidirectional, isPropertyBindEnabled);
 
     /// <summary>
-    /// Constructor for ObservableListBindProperty for a bind type of UpdateCustomNotify. For UpdateCollectionNotify or UpdatePropertyNotify use a different constructor.
-    /// 
-    /// <br/><br/>UpdateCustomNotify: On PropertyChanged this will utilize a user provided ICustomPropertyMap to update the property on the corresponding bound item.
+    /// <br/>Constructor for <see cref="ObservableListBindProperty{TItemA, TItemB}"/> for a  <see cref="PropertyBindType"/> of UpdateCustomNotify. For UpdateCollectionNotify or UpdatePropertyNotify use a different constructor.
+    /// <br/><br/>
+    /// <br/><br/>UpdateCustomNotify - <inheritdoc cref="PropertyBindType.UpdateCustomNotify"/>
     /// </summary>
-    /// <param name="obvListA">The source list.</param>
-    /// <param name="obvListB">The target list.</param>
-    /// <param name="customPropertyMap">A user provided map between properties on ItemA and ItemB that will update the property on a cooresponding bound object.</param>
-    /// <param name="isBidirectional">Sets if changes to the target list is allowed and propagated back to the source.</param>
-    /// <param name="isPropertyBindEnabled">If true, will turn on the property binding method of the provided bind type.</param>
+    /// <param name="observableListA"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='observableListA']"/></param>
+    /// <param name="observableListB"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='observableListB']"/></param>
+    /// <param name="customPropertyMap">A user provided map of type <see cref="ICustomPropertyMap{TItemSource, TItemTarget}"/> between properties on ItemA and ItemB that will update the property on a cooresponding bound object.</param>
+    /// <param name="isBidirectional"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='isBidirectional']"/></param>
+    /// <param name="isPropertyBindEnabled"><inheritdoc cref="ObservableListBindProperty{TItemA, TItemB}.ObservableListBindProperty(IObservableList{TItemA}, IObservableList{TItemB}, PropertyBindType, bool, bool)" path="/param[@name='isPropertyBindEnabled']"/> </param>
     public ObservableListBindProperty(
-     IObservableList<TItemA> obvListA,
-     IObservableList<TItemB> obvListB,
+     IObservableList<TItemA> observableListA,
+     IObservableList<TItemB> observableListB,
      ICustomPropertyMap<TItemA, TItemB> customPropertyMap,
      bool isBidirectional = true,
      bool isPropertyBindEnabled = true
-     ) => Constructor2(obvListA, obvListB, customPropertyMap, isBidirectional, isPropertyBindEnabled);
+     ) => Constructor2(observableListA, observableListB, customPropertyMap, isBidirectional, isPropertyBindEnabled);
 
     /// <summary>
-    /// Derived classes are responsible for initialization.
+    /// Empty constructor. Derived classes responsible for initialization.
     /// </summary>
     protected ObservableListBindProperty() { }
     //Allows derived member ObservableListBindPropertyFunc to access constructor after ConvertItem assignment.

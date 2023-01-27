@@ -2,105 +2,71 @@
 
 namespace Gstc.Collections.ObservableLists.Binding;
 
-//Todo: Update all comments here
 /// <summary>
-/// The ObservableListBindFunc is a concrete implementation of ObservableListSynchronizer that
-/// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 
-/// in a method call.
-/// 
-/// The ObservableListSynchronizer provides synchronization between two ObservableLists of different types 
-/// {TSource} and {TDestination}. Add, Remove, clear, etc on one list is propagated to the other.
-/// The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) 
-/// that provide two way conversion between {TSource} and {TDestination}. Used in conjunction with the 
-/// INotifyPropertySyncChanged interface, this class can also provide synchronization for notify events properties
-/// within an item of {TSource} and {TDestination}. If a PropertyChanged event is triggered on an item in {TSource}
-/// the class can trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
-/// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
-///
-///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019
-///
-/// 
+/// The <see cref="ObservableListBindFunc{TItemA, TItemB}"/> is a concrete implementation of <see cref="ObservableListBind{TItemA, TItemB}"/> 
+/// where the ConvertItem(...) methods are defined by delegates of type <see cref="Func{TItemA, TItemB}"/> 
+/// passed as parameters in the constructor.
+/// <br/><br/>
+/// <inheritdoc cref="ObservableListBind{TItemA, TItemB}"/>
 /// </summary>
-/// <typeparam name="TItemA">The source or model list type.</typeparam>
-/// <typeparam name="TItemB">The destination or viewmodel list type.</typeparam>
+/// <typeparam name="TItemA">The item type of <see cref="ObservableListA{TItemA}"/> to be bound on onto <see cref="ObservableListB{TItemB}"/></typeparam>
+/// <typeparam name="TItemB">The item type of <see cref="ObservableListB{TItemB}"/> to be bound on onto <see cref="ObservableListA{TItemA}"/></typeparam>
+
 public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA, TItemB> {
 
-    private readonly Func<TItemA, TItemB> _convertItemAToItemB;
-    private readonly Func<TItemB, TItemA> _convertItemBTItemA;
-    public override TItemB ConvertItem(TItemA item) => _convertItemAToItemB(item);
-    public override TItemA ConvertItem(TItemB item) => _convertItemBTItemA(item);
+    private readonly Func<TItemA, TItemB> _convertItemAToB;
+    private readonly Func<TItemB, TItemA> _convertItemBToA;
+    public override TItemB ConvertItem(TItemA item) => _convertItemAToB(item);
+    public override TItemA ConvertItem(TItemB item) => _convertItemBToA(item);
+
+    ///<inheritdoc cref = "ObservableListBind{TItemA, TItemB}" />
+    public ObservableListBindFunc() { }
 
     /// <summary>
-    /// The ObservableListBindFunc is a concrete implementation of ObservableListBindFunc that
-    /// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 
-    /// in a method call.
-    /// 
-    /// The ObservableListSynchronizer provides synchronization between two ObservableLists of different types 
-    /// {TSource} and {TDestination}. Add, Remove, clear, etc on one list is propagated to the other.
-    /// The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) 
-    /// that provide two way conversion between {TSource} and {TDestination}. Used in conjunction with the 
-    /// INotifyPropertySyncChanged interface, this class can also provide synchronization for notify events properties
-    /// within an item of {TSource} and {TDestination}. If a PropertyChanged event is triggered on an item in {TSource}
-    /// the class can trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
-    /// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
-    /// 
+    /// This constructor initializes <see cref="ObservableListBindFunc{TItemA,TItemB}"/> with ObservableListA and ObservableListB null. These can be assigned in following code.
+    /// <br/><br/>
+    /// <inheritdoc cref="ObservableListBindFunc{TItemA, TItemB}"/> 
     /// </summary>
-    /// <param name="convertItemAToItemB">Method for converting a {TSource} type to {TDestination} type.</param>
-    /// <param name="convertItemBtoItemA">Method for converting a {TDestination} type to {TSource} type.</param>
-    /// <param name="propertyNotifySourceToDest">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
-    /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
+    /// <param name="convertItemAToB">Method for converting a {TItemA} to {TItemB}</param>
+    /// <param name="convertItemBToA">Method for converting a {TItemB} to {TItemA}</param>
+    /// <param name="isBidirectional"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='isBidirectional']"/></param>
+    /// <param name="sourceList"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='sourceList']"/> </param>
     public ObservableListBindFunc(
-        Func<TItemA, TItemB> convertItemAToItemB,
-        Func<TItemB, TItemA> convertItemBtoItemA,
+        Func<TItemA, TItemB> convertItemAToB,
+        Func<TItemB, TItemA> convertItemBToA,
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) : base() {
-        _convertItemAToItemB = convertItemAToItemB;
-        _convertItemBTItemA = convertItemBtoItemA;
-
+        _convertItemAToB = convertItemAToB;
+        _convertItemBToA = convertItemBToA;
         IsBidirectional = isBidirectional;
         SourceList = sourceList;
     }
 
     /// <summary>
-    /// The ObservableListBindFunc is a concrete implementation of ObservableBind that
-    /// lets you provide the ConvertSourceToDestination(...) and ConvertDestinationToSource(...) by passing 
-    /// in a method call.
-    /// 
-    /// The ObservableListSynchronizer provides synchronization between two ObservableLists of different types 
-    /// {TSource} and {TDestination}. Add, Remove, clear, etc on one list is propagated to the other.
-    /// The user is required to provide a ConvertSourceToDestination(...) and ConvertDestinationToSource(...) 
-    /// that provide two way conversion between {TSource} and {TDestination}. Used in conjunction with the 
-    /// INotifyPropertySyncChanged interface, this class can also provide synchronization for notify events properties
-    /// within an item of {TSource} and {TDestination}. If a PropertyChanged event is triggered on an item in {TSource}
-    /// the class can trigger a PropertyChanged event in the corresponding {TDestination} item, and vice-versa.
-    /// This class can serve as a map between a model and viewmodel for user interfaces or headless data servers.
-    ///  
+    /// This constructor initializes <see cref="ObservableListBindFunc{TItemA,TItemB}"/> with a user provided ObservableListA and ObservableListB.
+    /// <br/><br/>
+    /// <inheritdoc cref="ObservableListBindFunc{TItemA, TItemB}"/> 
     /// </summary>
-    /// <param name="convertItemAToItemB">Method for converting a {TSource} type to {TDestination} type.</param>
-    /// <param name="convertItemBtoItemA">Method for converting a {TDestination} type to {TSource} type.</param>
-    /// <param name="obvListA">The source ObservableList{TSource} to be synchronized.</param>
-    /// <param name="obvListB">The destination ObservableList{TDestination} to be synchronized.</param>
-    /// <param name="propertySyncListAToListB">If true, triggers a PropertyChanged event on {TDestination} if one occurs on {TSource}. Requires INotifyPropertySyncChanged to be implemented on {TDestination}.</param>
-    /// <param name="propertyNotifyDestToSource">If true, triggers a PropertyChanged event on {TSource} if one occurs on {TDestination}. Requires INotifyPropertySyncChanged to be implemented on {TSource}.</param>
-
+    /// <param name="convertItemAToB"><inheritdoc cref="ObservableListBindFunc{TItemA, TItemB}.ObservableListBindFunc(Func{TItemA, TItemB}, Func{TItemB, TItemA}, bool, ListIdentifier)" path="/param[@name='convertItemAToB']"/></param>
+    /// <param name="convertItemBToA"><inheritdoc cref="ObservableListBindFunc{TItemA, TItemB}.ObservableListBindFunc(Func{TItemA, TItemB}, Func{TItemB, TItemA}, bool, ListIdentifier)" path="/param[@name='convertItemBToA']"/></param>
+    /// <param name="observableListA"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='observableListA']"/></param>
+    /// <param name="observableListB"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='observableListB']"/></param>
+    /// <param name="isBidirectional"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='isBidirectional']"/></param>
+    /// <param name="sourceList"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(IObservableList{TItemA}, IObservableList{TItemB}, bool, ListIdentifier)" path="/param[@name='sourceList']"/> </param>
     public ObservableListBindFunc(
-        Func<TItemA, TItemB> convertItemAToItemB,
-        Func<TItemB, TItemA> convertItemBtoItemA,
-        ObservableList<TItemA> obvListA,
-        ObservableList<TItemB> obvListB,
+        Func<TItemA, TItemB> convertItemAToB,
+        Func<TItemB, TItemA> convertItemBToA,
+        IObservableList<TItemA> observableListA,
+        IObservableList<TItemB> observableListB,
         bool isBidirectional = false,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
-        _convertItemAToItemB = convertItemAToItemB;
-        _convertItemBTItemA = convertItemBtoItemA;
-
+        _convertItemAToB = convertItemAToB;
+        _convertItemBToA = convertItemBToA;
         SourceList = sourceList;
         IsBidirectional = isBidirectional;
-        ReplaceListA(obvListA);
-        ReplaceListB(obvListB);
-
+        ReplaceListA(observableListA);
+        ReplaceListB(observableListB);
     }
 }
