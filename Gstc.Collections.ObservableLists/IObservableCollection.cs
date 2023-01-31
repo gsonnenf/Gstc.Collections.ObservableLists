@@ -5,10 +5,7 @@ using System.ComponentModel;
 namespace Gstc.Collections.ObservableLists;
 
 /// <summary>
-/// Implements ICollection, INotifyCollectionChanged and INotifyPropertyChanged for a collection.
-///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019
+/// Union of <see cref="ICollection"/>, <see cref="INotifyCollectionChanged"/> and <see cref="INotifyPropertyChanged"/>.
 /// </summary>
 #pragma warning disable CA1010 // Generic interface should also be implemented
 public interface IObservableCollection :

@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.ComponentModel;
+using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists;
 
 /// <summary>
-/// The interface for an ObservableList{T} that provides notificatinos (CollectionChanging, CollectionChanging, Adding, Added, etc) when changes are made to the list,
-/// and can be cast down to its base types (IList{T}, IList, ICollection{T},etc) and still maintain notifications. 
-/// <br/><br/>Author: Greg Sonnenfeld
-/// <br/><br/>Copyright 2019
+/// The interface for <see cref="ObservableList{TItem}"/>, <see cref="ObservableIList{TItem, TList}"/> and <see cref="ObservableIListLocking{TItem,TList}"/> 
+/// that provides <see cref="IList{T}"/> functionality and notifications when the list changes.
+/// 
+/// <br/><br/>Greg Sonnenfeld
+/// <br/>Copyright 2019 - 2023
 /// </summary>
-/// <typeparam name="TItem"></typeparam>
+/// <typeparam name="TItem">The type of elements in the list.</typeparam>
 public interface IObservableList<TItem> :
     IObservableCollection<TItem>,
     INotifyListChangedEvents,

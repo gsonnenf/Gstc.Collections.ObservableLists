@@ -15,7 +15,7 @@ namespace Gstc.Collections.ObservableLists.Test;
 public class ObservableListEventOrderTest : CollectionTestBase<TestItem> {
 
     public readonly static object[] ObservableListDataSource = {
-        () => new ObservableList<TestItem>(), //A generator is needed. The static data souce is only called once per ValueSource method.
+        () => new ObservableList<TestItem>(), //A generator is needed. Static data source is called only instantiated once per ValueSource per test.
         () => new ObservableIList<TestItem, List<TestItem>>(),
         () => new ObservableIListLocking<TestItem,List<TestItem>>()
     };

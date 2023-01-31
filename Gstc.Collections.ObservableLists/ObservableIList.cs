@@ -6,25 +6,33 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Gstc.Collections.ObservableLists.Abstract;
+using Gstc.Collections.ObservableLists.ComponentModel;
+using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists;
 
 /// <summary>
-/// ObservableIList{TItem, TList{TItem}} is an observable list wrapper which has an internal TList{TItem} that serves as 
-/// the internal collection and is specified by the user. The list triggers observable events before and after write operations, and 
-/// triggers events even when upcast to its interfaces: IList, IList{T}, ICollection, ICollection{T}. The list implements:INotifyCollectionChanged, INotifyPropertyChanged.
+/// The <see cref="ObservableIList{TItem, TList}"/> is a list that implements on change events that are triggered when the collection changes.
+/// The list implements <see cref="IList{TItem}"/> and contains observable hooks that are invoked prior to changes (Adding, Moving, Removing, 
+/// Replacing, Reseting, OnCollectionChanging) and hooks invoked after the list has changed (Added, Moved, Remolved, Replaced, Reset, 
+/// OnCollectionChanged, OnPropertyChanged), and implements the <see cref="INotifyCollectionChanged"/>, <see cref="INotifyListChangedEvents"/>, 
+/// and <see cref="INotifyListChangingEvents"/> interface. The list also contains two refresh methods: RefreshIndex(int) and RefreshAll(), 
+/// that will respectively trigger Replace and Reset events without changing the list.
+/// <br/><br/>
+/// The <see cref="ObservableIList{TItem, TList}"/> serves as an observable wrapper for an internal <see cref="IList{TItem}"/> specified by the
+/// <see cref="TList"/> parameter.  The <see cref="ObservableIList{TItem, TList}"/> is designed to be upcast and will still generate events when 
+/// upcast to its various interfaces such as <see cref="IList{TItem}"/> and <see cref="ICollection{TItem}"/>
+/// <br/><br/>
+/// If you prefer to use an internal list of the standard <see cref="List{TItem}"/> type <see cref="IList{TItem}"/> you should use the 
+/// <see cref="ObservableList{TItem}"/>, if you need locking functionality for multithread/asynchronous operation, you may use 
+/// the <see cref="ObservableIListLocking{TItem, TList}"/>.
 /// 
-/// The internal list may be created on instantiation, provided by the user on instantiation, or added by the user after instantiation.
-/// 
-/// The AbstractObservableList prevents event reentrancy by default, but reentrancy can be enabled by setting the AllowReentrancy flag.
-///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019,2022,2023
+/// <br/><br/>
+/// Greg Sonnenfeld
+/// <br/>Copyright 2019 - 2023
 /// </summary>
-/// <typeparam name="TItem">The type of item used in the list.</typeparam>
-/// <typeparam name="TList">The type of internal list.</typeparam>
-///
-
+/// <typeparam name="TItem">The type of elements in the list.</typeparam>
+/// /// <typeparam name="TList">The type of internal list.</typeparam>
 public class ObservableIList<TItem, TList> :
     AbstractListUpcast<TItem>,
     IObservableList<TItem>
@@ -124,7 +132,7 @@ public class ObservableIList<TItem, TList> :
     #endregion
 
     #region Methods
-    //Todo: update these from OberservableIListLocking
+    //Todo: update these comments from OberservableIListLocking
     /// <summary>
     /// Adds a list of items and triggers a single CollectionChanged and Add event. 
     /// </summary>
@@ -267,7 +275,6 @@ public class ObservableIList<TItem, TList> :
     /// <summary>
     /// Generates a reset event without modifying the underlying list.
     /// </summary>
-    /// <param name="index"></param>
     public void RefreshAll() {
         using (BlockReentrancy()) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);

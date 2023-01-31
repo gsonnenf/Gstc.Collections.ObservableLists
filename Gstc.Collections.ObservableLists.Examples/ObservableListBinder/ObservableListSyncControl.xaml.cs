@@ -6,7 +6,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListBinder {
 
     //todo: Add a button to select bidirectionalty
     //todo: add an exception popup for exception when unidirectionality is set
-    //todo: use ObservableListBindProperty instead of normal obsercable list bind
+    //todo: use ObservableListBindProperty instead of normal observable list bind
     //Why are they syncing?
     public partial class ObservableListBinderControl : UserControl {
 

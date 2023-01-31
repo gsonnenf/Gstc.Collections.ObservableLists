@@ -3,10 +3,10 @@
 namespace Gstc.Collections.ObservableLists;
 
 /// <summary>
-/// Implements ICollection, INotifyCollectionChanged and INotifyPropertyChanged for a generic collection.
-/// Author: Greg Sonnenfeld
-/// Copyright 2019
+/// An interface for a collection that implements the observable events specified in the <see cref="IObservableCollection"/>.
+/// Property <see cref="AllowReentrancy"/> and methods <see cref="RefreshIndex(int)"/> and <see cref="AllowReentrancy"/> are introduced.
 /// </summary>
+/// <typeparam name="TItem">The type of elements in the list.</typeparam>
 public interface IObservableCollection<TItem> :
     ICollection<TItem>,
     IObservableCollection {
@@ -19,13 +19,12 @@ public interface IObservableCollection<TItem> :
     /// </summary>
     bool AllowReentrancy { set; }
     /// <summary>
-    /// Triggers a INotifyPropertyChanged replaced event without making changes to the underlying list.
+    /// Triggers an INotifyPropertyChanged replaced event without making changes to the underlying list.
     /// </summary>
     /// <param name="index">The index to trigger the replace event.</param>
     void RefreshIndex(int index);
     /// <summary>
-    /// Triggers a INotifyPropertyChanged reset event without making changes to the underlying list.
+    /// Triggers an INotifyPropertyChanged reset event without making changes to the underlying list.
     /// </summary>
-    /// <param name="index"></param>
     void RefreshAll();
 }

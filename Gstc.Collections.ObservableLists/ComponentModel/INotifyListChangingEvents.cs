@@ -3,32 +3,32 @@
 namespace Gstc.Collections.ObservableLists.ComponentModel;
 
 /// <summary>
-/// Provides a set of events that will be triggered after a List has been changed..
+///Provides a set of events that will be triggered before changes to a list.
 /// </summary>
 public interface INotifyListChangingEvents : INotifyCollectionChanging {
 
     /// <summary>
-    /// Triggers events before an item or items are added. 
+    /// Occurs before an item or items are added. 
     /// </summary>
     event NotifyCollectionChangedEventHandler Adding;
 
     /// <summary>
-    /// Triggers events before an item has changed position. 
+    /// Occurs before an item has changed position. 
     /// </summary>
     event NotifyCollectionChangedEventHandler Moving;
 
     /// <summary>
-    /// Triggers events before an item or items are removed. 
+    /// Occurs before an item or items are removed. 
     /// </summary>
     event NotifyCollectionChangedEventHandler Removing;
 
     /// <summary>
-    /// Triggers events before an item has been replaced. 
+    /// Occurs before an item has been replaced. 
     /// </summary>
     event NotifyCollectionChangedEventHandler Replacing;
 
     /// <summary>
-    /// Triggers events before the list has changed substantially such as a Clear(). 
+    /// Occurs before the list has changed substantially such as a clear. 
     /// </summary>
     event NotifyCollectionChangedEventHandler Resetting;
 }

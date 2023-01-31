@@ -6,29 +6,24 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Gstc.Collections.ObservableLists.Multithread;
 
-//Todo: review comment
 /// <summary>
-/// ObservableIListLocking{TItem, TList{TItem}} is an observable locking list wrapper which has an internal TList{TItem} that serves as 
-/// the internal collection and is specified by the user. The list triggers observable events before and after write operations, and 
-/// triggers events even when upcast to its interfaces: IList, IList{T}, ICollection, ICollection{T}. The list implements:INotifyCollectionChanged, INotifyPropertyChanged.
-///  
-/// The internal list may be created on instantiation, provided by the user on instantiation, or added by the user after instantiation.
-/// In many cases using ObservableList may be preferred over using the .NET ObservableCollection for its compatibility with existing collection types and interface.
-/// 
-/// All read and write operations are protected by a lock on the protected _syncRoot object. It is not exposed by default, but can be exposed on a derived class.
-/// 
-/// Reentrancy is only allowed from separate threads to prevent deadlock. Threads are tracked via ManagedThreadId. Be cautious with creating
-/// new threads in onChange events that write to the list. This can result in infinite onChange events or a stack overflow.
-///
-/// Author: Greg Sonnenfeld
-/// Copyright 2019,2022,2023
+/// <see cref="ObservableIListLocking{TItem, TList}"/> provides the functionality of the <see cref="ObservableIList{TItem, TList}"/> class
+/// while providing locking for thread safety. 
+/// <br/><br/> 
+/// Locking for read/write operations on internal list is provided by a <see cref="ReaderWriterLockSlim"/>. A second lock, utilizing the 
+/// lock keyword, is used for event invocations blocks. This allows asynchronous read operations while events are invoked serially. 
+/// todo: IEnumeration would require manually locking the list. A clone list feature is under consideration.
+/// <br/><br/> 
+/// An asynchronous environment has special consideration for reentrancy. Synchronous reentrancy throws an exception as this would always 
+/// cause deadlock. asynchronous reentrancy is always allowed, as it is prohibitively complex to distinguished between asynchronous reenentracy
+/// and non-rentrant asynchronous operations. Avoid Thread.Join and await in events with list operations as these will always trigger deadlock.
 /// </summary>
-/// <typeparam name="TItem">The type of item used in the list.</typeparam>
+/// <typeparam name="TItem">The type of elements in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
-/// 
 public class ObservableIListLocking<TItem, TList> :
     AbstractUpcastLockingIList<TItem>,
     IObservableList<TItem>
@@ -176,6 +171,7 @@ public class ObservableIListLocking<TItem, TList> :
     #region Method Overrides
     /// <summary>
     /// Indexes an element of the list. CollectionChanging, CollectionChanged, PropertyChanged, Replacing, Replaced event are triggered.
+    /// </summary>
     /// <param name="index">Index of item to replace.</param>
     /// <returns></returns>
     public override TItem this[int index] {

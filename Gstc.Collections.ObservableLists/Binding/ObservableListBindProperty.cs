@@ -7,7 +7,7 @@ namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
 /// The <see cref="ObservableListBindProperty{TItemA, TItemB}"/> provides data binding between a pair of <see cref="IObservableList{TItemA}"/>.
-/// A user defined map between <see cref="{TItemA}"/> and <see cref="{TItemB}"/> is defined in the ConvertItem(..) methods. Different methods of 
+/// A user defined map between <see cref="TItemA"/> and <see cref="TItemB"/> is defined in the ConvertItem(..) methods. Different methods of 
 /// mapping between properties on the items are provided by the <seealso cref="PropertyBindType"/>.
 /// <br/><br/>
 /// The binding can be set to unidirectional mode or bidirectional mode, and the source list is always ObservableListA.
@@ -23,8 +23,11 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
 
+
     #region Abstract
+    /// <inheritdoc/>
     public abstract TItemB ConvertItem(TItemA item);
+    /// <inheritdoc/>
     public abstract TItemA ConvertItem(TItemB item);
     #endregion
 

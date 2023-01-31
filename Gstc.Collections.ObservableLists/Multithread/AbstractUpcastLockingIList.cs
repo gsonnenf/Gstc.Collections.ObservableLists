@@ -19,6 +19,9 @@ public abstract class AbstractUpcastLockingIList<TItem> :
     //protected readonly object _syncRoot = new();
 
     #region abstract methods
+    /// <summary>
+    /// The internal list that is wrapped by the <see cref="AbstractListUpcast{TItem}"/> wrapper.
+    /// </summary>
     protected abstract IList<TItem> InternalList { get; }
     public abstract TItem this[int index] { get; set; }
     public abstract void Insert(int index, TItem item);
@@ -48,8 +51,9 @@ public abstract class AbstractUpcastLockingIList<TItem> :
         using (ReadLock()) return InternalList.IndexOf(item);
     }
 
+    //TODO - Feature: Add an flag for IEnumerator providing a clone or using the initial list and adding a lock.
     public IEnumerator<TItem> GetEnumerator() {
-        using (ReadLock()) return InternalList.GetEnumerator(); //TODO - Feature: Do we need to make a snapshot of list for thread safe enumeration
+        using (ReadLock()) return InternalList.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() {

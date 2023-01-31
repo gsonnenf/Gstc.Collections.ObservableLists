@@ -5,9 +5,9 @@ using System.ComponentModel;
 namespace Gstc.Collections.ObservableLists.Binding;
 
 /// <summary>
-/// The <see cref="ObservableListBind{TItemA, TItemB}"/> provides data binding between a pair of <see cref="IObservableList{TItemA}"/>, 
-/// <see cref="ObservableListA{TItemA}"/> and <see cref="ObservableListB{TItemB}"/>
-/// A user defined map between <see cref="{TItemA}"/> and <see cref="{TItemB}"/> is defined in the ConvertItem(..) methods. 
+/// The <see cref="ObservableListBind{TItemA, TItemB}"/> provides binding between a pair of <see cref="IObservableList{TItemA}"/>, 
+/// ObservableListA and ObservableListB. A user defined mapping between <see cref="TItemA"/> and <see cref="TItemB"/> is defined in 
+/// the ConvertItem(..) methods. 
 /// <br/><br/>
 /// The binding can be set to unidirectional mode or bidirectional mode, with the SourceList property specifying the source list.
 /// In bidirectional mode, changes are propogated in both directions, In unidirectional mode only the source list can be modified and
@@ -17,8 +17,8 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// Author: Greg Sonnenfeld
 /// Copyright 2019 to 2023
 /// </summary>
-/// <typeparam name="TItemA">The item type of <see cref="ObservableListA{TItemA}"/> to be bound on onto <see cref="ObservableListB{TItemB}"/></typeparam>
-/// <typeparam name="TItemB">The item type of <see cref="ObservableListB{TItemB}"/> to be bound on onto <see cref="ObservableListA{TItemA}"/></typeparam>
+/// <typeparam name="TItemA">The item type of <see cref="ObservableListA"/> to be bound on onto <see cref="ObservableListB"/></typeparam>
+/// <typeparam name="TItemB">The item type of <see cref="ObservableListB"/> to be bound on onto <see cref="ObservableListA"/></typeparam>
 public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<TItemA, TItemB> {
     public abstract TItemB ConvertItem(TItemA item);
     public abstract TItemA ConvertItem(TItemB item);
