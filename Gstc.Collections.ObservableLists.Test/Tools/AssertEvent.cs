@@ -13,12 +13,12 @@ namespace Gstc.Utility.UnitTest.Event;
 public partial class AssertEvent<TEventArgs> : IDisposable
     where TEventArgs : EventArgs {
 
+    #region Fields and Properties
     private object _parent;
 
     private readonly EventInfo _eventInfo;
     private readonly Delegate _delegate;
 
-    #region Fields and Properties
     public ErrorLog ErrorLog { get; protected set; } = new();
     public string ErrorMessages => ErrorLog.ErrorMessages();
     public int TimesCalled { get; protected set; }
@@ -46,6 +46,8 @@ public partial class AssertEvent<TEventArgs> : IDisposable
 
         eventInfo.AddEventHandler(parent, _delegate);
     }
+
+
 
     public void Dispose() {
         _eventInfo.RemoveEventHandler(_parent, _delegate);

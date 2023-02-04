@@ -1,6 +1,7 @@
 ﻿using System;
 using Gstc.Collections.ObservableLists.Binding;
 using Gstc.Collections.ObservableLists.Test.Fakes;
+using Gstc.Utility.UnitTest.Event;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;
@@ -376,6 +377,25 @@ public class ObservableListBindTest {
             Assert.That(ItemB2, Is.EqualTo(obvListBind.ObservableListB[0]));
             Assert.That(obvListBind.ObservableListA, Has.Count.EqualTo(1));
             Assert.That(obvListBind.ObservableListB, Has.Count.EqualTo(1));
+        });
+    }
+
+    [Test]
+    [TestCaseSource(nameof(DataSource_Prepopulated))]
+    public void ReleaseAll_ClearsAllEventsListsItemsSuccessfully(Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator) {
+
+        IObservableListBind<ItemA, ItemB> obvListBind = obvListBindGenerator();
+        IObservableList<ItemA> obvListA = obvListBind.ObservableListA;
+        IObservableList<ItemB> obvListB = obvListBind.ObservableListB;
+
+        obvListBind.ReleaseAll();
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA, Is.Null);
+            Assert.That(obvListBind.ObservableListB, Is.Null);
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListA, nameof(obvListA.CollectionChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListB, nameof(obvListB.CollectionChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListA, nameof(obvListA.PropertyChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListB, nameof(obvListB.PropertyChanged)), Is.EqualTo(0));
         });
     }
 }

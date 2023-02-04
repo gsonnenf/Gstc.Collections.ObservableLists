@@ -97,7 +97,14 @@ abstract internal class AbstractPropertyBinder<TItemSource, TItemTarget> : IProp
     /// </summary>
     public void UnbindAll() {
         if (!_isBindingEnabled) return;
-        foreach (var kvp in BindingDictionary) Unbind(kvp.Value.itemS, kvp.Key);
+        foreach (var kvp in BindingDictionary) {
+            var itemT = kvp.Key;
+            var itemS = kvp.Value.itemS;
+            var (_, eventP, eventT) = BindingDictionary[itemT];
+            if (itemS is INotifyPropertyChanged obvItemS) obvItemS.PropertyChanged -= eventP;
+            if (itemT is INotifyPropertyChanged obvItemT) obvItemT.PropertyChanged -= eventT;
+        }
+        BindingDictionary.Clear();
     }
 
     /// <summary>

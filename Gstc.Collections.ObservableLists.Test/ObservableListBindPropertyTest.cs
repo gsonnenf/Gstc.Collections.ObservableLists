@@ -28,8 +28,14 @@ public class ObservableListBindPropertyTest {
     };
 
     public static object[] DataSource_Populated => new object[] {
-        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA> {ItemA1}, new ObservableList<ItemB>()),
-        new ObservableListBindProperty_ItemAB(new ObservableList<ItemA> {ItemA1}, new ObservableList<ItemB>(), customPropertyMap: new CustomPropertyMapItemAB()),
+        new ObservableListBindProperty_ItemAB(
+            new ObservableList<ItemA> {ItemA1},
+            new ObservableList<ItemB>()),
+
+        new ObservableListBindProperty_ItemAB(
+            new ObservableList<ItemA> {ItemA1},
+            new ObservableList<ItemB>(),
+            customPropertyMap: new CustomPropertyMapItemAB()),
 
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
@@ -341,6 +347,32 @@ public class ObservableListBindPropertyTest {
             Assert.That(obvListBind.ObservableListA[0], Is.Not.SameAs(obvListBind.ObservableListA[1]));
             Assert.That(obvListBind.ObservableListB[0], Is.Not.SameAs(obvListBind.ObservableListB[1]));
             Assert.That(obvListBind.ObservableListB[0], Is.Not.EqualTo(obvListBind.ObservableListB[1]));
+        });
+    }
+
+    [Test]
+    [TestCaseSource(nameof(DataSource_Populated))]
+    public void ReleaseAll_ClearsAllEventsAndListsSuccessfully(IObservableListBindProperty<ItemA, ItemB> obvListBind) {
+        IObservableList<ItemA> obvListA = obvListBind.ObservableListA;
+        IObservableList<ItemB> obvListB = obvListBind.ObservableListB;
+        ItemA itemA1 = obvListA[0];
+        ItemB itemB1 = obvListB[0];
+
+        obvListBind.ReleaseAll();
+
+        Assert.Multiple(() => {
+            Assert.That(obvListBind.ObservableListA, Is.Null);
+            Assert.That(obvListBind.ObservableListB, Is.Null);
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListA, nameof(obvListA.CollectionChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListB, nameof(obvListB.CollectionChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListA, nameof(obvListA.PropertyChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyCollection(obvListB, nameof(obvListB.PropertyChanged)), Is.EqualTo(0));
+        });
+
+
+        Assert.Multiple(() => {
+            Assert.That(AssertEvent.NumberOfEvents_NotifyProperty(itemA1, nameof(itemA1.PropertyChanged)), Is.EqualTo(0));
+            Assert.That(AssertEvent.NumberOfEvents_NotifyProperty(itemB1, nameof(itemB1.PropertyChanged)), Is.EqualTo(0));
         });
     }
 }
