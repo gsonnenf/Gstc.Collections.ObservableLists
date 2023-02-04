@@ -24,15 +24,17 @@ public class ObservableListBindTest {
         ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           PropertyBindType.UpdateCollectionNotify,
            new ObservableList<ItemA>(),
            new ObservableList<ItemB>()),
 
         ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new CustomPropertyMapItemAB(),
            new ObservableList<ItemA>(),
-           new ObservableList<ItemB>(),
-           new CustomPropertyMapItemAB())
+           new ObservableList<ItemB>()
+           )
     };
 
     //Generator methods resolve issue with NUnit ValueSource using same object for each run
@@ -57,15 +59,17 @@ public class ObservableListBindTest {
         ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           PropertyBindType.UpdateCollectionNotify,
            new ObservableList<ItemA> {ItemA1},
            new ObservableList<ItemB> {ItemB1}),
 
         () => new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new CustomPropertyMapItemAB(),
            new ObservableList<ItemA> {ItemA1},
-           new ObservableList<ItemB> {ItemB1},
-           new CustomPropertyMapItemAB())
+           new ObservableList<ItemB> {ItemB1}
+           )
     };
 
     public static object[] DataSource_CopyInConstructor => new object[] {
@@ -83,15 +87,17 @@ public class ObservableListBindTest {
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           PropertyBindType.UpdateCollectionNotify,
            ItemA.GetSampleSourceItemAList(),
            new ObservableList<ItemB>()),
 
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new CustomPropertyMapItemAB(),
            ItemA.GetSampleSourceItemAList(),
-           new ObservableList<ItemB>(),
-           new CustomPropertyMapItemAB())
+           new ObservableList<ItemB>()
+           )
     };
     #endregion
 

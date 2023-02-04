@@ -9,8 +9,8 @@ namespace Gstc.Collections.ObservableLists.Binding;
 /// <br/><br/>
 /// <inheritdoc cref="ObservableListBind{TItemA, TItemB}"/>
 /// </summary>
-/// <typeparam name="TItemA">The item type of <see cref="ObservableListA{TItemA}"/> to be bound on onto <see cref="ObservableListB{TItemB}"/></typeparam>
-/// <typeparam name="TItemB">The item type of <see cref="ObservableListB{TItemB}"/> to be bound on onto <see cref="ObservableListA{TItemA}"/></typeparam>
+/// <typeparam name="TItemA">The item type of <see cref="ObservableListA"/> to be bound on onto <see cref="ObservableListB"/></typeparam>
+/// <typeparam name="TItemB">The item type of <see cref="ObservableListB"/> to be bound on onto <see cref="ObservableListA"/></typeparam>
 
 public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA, TItemB> {
 
@@ -18,9 +18,6 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
     private readonly Func<TItemB, TItemA> _convertItemBToA;
     public override TItemB ConvertItem(TItemA item) => _convertItemAToB(item);
     public override TItemA ConvertItem(TItemB item) => _convertItemBToA(item);
-
-    ///<inheritdoc cref = "ObservableListBind{TItemA, TItemB}" />
-    public ObservableListBindFunc() { }
 
     /// <summary>
     /// This constructor initializes <see cref="ObservableListBindFunc{TItemA,TItemB}"/> with ObservableListA and ObservableListB null. These can be assigned in following code.

@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace Gstc.Collections.ObservableLists.Binding;
 /// <summary>
 /// The <see cref="ObservableListBindPropertyFunc{TItemA, TItemB}"/> is a concrete implementation of <see cref="ObservableListBindProperty{TItemA, TItemB}"/> 
-/// where the ConvertItem(...) asbstract methods are set by delegates of type <see cref="Func{TItemA, TItemB}"/> 
+/// where the ConvertItem(...) asbstract methods are defined by delegates of type <see cref="Func{TItemA, TItemB}"/> 
 /// passed as parameters in the constructor.
 /// <br/><br/>
 /// <inheritdoc cref="ObservableListBindProperty{TItemA, TItemB}"/> 
@@ -24,7 +24,7 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
 
     /// <summary>
     /// Constructor for <see cref="ObservableListBindPropertyFunc{TItemA, TItemB}"/>, a concrete implementation of <see cref="ObservableListBindProperty{TItemA, TItemB}"/> 
-    /// where the ConvertItem(...) abstract methods are set by delegates of type <see cref="Func{TItemA, TItemB}"/> <br/>
+    /// where the ConvertItem(...) abstract methods are defined by delegates of type <see cref="Func{TItemA, TItemB}"/> <br/>
     /// <inheritdoc cref="ObservableListBindProperty{TItemA, TItemB}.ObservableListBindProperty(IObservableList{TItemA}, IObservableList{TItemB}, PropertyBindType, bool, bool)"/> 
     /// </summary>
     /// <param name="convertItemAToB"><inheritdoc cref="ObservableListBindFunc{TItemA, TItemB}.ObservableListBindFunc(Func{TItemA, TItemB}, Func{TItemB, TItemA}, bool, ListIdentifier)" path="/param[@name='convertItemAToB']"/></param>
@@ -37,10 +37,12 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
     public ObservableListBindPropertyFunc(
         Func<TItemA, TItemB> convertItemAToB,
         Func<TItemB, TItemA> convertItemBToA,
-        IObservableList<TItemA> observableListA,
-        IObservableList<TItemB> observableListB,
         PropertyBindType bindType = PropertyBindType.UpdateCollectionNotify,
+        IObservableList<TItemA> observableListA = null,
+        IObservableList<TItemB> observableListB = null,
         bool isBidirectional = true, bool isPropertyBindEnabled = true) {
+        observableListA ??= new ObservableList<TItemA>();
+        observableListB ??= new ObservableList<TItemB>();
         ConvertItemAToB = convertItemAToB;
         ConvertItemBToA = convertItemBToA;
         Constructor1(observableListA, observableListB, bindType, isBidirectional, isPropertyBindEnabled);
@@ -62,9 +64,9 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
     public ObservableListBindPropertyFunc(
         Func<TItemA, TItemB> convertItemAToB,
         Func<TItemB, TItemA> convertItemBToA,
-        IObservableList<TItemA> observableListA,
-        IObservableList<TItemB> observableListB,
         ICustomPropertyMap<TItemA, TItemB> customPropertyMap,
+        IObservableList<TItemA> observableListA = null,
+        IObservableList<TItemB> observableListB = null,
         bool isBidirectional = true,
         bool isPropertyBindEnabled = true) {
         ConvertItemAToB = convertItemAToB;

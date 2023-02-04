@@ -16,15 +16,17 @@ public class ObservableListBindPropertyTest {
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           PropertyBindType.UpdateCollectionNotify,
            new ObservableList<ItemA>(),
            new ObservableList<ItemB>()),
 
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new CustomPropertyMapItemAB(),
            new ObservableList<ItemA>(),
-           new ObservableList<ItemB>(),
-           new CustomPropertyMapItemAB())
+           new ObservableList<ItemB>()
+           )
     };
 
     public static object[] DataSource_Populated => new object[] {
@@ -40,6 +42,7 @@ public class ObservableListBindPropertyTest {
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           PropertyBindType.UpdateCollectionNotify,
            new ObservableList<ItemA> {ItemA1},
            new ObservableList<ItemB>()
            ),
@@ -47,9 +50,10 @@ public class ObservableListBindPropertyTest {
         new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new CustomPropertyMapItemAB(),
            new ObservableList<ItemA> {ItemA1},
-           new ObservableList<ItemB>(),
-           new CustomPropertyMapItemAB())
+           new ObservableList<ItemB>()
+           )
     };
     public static object[] DataSource_NullTest => new object[] {
         ()=> new ObservableListBindProperty_ItemAB(new ObservableList<ItemA>(), new ObservableList<ItemB>(), PropertyBindType.UpdatePropertyNotify),
@@ -59,15 +63,17 @@ public class ObservableListBindPropertyTest {
         ()=> new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           PropertyBindType.UpdateCollectionNotify,
            new ObservableList<ItemA>(),
            new ObservableList<ItemB>()),
 
         ()=>new ObservableListBindPropertyFunc<ItemA,ItemB>(
            ObservableListBindProperty_ItemAB.ConvertItemAToB,
            ObservableListBindProperty_ItemAB.ConvertItemBToA,
+           new CustomPropertyMapItemAB(),
            new ObservableList<ItemA>(),
-           new ObservableList<ItemB>(),
-           new CustomPropertyMapItemAB())
+           new ObservableList<ItemB>()
+           )
     };
 
     #region Test Fixture
@@ -183,16 +189,18 @@ public class ObservableListBindPropertyTest {
     #region UpdateProperty
     public static object[] DataSource_UpdatePropertyNotify => new object[] {
         new ObservableListBindProperty_ItemMVM(
+            PropertyBindType.UpdatePropertyNotify,
             new ObservableList<ItemModel>(),
-            new ObservableList<ItemViewModel>(),
-            PropertyBindType.UpdatePropertyNotify),
+            new ObservableList<ItemViewModel>()
+            ),
 
         new ObservableListBindPropertyFunc<ItemModel,ItemViewModel>(
            ObservableListBindProperty_ItemMVM.ConvertItemMToVM,
            ObservableListBindProperty_ItemMVM.ConvertItemVMToM,
+           PropertyBindType.UpdatePropertyNotify,
            new ObservableList<ItemModel>(),
-           new ObservableList<ItemViewModel>(),
-           PropertyBindType.UpdatePropertyNotify)
+           new ObservableList<ItemViewModel>()
+           )
     };
 
 
@@ -236,14 +244,16 @@ public class ObservableListBindPropertyTest {
         new ObservableListBindProperty_ItemMVMHook(
             new ObservableList<ItemModelHook>(),
             new ObservableList<ItemViewModelHook>(),
-            PropertyBindType.UpdatePropertyNotify),
+            PropertyBindType.UpdatePropertyNotify
+        ),
 
         new ObservableListBindPropertyFunc<ItemModelHook,ItemViewModelHook>(
            ObservableListBindProperty_ItemMVMHook.ConvertItemMToVM,
            ObservableListBindProperty_ItemMVMHook.ConvertItemVMToM,
+           PropertyBindType.UpdatePropertyNotify,
            new ObservableList<ItemModelHook>(),
-           new ObservableList<ItemViewModelHook>(),
-           PropertyBindType.UpdatePropertyNotify)
+           new ObservableList<ItemViewModelHook>()
+           )
     };
 
     [Test, Description("Tests that property notify events are propagated from source to target on PropertyBindType.UpdatePropertyNotify using INotifyPropertyChangedHook.")]

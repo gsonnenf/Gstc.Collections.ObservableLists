@@ -79,6 +79,7 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     /// <br/><br/>
     /// <br/><br/>UpdateCollectionNotify - <inheritdoc cref="PropertyBindType.UpdateCollectionNotify"/>
     /// <br/><br/>UpdatePropertyNotify - <inheritdoc cref="PropertyBindType.UpdatePropertyNotify"/>
+    /// <br/><br/>UpdateCustomNotify - <inheritdoc cref="PropertyBindType.UpdateCustomNotify"/>
     /// </summary>
     /// <param name="obvListA">The source list.</param>
     /// <param name="obvListB">The target list.</param>
