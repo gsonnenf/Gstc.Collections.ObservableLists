@@ -200,7 +200,7 @@ public class ObservableListBindTest {
     }
 
     [Test, Description("Tests that bidirectional add works properly.")]
-    public void AddItem_ListsAreSynced_UnidirectionalTargetThrowsError(
+    public void AddItem_ListsAreSynced_BidirectionalSuccess_UnidirectionalTargetThrowsError(
             [ValueSource(nameof(DataSource_Empty))] Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator,
             [Values] ListIdentifier sourceList,
             [Values] bool isBidirectional,
@@ -236,7 +236,7 @@ public class ObservableListBindTest {
     }
 
     [Test, Description("Tests that remove works properly")]
-    public void ClearItem_ListsAreSynced_UnidirectionalTargetThrowsError(
+    public void ClearItem_ListsAreSynced_BidirectionalSuccess_UnidirectionalTargetThrowsError(
             [ValueSource(nameof(DataSource_Prepopulated))] Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator,
             [Values] ListIdentifier sourceList,
             [Values] bool isBidirectional,
@@ -268,7 +268,7 @@ public class ObservableListBindTest {
     }
 
     [Test, Description("Tests that move works properly")]
-    public void MoveItem_ListsAreSynced_UnidirectionalTargetThrowsError(
+    public void MoveItem_ListsAreSynced_BidirectionalSuccess_UnidirectionalTargetThrowsError(
             [ValueSource(nameof(DataSource_Prepopulated))] Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator,
             [Values] ListIdentifier sourceList,
             [Values] bool isBidirectional,
@@ -319,7 +319,7 @@ public class ObservableListBindTest {
     }
 
     [Test, Description("Tests that remove works properly")]
-    public void RemoveItem_ListsAreSynced_UnidirectionalTargetThrowsError(
+    public void RemoveItem_ListsAreSynced_BidirectionalSuccess_UnidirectionalTargetThrowsError(
             [ValueSource(nameof(DataSource_Prepopulated))] Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator,
             [Values] ListIdentifier sourceList,
             [Values] bool isBidirectional,
@@ -352,7 +352,7 @@ public class ObservableListBindTest {
     }
 
     [Test, Description("Tests that replace works properly")]
-    public void ReplaceItem_ListsAreSynced_UnidirectionalTargetThrowsError(
+    public void ReplaceItem_ListsAreSynced_BidirectionalSuccess_UnidirectionalTargetThrowsError(
             [ValueSource(nameof(DataSource_Prepopulated))] Func<IObservableListBind<ItemA, ItemB>> obvListBindGenerator,
             [Values] ListIdentifier sourceList,
             [Values] bool isBidirectional,

@@ -41,8 +41,6 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
         IObservableList<TItemA> observableListA = null,
         IObservableList<TItemB> observableListB = null,
         bool isBidirectional = true, bool isPropertyBindEnabled = true) {
-        observableListA ??= new ObservableList<TItemA>();
-        observableListB ??= new ObservableList<TItemB>();
         ConvertItemAToB = convertItemAToB;
         ConvertItemBToA = convertItemBToA;
         Constructor1(observableListA, observableListB, bindType, isBidirectional, isPropertyBindEnabled);

@@ -31,7 +31,7 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
     public ObservableListBindFunc(
         Func<TItemA, TItemB> convertItemAToB,
         Func<TItemB, TItemA> convertItemBToA,
-        bool isBidirectional = false,
+        bool isBidirectional = true,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) : base() {
         _convertItemAToB = convertItemAToB;
@@ -56,7 +56,7 @@ public class ObservableListBindFunc<TItemA, TItemB> : ObservableListBind<TItemA,
         Func<TItemB, TItemA> convertItemBToA,
         IObservableList<TItemA> observableListA,
         IObservableList<TItemB> observableListB,
-        bool isBidirectional = false,
+        bool isBidirectional = true,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
         _convertItemAToB = convertItemAToB;

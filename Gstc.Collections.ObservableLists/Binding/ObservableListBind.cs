@@ -59,7 +59,7 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
     protected ObservableListBind(
         IObservableList<TItemA> observableListA,
         IObservableList<TItemB> observableListB,
-        bool isBidirectional = false,
+        bool isBidirectional = true,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
         SourceList = sourceList;
@@ -77,7 +77,7 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
     /// <param name="isBidirectional"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(bool, ListIdentifier)" path="/param[@name='isBidirectional']"/> </param>
     /// <param name="sourceList"><inheritdoc cref="ObservableListBind{TItemA, TItemB}.ObservableListBind(bool, ListIdentifier)" path="/param[@name='sourceList']"/> </param>
     protected ObservableListBind(
-        bool isBidirectional = false,
+        bool isBidirectional = true,
         ListIdentifier sourceList = ListIdentifier.ListA
         ) {
         SourceList = sourceList;
@@ -135,13 +135,13 @@ public abstract class ObservableListBind<TItemA, TItemB> : IObservableListBind<T
     //todo: - Feature: Add an optional dispatcher method to execute update code on a UI thread.
     private void ListAChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (_isSynchronizationInProgress || _observableListB == null) return;
-        if (IsBidirectional == false && !(SourceList == ListIdentifier.ListA)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to false.");
+        if (IsBidirectional == false && !(SourceList == ListIdentifier.ListA)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to true.");
         ListChanged(args, _observableListA, _observableListB, ConvertItem);
     }
 
     private void ListBChanged(object sender, NotifyCollectionChangedEventArgs args) {
         if (_isSynchronizationInProgress || _observableListA == null) return;
-        if (IsBidirectional == false && !(SourceList == ListIdentifier.ListB)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to false.");
+        if (IsBidirectional == false && !(SourceList == ListIdentifier.ListB)) throw new InvalidOperationException("The target list was modified but bidirectional is not set to true.");
         ListChanged(args, _observableListB, _observableListA, ConvertItem);
     }
 
