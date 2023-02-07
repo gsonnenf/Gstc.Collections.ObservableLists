@@ -3,13 +3,13 @@
   <img src="https://user-images.githubusercontent.com/686792/53543486-0e638800-3ae0-11e9-9566-6d2f18a28e61.jpg" height="350">
 </p>
 
-
+***New Version 2 Release Candidate! (2023-02-07)<br>***
 Gstc.Collections.ObservableLists <br>
 Author - Greg Sonnenfeld, Copyright 2019 to 2023 <br>
 License: LGPL 3.0 <br>
 Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
 
-## What is it?
+## What is it? 
 A collection of lists that provides hooks that are invoked before and after list modified.<br>
 `ObservableList<TItem>`<br> `ObservableIList<TItem,TList<TItem>>`<br> `ObservableIListLocking<TItem,TList<TItem>>`<br> `IObservableList<TItem>`<br><br>
 
