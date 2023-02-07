@@ -1,10 +1,13 @@
 # Gstc.Collections.ObservableLists
-***Gstc.Collections.ObservableLists*** contains lists/list wrappers that implement the observable pattern, provide events that are invoked when a list is modified, and a set of list binding classes that synchronize the content of observable lists using a conversion between item classes.<br>
+An observable lists library with upcast compatibility, list wrapping, reentrancy protection, thread safety, and robust unit testing,
 
-***Observable Lists***: `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, `IObservableList<TItem>`<br>
+#### Observable Lists
+A set of lists/list wrappers that implement the observable pattern, invoking events when a list is modified.<br/>
+`ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, `IObservableList<TItem>`<br>
 
-
-***Observable List Binding***: `ObservableListBind<TItemA,TItemB>`, `ObservableListBindFunc<TItemA,TItemB>`, `ObservableListBindProperty<TItemA,TItemB>`, `ObservableListBindPropertyFunc<TItemA,TItemB>`
+#### Observable List Bindings 
+A set of list binding classes that synchronize the content of observable lists using a conversion method between item types.<br/>
+`ObservableListBind<TItemA,TItemB>`, `ObservableListBindFunc<TItemA,TItemB>`, `ObservableListBindProperty<TItemA,TItemB>`, `ObservableListBindPropertyFunc<TItemA,TItemB>`
 
 ## License
 <p align="left">
