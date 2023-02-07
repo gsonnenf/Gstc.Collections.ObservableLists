@@ -4,39 +4,48 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel>
-        <Grid DockPanel.Dock="Bottom">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Button Click="Button_Click_List">Load ObservableList</Button>
-            <Button Grid.Column="1" Click="Button_Click_IList">Load ObservableIList</Button>
-            <Button Grid.Column="2" Click="Button_Click_IListLocking">Load ObservableIListLocking</Button>
-        </Grid>
-        <Button DockPanel.Dock="Bottom" Click="Button_Click_New" >Replace Internal List</Button>
-        <Button DockPanel.Dock="Bottom" Click="Button_Click_Remove">Remove Customer</Button>
-        <Button DockPanel.Dock="Bottom" Click="Button_Click_AddRange">Add Many Customers</Button>
-        <Button DockPanel.Dock="Bottom" Click="Button_Click_Add">Add Customer</Button>
- 
-        <Grid DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="300"/>
-            </Grid.ColumnDefinitions>
-            <ListView ItemsSource="{Binding BindingList, RelativeSource={RelativeSource AncestorType=UserControl}}" Name="CustomerListView">
+             d:DesignHeight="600" d:DesignWidth="800"
+             d:Background="WhiteSmoke">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="120px"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" MinHeight="100px" Margin="10px" >
+            <ListView Width="500px" ItemsSource="{Binding BindingList, RelativeSource={RelativeSource AncestorType=UserControl}}" Name="CustomerListView">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="80" Header="First" DisplayMemberBinding="{Binding Path=FirstName}" />
-                        <GridViewColumn Width="80" Header="Last" DisplayMemberBinding="{Binding Path=LastName}" />
+                        <GridViewColumn Width="100" Header="First" DisplayMemberBinding="{Binding Path=FirstName}" />
+                        <GridViewColumn Width="100" Header="Last" DisplayMemberBinding="{Binding Path=LastName}" />
                         <GridViewColumn Width="150" Header="Dob" DisplayMemberBinding="{Binding Path=BirthDate, StringFormat=yyyy-MM-dd}" />
-                        <GridViewColumn Width="200" Header="PurchaseAmount" DisplayMemberBinding="{Binding Path=PurchaseAmount}" />
+                        <GridViewColumn Width="150" Header="PurchaseAmount" DisplayMemberBinding="{Binding Path=PurchaseAmount}" />
                     </GridView>
                 </ListView.View>
             </ListView>
-            <TextBox Name="EventTextBox" Grid.Column="1" TextWrapping="Wrap"></TextBox>
+            <TextBox Width="300px"  Name="EventTextBox" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Height="120px" >
+            <StackPanel Margin="20px">
+                <Label Padding="5" Margin="5">Observable List Type:</Label>
+                <ComboBox Width="300px" Padding="5" Margin="5" Height="30px" Name="BindTypeComboBox" SelectionChanged="ComboBox_SelectionChanged"/>
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200px"/>
+                    <ColumnDefinition Width="200px"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50px"/>
+                    <RowDefinition Height="50px"/>
+                </Grid.RowDefinitions>
+                <Button Click="ButtonClick_New" Margin="10px">Replace Internal List</Button>
+                <Button Click="ButtonClick_Remove" Margin="10px" Grid.Column="1" >Remove Customer</Button>
+                <Button Click="ButtonClick_AddRange" Margin="10px" Grid.Row="1" Grid.Column="0" >Add Many Customers</Button>
+                <Button Click="ButtonClick_Add"  Margin="10px" Grid.Row="1" Grid.Column="1"  >Add Customer</Button>
         </Grid>
-    </DockPanel>
+        </StackPanel>
+
+
+    </Grid>
 </UserControl>

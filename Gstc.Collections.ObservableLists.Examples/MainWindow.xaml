@@ -6,14 +6,20 @@
         xmlns:observableListSync="clr-namespace:Gstc.Collections.ObservableLists.Examples.ObservableListBinder"
         xmlns:observableList="clr-namespace:Gstc.Collections.ObservableLists.Examples.ObservableList"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1000">
     <Grid>
         <TabControl TabStripPlacement="Bottom">
-            <TabItem Header="Observable List Control">
-                <observableList:ObservableListControl></observableList:ObservableListControl>
+            <TabItem Header="Observable List Demo" Height="40px">
+                <DockPanel LastChildFill="True" >
+                    <Label FontWeight="Bold" FontSize="14">Observable List Demo</Label>
+                    <observableList:ObservableListControl />
+                </DockPanel>
             </TabItem>
-            <TabItem Header="Observable List Sync">
-                <observableListSync:ObservableListBinderControl x:Name="ObvListSync"></observableListSync:ObservableListBinderControl>
+            <TabItem Header="Observable List Bind Demo">
+                <StackPanel>
+                    <Label FontWeight="Bold" FontSize="14">Observable List Bind Demo</Label>
+                    <observableListSync:ObservableListBinderControl x:Name="ObvListSync"/>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </Grid>

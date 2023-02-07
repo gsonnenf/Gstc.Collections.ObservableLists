@@ -55,6 +55,12 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ObservableListBinder\IItemA.cs" />
+    <Compile Include="ObservableListBinder\IItemB.cs" />
+    <Compile Include="ObservableListBinder\NotifyPropertyChanged.cs" />
+    <Compile Include="ObservableListBinder\ItemA.cs" />
+    <Compile Include="ObservableListBinder\ItemB.cs" />
+    <Compile Include="ObservableListBinder\MapItem.cs" />
     <Compile Include="ObservableList\Customer.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -78,8 +84,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ObservableListBinder\TestModel.cs" />
-    <Compile Include="ObservableListBinder\TestViewModel.cs" />
+    <Compile Include="ObservableListBinder\ItemM.cs" />
+    <Compile Include="ObservableListBinder\ItemVM.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

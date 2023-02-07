@@ -25,83 +25,63 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             set => SetValue(BindingListProperty, value);
         }
 
-        /// <summary>
-        /// Demo for ObservableList{}
-        /// </summary>
-        private ObservableList<Customer> CustomerObservableList { get; set; } = new ObservableList<Customer>();
+        private ObservableList<Customer> ObservableListCustomer { get; set; } = new ObservableList<Customer>() { IsResetForAddRange = true };
 
-        /// <summary>
-        /// Demo for ObservableIList{}
-        /// </summary>
-        private ObservableIList<Customer, List<Customer>> CustomerObservableIList { get; set; } = new ObservableIList<Customer, List<Customer>>();
+        private ObservableIList<Customer, List<Customer>> ObservableIListCustomer { get; set; } = new ObservableIList<Customer, List<Customer>>() { IsResetForAddRange = true };
 
-        /// <summary>
-        /// Demo for ObservableIListLocking{}
-        /// </summary>
-        private ObservableIListLocking<Customer, List<Customer>> CustomerObservableIListLocking { get; set; } = new ObservableIListLocking<Customer, List<Customer>>();
+        private ObservableIListLocking<Customer, List<Customer>> ObservableIListLockingCustomer { get; set; } = new ObservableIListLocking<Customer, List<Customer>>() { IsResetForAddRange = true };
 
-        /// <summary>
-        /// Demonstrates the observable list upcast to the IList{} interface and still generating OnChange events.
-        /// </summary>
-        private IList<Customer> UpcastList => BindingList;
+        public Dictionary<string, IObservableList<Customer>> ComboBoxDictionary;
 
         public ObservableListControl() {
-            InitializeComponent();
-            BindingList = CustomerObservableList;
-            CustomerObservableList.IsResetForAddRange = true; //Fixes WPF issue with add range.
-            CustomerObservableList.List = Customer.GenerateCustomerList();
-            CustomerObservableIList.List = Customer.GenerateCustomerList();
-            CustomerObservableIListLocking.List = Customer.GenerateCustomerList();
+            ObservableListCustomer.IsResetForAddRange = true; //Fixes WPF issue with add range.
+            ObservableListCustomer.List = Customer.GenerateCustomerList();
+            ObservableIListCustomer.List = Customer.GenerateCustomerList();
+            ObservableIListLockingCustomer.List = Customer.GenerateCustomerList();
 
-            AddEvents(CustomerObservableList);
-            AddEvents(CustomerObservableIList);
-            AddEvents(CustomerObservableIListLocking);
+            InitializeComponent();
+
+            ComboBoxDictionary = new Dictionary<string, IObservableList<Customer>>() {
+                { "ObservableList<Customer>", ObservableListCustomer},
+                { "ObservableIList<Customer,List<Customer>>",ObservableIListCustomer },
+                { "ObservableIListLocking<Customer,List<Customer>>",ObservableIListLockingCustomer },
+            };
+            BindTypeComboBox.DisplayMemberPath = "Key";
+            BindTypeComboBox.SelectedValuePath = "Value";
+            BindTypeComboBox.ItemsSource = ComboBoxDictionary;
+            BindTypeComboBox.SelectedIndex = 0;
+
+            AddLoggingEvents(ObservableListCustomer);
+            AddLoggingEvents(ObservableIListCustomer);
+            AddLoggingEvents(ObservableIListLockingCustomer);
 
         }
 
         #region events
-        private void Button_Click_Add(object sender, RoutedEventArgs args)
-            => UpcastList.Add(Customer.GenerateCustomer());
+        private void ButtonClick_Add(object sender, RoutedEventArgs args) => BindingList.Add(Customer.GenerateCustomer());
 
-        private void Button_Click_AddRange(object sender, RoutedEventArgs args) {
+        private void ButtonClick_AddRange(object sender, RoutedEventArgs args) => BindingList.AddRange(Customer.GenerateCustomerList());
 
-            if (UpcastList is ObservableList<Customer> list)
-                list.AddRange(Customer.GenerateCustomerList());
-
-            else if (UpcastList is ObservableIList<Customer, List<Customer>> list2)
-                foreach (var customer in Customer.GenerateCustomerList())
-                    list2.Add(customer);
-
-            else if (UpcastList is ObservableIListLocking<Customer, List<Customer>> list3)
-                foreach (var customer in Customer.GenerateCustomerList())
-                    list3.Add(customer);
+        private void ButtonClick_New(object sender, RoutedEventArgs e) {
+            //Accessing the internal list is not part of the IObservableList interface so an explict cast is necessary.
+            var newList = Customer.GenerateCustomerList();
+            if (BindingList is ObservableList<Customer> list) list.List = newList;
+            else if (BindingList is ObservableIList<Customer, List<Customer>> list2) list2.List = newList;
+            else if (BindingList is ObservableIListLocking<Customer, List<Customer>> list3) list3.List = newList;
         }
 
-        private void Button_Click_New(object sender, RoutedEventArgs e) {
-
-            if (UpcastList is ObservableList<Customer> list)
-                list.List = Customer.GenerateCustomerList();
-
-            else if (UpcastList is ObservableIList<Customer, List<Customer>> list2)
-                list2.List = Customer.GenerateCustomerList();
-
-            else if (UpcastList is ObservableIListLocking<Customer, List<Customer>> list3)
-                list3.List = Customer.GenerateCustomerList();
-        }
-
-        private void Button_Click_Remove(object sender, RoutedEventArgs args) {
+        private void ButtonClick_Remove(object sender, RoutedEventArgs args) {
             var index = CustomerListView.SelectedIndex;
             if (index < 0 || index >= BindingList.Count) {
                 AddToTextBox("Customer not selected.\n");
                 return;
             }
             try { BindingList.RemoveAt(index); }
-            catch (InvalidOperationException e) { AddToTextBox(e.Message); }
+            catch (NoPurchaseApprovalExpection e) { AddToTextBox(e.Message); }
         }
 
-        private void Button_Click_List(object sender, RoutedEventArgs e) => BindingList = CustomerObservableList;
-        private void Button_Click_IList(object sender, RoutedEventArgs e) => BindingList = CustomerObservableIList;
-        private void Button_Click_IListLocking(object sender, RoutedEventArgs e) => BindingList = CustomerObservableIListLocking;
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+          BindingList = (IObservableList<Customer>)BindTypeComboBox.SelectedValue;
         #endregion
 
         #region helpers
@@ -110,11 +90,9 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             EventTextBox.ScrollToEnd();
         }
 
-        private void AddEvents(IObservableList<Customer> list) {
+        private void AddLoggingEvents(IObservableList<Customer> list) {
             list.CollectionChanged += (sender, args) => {
-
                 var message = "Collection Changed - ";
-
                 if (args.NewItems != null) {
                     var customer = args.NewItems[0] as Customer;
                     message += ("Customer Added: " + customer.FirstName + " " + customer.LastName);
@@ -122,18 +100,19 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
                     var customer = args.OldItems[0] as Customer;
                     message += ("Customer Removed: " + customer.FirstName + " " + customer.LastName);
                 } else message += "Reset";
-
                 AddToTextBox(message + "\n");
             };
 
             list.CollectionChanging += (sender, args)
-                => AddToTextBox("Attempting to connect to database...");
+                => AddToTextBox("Attempting to modify list...");
 
             list.Removing += (sender, args) => {
                 if (((Customer)args.OldItems?[0])?.PurchaseAmount >= 50)
-                    throw new InvalidOperationException("Purchases above $50 require approval for removal.\n");
+                    throw new NoPurchaseApprovalExpection("Purchases above $50 require approval for removal.\n");
             };
         }
+
+        public class NoPurchaseApprovalExpection : Exception { public NoPurchaseApprovalExpection(string message) : base(message) { } }
         #endregion
     }
 }
