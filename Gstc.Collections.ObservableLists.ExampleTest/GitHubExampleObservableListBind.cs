@@ -9,7 +9,7 @@ namespace Gstc.Collections.ObservableLists.ExampleTest;
 public class GitHubExampleObservableListBind {
 
     [Test]
-    public void Example() {
+    public void ObservableListBindExample() {
         ObservableList<PhoneViewModel> obvPhoneListVM = new(); // Empty list
         ObservableList<PhoneModel> obvPhoneListM = new() { // Our example list with initial data
             new() { PhoneNumber = 5551112222 },

@@ -17,7 +17,7 @@ public enum ListIdentifier {
 /// </summary>
 public enum PropertyBindType {
     /// <summary>
-    ///  When the PropertyChanged event is raised on a list item, the corresponding item on the alternate list will be replaced by a newly craeated updated item created using the ConvertItem(...) method.
+    ///  When the PropertyChanged event is raised on a list item, the corresponding item on the alternate list will be replaced by a newly created updated item created using the ConvertItem(...) method.
     /// </summary>
     UpdateCollectionNotify,
     /// <summary>
