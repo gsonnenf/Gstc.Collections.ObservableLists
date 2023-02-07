@@ -12,9 +12,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C695C00E-2E8D-4688-B79E-8B063653108A}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		LICENSE.md = LICENSE.md
+		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gstc.Collections.ObservableLists.ExampleTest", "Gstc.Collections.ObservableLists.ExampleTest\Gstc.Collections.ObservableLists.ExampleTest.csproj", "{C330E845-5178-42D2-BF11-CE57D61F20C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gstc.Collections.ObservableLists.ExampleTest", "Gstc.Collections.ObservableLists.ExampleTest\Gstc.Collections.ObservableLists.ExampleTest.csproj", "{C330E845-5178-42D2-BF11-CE57D61F20C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
