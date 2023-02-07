@@ -2,26 +2,26 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Gstc.Collections.ObservableLists</id>
-    <version>1.0.0</version>
-    <title>ObservableList and ObservableListSynchronizer</title>
+    <version>2.0.0</version>
+    <title>ObservableList and ObservableListBind</title>
     <authors>Greg Sonnenfeld</authors>
     <owners>Greg Sonnenfeld</owners>
-    <licenseUrl>https://github.com/gsonnenf/Gstc.Collections.ObservableLists/blob/master/LICENSE.md</licenseUrl>
+    <license type="expression">LGPL-3.0-only</license>
     <projectUrl>https://github.com/gsonnenf/Gstc.Collections.ObservableLists</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
-      This library implements an extendable ObservableList&lt;T&gt;, which generates INotifyCollectionChanged events, works when downcast, and can wrap IList&lt;T&gt;, and ObservableListSynchronizer&lt;TSource,TDestination&gt; which synchronizes two related ObservableLists&lt;T&gt;.
+      An observable lists library with upcast compatibility, list wrapping, reentrancy protection, thread safety, and robust unit testing.
     </summary>
-    <description>
-      This library implements an extendable ObservableList&lt;T&gt;, which generates INotifyCollectionChanged events, works when downcast, and can wrap IList&lt;T&gt;, and ObservableListSynchronizer&lt;TSource,TDestination&gt; which synchronizes two related ObservableLists&lt;T&gt;.
+      <description>
+      This library contains a set of lists/list wrappers that implement the observable pattern, invoking events when a list is modified, and
+      a set of list bindings that synchronize the content of observable lists using a mapping between item types.
 
-      The ObservableList implements IList, IList&lt;T&gt;, ICollection, ICollection&lt;T&gt;, INotifyCollectionChanged, INotifyPropertyChanged and generates CollectionChanged events even when downcast to its interfaces. The base functionality of the ObservableList&lt;T&gt; is backed by a standard List&lt;T&gt;. The ObservableList can thus serve as a wrapper for a pre-existing List&lt;T&gt;.
-
-      The ObservableListSynchronizer&lt;TSource,TDestination&gt; provides synchronization between two ObservableList&lt;T&gt; of different but related types &lt;TSource&gt; and &lt;TDestination&gt;. When an item is added, moved or removed from one list, the change will be propagated to the other list.
     </description>
-    <releaseNotes>This code is strongly unit tested, reviewed and commented. It still needs community usage and additional usage to see if any difficulties pop up.</releaseNotes>
-    <copyright>Greg Sonnenfeld Copyright 2019</copyright>
-    <tags>ObservableCollection ObservableList IObservableCollection IObservableList IList List Collections Synchronization</tags>
+    <releaseNotes>Version 2.0 is not compatible with version 1.0.</releaseNotes>
+    <copyright>Greg Sonnenfeld Copyright 2019 to 2023</copyright>
+    <tags>ObservableList ObservableCollection IObservableList IObservableCollection IList List Collections Synchronization Binding Multithread async</tags>
+    <icon>icon.png</icon>
+    <readme>README.md</readme>
     <dependencies>
       <group targetFramework=".NETStandard2.0" />
     </dependencies>
@@ -30,6 +30,8 @@
   <files>
     <!-- ReSharper disable MarkupAttributeTypo -->
     <file src="bin\release\netstandard2.0\*.*" target="lib\netstandard2.0\" />
+    <file src="icon.png" target="" />
+    <file src="../README.md" target="" />
     <!-- ReSharper restore MarkupAttributeTypo -->
   </files>
 </package>
