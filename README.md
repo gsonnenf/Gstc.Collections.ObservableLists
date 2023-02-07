@@ -10,19 +10,47 @@ License: LGPL 3.0 <br>
 Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
 
 ## What is it?
-This library implements an `ObservableList<T>`, which generates `INotifyCollectionChanged` events, and an 
-`ObservableListSynchronizer<TSource,TDestination>`, which keeps two related observable lists synchronized. The code has very strong
-unit testing and provides example usage.
+A collection of lists that provides hooks that are invoked before and after list modified.<br>
+`ObservableList<TItem>`<br> `ObservableIList<TItem,TList<TItem>>`<br> `ObservableIListLocking<TItem,TList<TItem>>`<br> `IObservableList<TItem>`<br><br>
 
-### `ObservableList<T>`
-The `ObservableList<T>` implmenents `IList`, `IList<T>`, `ICollection`, `ICollection<T>`, `INotifyCollectionChanged`, `INotifyPropertyChanged` and will still generate collection changed events when downcast to its interfaces. The base functionality of the `ObservableList<T>` is backed by a standard `List<T>`. The ObservableList can thus serve as a wrapper for a pre-existing `List<T>`. 
+A collection of tools that synchronize the content of two lists, `IObservableList<TItemA>` and `IObservableList<TItemB>`, provided a conversion between TItemA and TItemB.<br>
+`ObservableListBind<TItemA,TItemB>`<br>
+`ObservableListBindProperty<TItemA,TItemB>`
+  
+## Observable List 
 
-The standard .net ObservableCollection is a bit limiting to work with. I believe it is sealed and does not implement many desirable
-interfaces. It also cannot be used as a collection wrapper.
+The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
 
-### `ObservableListSynchronizer<TSource,TDestination>`
-The `ObservableListSynchronizer<TSource,TDestination>` provides synchronization between two ObservableLists of different but related 
-types `<TSource>` and `<TDestination>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
+#### Classes
+`ObservableList<TItem>` - is the default observable list contains an internal `List<TItem>`, and can serve as a wrapper for a pre-existing `List<T>`. It provides pre/post list modification events, maintains events on upcast, and provides reenetrancy protection.
+
+```csharp
+var obvList = new ObservableList<Customer>();
+obvList.Adding += (sender,args)=> Console.WriteLine("Attempting to add a new customer.");
+```
+
+`ObservableIList<TItem,TList<TItem>>` - is similar to `ObservableList<TItem>`, but allows the user to specify the internal list type with the `TList<TItem>` generic parameter. 
+
+```csharp
+Collection<Customer> customers = SomeDbApi.GetCustomers();
+var obvList = new ObservableIList<Customer, Collection<Customer>>(customers); 
+obvList.Adding += (sender,args)=> Console.WriteLine("Adding new customer to database mapped collection.");
+```
+
+`ObservableIListLocking<TItem,TList<TItem>>` is similar to `ObservableIList<TItem,TList<TItem>>`, but implements locking for events and list access, and special reentrancy rules for asynchronous/multithread operation.<br>
+
+```csharp
+var obvList = new ObservableIList<Customer, Collection<Customer>>() {List = SomeExampleCollection;}
+obvList.Adding += (sender,args)=> Console.WriteLine("Fetching customer from Web API...");
+for (int index = 0; index < 1000; index++) Task task = Task.Run(() => obvList.Add( MyWebApi.getNewCustomer() ));
+```
+
+These lists implement `IObservableList<Item>` that include `IList<T>`, `IList`, `ICollection<T>`, `INotifyCollectionChanging`, `INotifyCollectionChanged`, `INotifyListChangingEvents`, `INotifyListChangingEvents` <br>
+
+
+
+## Observable List Bind
+The `ObservableListBind<TItemA,TItemB>` provides synchronization between two ObservableLists of different but related types `<TItemA>` and `<TItemB>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
 
 The `<TSource>` and `<TDestination>` are classes that map to each other in a one to one fashion, but may have differing field or include a data transformation. The user is required to provide a `ConvertSourceToDestination(...)` and `ConvertDestinationToSource(...)` that provide a two way conversion between a `<TSource>` and `<TDestination>` object. This is most often used when one needs to transform model data for display or a public API. A good example is mapping between a list of models and viewmodels. 
 
