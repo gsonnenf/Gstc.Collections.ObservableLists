@@ -1,171 +1,210 @@
 # Gstc.Collections.ObservableLists
-<p align="center">
+An observable lists library with upcast compatibility, list wrapping, reentrancy protection, thread safety, and robust unit testing.
+
+***Observable Lists:***
+A set of lists/list wrappers that implement the observable pattern, invoking events when a list is modified.<br/>
+`ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, `IObservableList<TItem>`<br>
+
+***Observable List Bindings:*** A set of list bindings that synchronize the content of observable lists using a mapping between item types.<br/>
+`ObservableListBind<TItemA,TItemB>`, `ObservableListBindFunc<TItemA,TItemB>`, `ObservableListBindProperty<TItemA,TItemB>`, `ObservableListBindPropertyFunc<TItemA,TItemB>`
+
+## License
+<p align="left">
   <img src="https://user-images.githubusercontent.com/686792/53543486-0e638800-3ae0-11e9-9566-6d2f18a28e61.jpg" height="350">
 </p>
 
-
+***New Version 2 Release Candidate! (2023-02-07)<br>***
 Gstc.Collections.ObservableLists <br>
-Author - Greg Sonnenfeld, Copyright 2019 <br>
+Author - Greg Sonnenfeld, Copyright 2019 to 2023 <br>
 License: LGPL 3.0 <br>
 Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
+  
+## Observable List 
+The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when the list is modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
 
-## What is it?
-This library implements an `ObservableList<T>`, which generates `INotifyCollectionChanged` events, and an 
-`ObservableListSynchronizer<TSource,TDestination>`, which keeps two related observable lists synchronized. The code has very strong
-unit testing and provides example usage.
+#### Classes
+`ObservableList<TItem>` is the default observable list that utilizes an internal `List<TItem>` and can also serve as a wrapper for a pre-existing `List<T>`. It provides list modification events, maintains event calls on upcast, and provides reenetrancy protection.
 
-### `ObservableList<T>`
-The `ObservableList<T>` implmenents `IList`, `IList<T>`, `ICollection`, `ICollection<T>`, `INotifyCollectionChanged`, `INotifyPropertyChanged` and will still generate collection changed events when downcast to its interfaces. The base functionality of the `ObservableList<T>` is backed by a standard `List<T>`. The ObservableList can thus serve as a wrapper for a pre-existing `List<T>`. 
+```csharp
+var obvList = new ObservableList<Customer>();
+obvList.Adding += (sender,args)=> Console.WriteLine("Attempting to add a new customer.");
+```
 
-The standard .net ObservableCollection is a bit limiting to work with. I believe it is sealed and does not implement many desirable
-interfaces. It also cannot be used as a collection wrapper.
+`ObservableIList<TItem,TList<TItem>>` is similar to `ObservableList<TItem>`, but allows the user to specify the internal list type with the `TList<TItem>` generic parameter. 
 
-### `ObservableListSynchronizer<TSource,TDestination>`
-The `ObservableListSynchronizer<TSource,TDestination>` provides synchronization between two ObservableLists of different but related 
-types `<TSource>` and `<TDestination>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other.
+```csharp
+Collection<Customer> customers = SomeDbApi.GetCustomers();
+var obvList = new ObservableIList<Customer, Collection<Customer>>(customers); 
+obvList.Adding += (sender,args)=> Console.WriteLine("Adding new customer to database mapped collection.");
+```
 
-The `<TSource>` and `<TDestination>` are classes that map to each other in a one to one fashion, but may have differing field or include a data transformation. The user is required to provide a `ConvertSourceToDestination(...)` and `ConvertDestinationToSource(...)` that provide a two way conversion between a `<TSource>` and `<TDestination>` object. This is most often used when one needs to transform model data for display or a public API. A good example is mapping between a list of models and viewmodels. 
+`ObservableIListLocking<TItem,TList<TItem>>` is similar to `ObservableIList<TItem,TList<TItem>>`, but implements a `ReaderWriterLockSlim` list access, `lock` for event access, and special reentrancy rules for asynchronous/multithread operation.<br>
 
-Used in conjunction with objects that implement an `INotifyPropertySyncChanged` interace, this class can also provide synchronization 
-of `PropertyChanged` notify events in `<TSource>` and `<TDestination>` objects. If a `PropertyChanged` event is triggered on an item in 
-`<TSource>`, an option exists to trigger a `PropertyChanged` event in the corresponding `<TDestination>` item, and vice-versa.
+```csharp
+var obvList = new ObservableIList<Customer, Collection<Customer>>() {List = SomeExampleCollection;}
+obvList.Adding += (sender,args)=> Console.WriteLine("Fetching customer from Web API...");
+for (int index = 0; index < 1000; index++) Task task = Task.Run(() => obvList.Add( MyWebApi.getNewCustomer() ));
+```
 
-This package is a polished subset of another library (which includes observable dictionaries) still under development. The Extended Observable Collection. 
+`IObservableList<Item>` is the interfae for these classes and includes `IList<T>`, `IList`, `ICollection<T>`, `INotifyCollectionChanging`, `INotifyCollectionChanged`, `INotifyListChangingEvents`, `INotifyListChangingEvents` <br>
 
-https://github.com/gsonnenf/ExtendedObservableCollection
+## List Binding
+
+### Observable List Bind
+`ObservableListBind<TItemA,TItemB>` provides synchronization between two ObservableLists of different but related types `<TItemA>` and `<TItemB>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other given a conversion method. `ObservableListBindFunc<TItemA,TItemB>` is an implementation that allows the conversion method to be passed in the constructor as an anonymous function.
+
+The `<TItemA>` and `<TItemB>` are classes that map to each other in an injective way, usually containing ommissions or data transformation. The user provides a `ConvertItem(...)` method that provide a two way conversion between a `<TItemA>` and `<TItemB>` object. This is most often used when one needs to transform model data for display or a public API.
+
+```csharp
+var obvListBind = new ObservableListBindFunc<int, string>(
+            (itemA) => itemA.ToString(),
+            (ItemB) => int.Parse(ItemB),
+            new ObservableList<int>(),
+            new ObservableList<string>()
+       );
+```
+### Observable List Bind Property
+`ObservableListBindProperty<TItemA,TItemB>` provides the functionality of `ObservableListBind<TItemA,TItemB>` and also provides synchronization between the properties of list item that implement `INotifyPropertyChanged`. 
+
+```csharp
+//See Gstc.Collections.ObservableLists.ExampleTest for example usage.
+```
+
+#### The class provides several different methods for synchronizing item properties including:
+
+`UpdateCollectionNotify` - When a PropertyChanged event is raised, the corresponding item on the alternate list will be replaced by a new item created using the ConvertItem(...) method.
+ 
+`UpdatePropertyNotify` - When a PropertyChanged event is raised, the corresponding item on the alternate list will have its PropertyChanged event triggered. The user is expected to provide any property synchronization. This is useful when the ItemB is a a wrapper for ItemA, and a PropertyChanged event is needed to trigger callbacks.
+   
+`UpdateCustomNotify` - When a PropertyChanged event is raised, the user provided `ICustomPropertyMap` is invoked to update item property on the alternate list.
+
 
 ## How do I get started?
 
 The `ObservableList<T>` should work somewhat similar to the standard .NET `ObservableCollection<T>`. First, add the nuget package 
-[ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project. 
+[ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project. (The 2.0 version has not yet been updated! StayTuned!) Next utilize code from the following examples or check out the ***Gstc.Collections.ObservableLists.ExampleTest*** namespace!
 
-The following example shows usage of an `ObservableList<T>`:
+The following example shows usage of an `ObservableList<T>` :
 
 ### `ObservableList<T>` Example
 ```csharp
-var myObvList = new ObservableList<string>();
-myObvList.CollectionChanged += (sender, args) => Console.Writeline("Collection has changed!");
-myObvList.Added += (sender, args) => Console.Writeline("First item in NewItems is: " + args.NewItems[0]);
-myObvList.Add("I am the first item.");
+ ObservableList<Customer> obvCustomerList = new ObservableList<Customer>();
 
-//works with downcasting
-IList myIList = myObvList as IList;
-myIList.Add("I am a second item added to a downcast IList.");
+        //An event added for collection changing
+        obvCustomerList.CollectionChanged += (sender, args) => {
+            if (args.Action == NotifyCollectionChangedAction.Reset)
+                foreach (Customer customer in (ObservableList<Customer>)sender)
+                    Console.WriteLine("Initial Customers: " + customer.FirstName + " " + customer.LastName);
+        };
 
-//Output:
-// Collection has changed!
-// First item in NewItems is: I am the first item.
-// First item in NewItems is: I am a second item added to a downcast IList.
+        //An existing list is assigned to be the internal list
+        List<Customer> customerList = Customer.GenerateCustomerList();
+        obvCustomerList.List = customerList;
+
+        //The ObservableList has functionality of a normal IList<>/Enumerable<>/etc.
+        foreach (Customer item in obvCustomerList) Console.WriteLine("ObservableList has customer:" + item.FirstName);
+
+        // IObservableList has hooks specific to actions (add, remove, reset, replace, move) as well as OnCollectionChanged.
+        obvCustomerList.Adding += (sender, args) => {
+            foreach (Customer customer in args.NewItems)
+                Console.WriteLine("Going to add Customer: " + customer.FirstName + " " + customer.LastName);
+        };
+
+        obvCustomerList.Added += (sender, args) => {
+            foreach (Customer customer in args.NewItems)
+                Console.WriteLine("Customer was Added: " + customer.FirstName + " " + customer.LastName);
+        };
+
+        obvCustomerList.Add(Customer.GenerateCustomer());
+
+        // IObservableList<> can be used in external methods that implement IList<> and IList
+        void AddCustomerToList(IList<Customer> list) => list.Add(Customer.GenerateCustomer());
+        void AddCustomerToList2(IList list) => list.Add(Customer.GenerateCustomer());
+
+        AddCustomerToList(obvCustomerList);
+        AddCustomerToList2(obvCustomerList);
 ```
 
-It can also be used with existing lists:
+### `ObservableListBind<TItemA,TItemB>` Example
+
+The following demonstrates how the ObservableListBind works. For examples of `ObservableListBindProperty<TItemA,TItemB>` see the ***Gstc.Collections.ObservableLists.ExampleTest*** namespace.
 
 ```csharp
-var myList = new List<string>() { "one","two","three" };
+   public void ObservableListBindExample() {
+        ObservableList<PhoneViewModel> obvPhoneListVM = new(); // Empty list
+        ObservableList<PhoneModel> obvPhoneListM = new() { // Our example list with initial data
+            new() { PhoneNumber = 5551112222 },
+            new() { PhoneNumber = 5553334444 },
+        };
 
-//Wrapping a list
-var myObvList = new ObservableList<string>();
-myObvList.CollectionChanged += (sender, args) => Console.Writeline("Collection has changed!");
-myObvList.Reset += (sender, args) => Console.Writeline("Collection has been reset!");
-myObvList.List = myList;
+        //Creates a binding between the two lists so they will have same content in converted form.
+        ObservableListBindPhone obvBindPhone = new(
+            obvListPhoneModel: obvPhoneListM,
+            obvListPhoneViewModel: obvPhoneListVM,
+            isBidirectional: true
+            );
 
-//Events after wrapping a list
-myObvList.Added += ()=> Console.Writeline("Item added: ");
+        foreach (var item in obvPhoneListM) Console.WriteLine(item.PhoneNumber);
+        foreach (var item in obvPhoneListVM) Console.WriteLine(item.PhoneString);
+        /// Output:
+        /// 5551112222
+        /// 5553334444
+        /// 555-111-2222
+        /// 555-333-4444
 
-myObvList.Add("I will trigger an event!");
-myList.Add("I will not trigger an event. It may be better to copy me into an observable list if this will happen.");
+        obvPhoneListVM.Clear();
+        Console.WriteLine(obvPhoneListM.Count);
+        Console.WriteLine(obvPhoneListVM.Count);
+        /// Output:
+        /// 0
+        /// 0
 
-//Output:
-// Collection has changed!
-// Collection has been reset!
-// Item added: I will trigger an event!
+        obvPhoneListM.Add(new() { PhoneNumber = 9876543210 });
+        obvPhoneListVM.Add(new() { PhoneString = "123-456-7890" });
+        foreach (var item in obvPhoneListM) Console.WriteLine(item.PhoneNumber);
+        foreach (var item in obvPhoneListVM) Console.WriteLine(item.PhoneString);
+        /// Output:
+        /// 9876543210
+        /// 1234567890
+        /// 987-654-3210
+        /// 123-456-7890
 
-``` 
+        /// ObservableListBindFunc can be used as alternate to inheriting an abstract class ObservableListBind by passing 
+        /// conversion functions in the constructor.
+        IObservableListBind<PhoneModel, PhoneViewModel> obvBindPhoneFunc
+            = new ObservableListBindFunc<PhoneModel, PhoneViewModel>(
+                convertItemAToB: (item) => new PhoneViewModel() { PhoneString = item.PhoneNumber.ToString("###-###-####") },
+                convertItemBToA: (item) => new PhoneModel() { PhoneNumber = long.Parse(Regex.Replace(item.PhoneString, "[^0-9]", "")) },
+                observableListA: new ObservableList<PhoneModel>() { new PhoneModel() { PhoneNumber = 1112223333 } },
+                observableListB: new ObservableList<PhoneViewModel>(),
+                isBidirectional: false,
+                sourceList: ListIdentifier.ListA
+            );
 
-### `ObservableListSynchronizer< TSource,TDestination >` Example
-
-The following show how easy it is to setup a synchronization using ObservableListSynchronizer. It demonstrates a sync between
-a Model and ViewModel list, where the ViewModel performs a transform on the data provided by the Model. For a different implementation
-you could also copy data back and forth between Model and ViewModel.
-
-```csharp
-public class GithubExample2 {
-        public static void Start() {
-            ObservableList<Model> sourceList = new ObservableList<Model>();
-            ObservableList<ViewModel> destList = new ObservableList<ViewModel>();
-
-            //Synchronizes our lists
-            ObservableListSynchronizer<Model, ViewModel> ObvListSync =
-                       new ObservableListSynchronizerFunc<Model, ViewModel>(
-                           (sourceItem) => new ViewModel(sourceItem),
-                           (destItem) => destItem.SourceItem,
-                           sourceList,
-                           destList
-                       );
-
-            //Thats it for setup.
-
-            //Example functionality
-            sourceList.Add(new Model { MyNum = 10, MyStringLower = "x" });
-            destList.Add(new ViewModel { MyNum = "1000", MyStringUpper = "A" });
-
-            Console.WriteLine(sourceList.Count); 
-            Console.WriteLine(destList.Count);
-
-            //OUTPUT
-            // 2
-            // 2
-
-            sourceList[0].MyNum = -1;
-
-            Console.WriteLine(sourceList[0].MyNum); //-1
-            Console.WriteLine(destList[0].MyNum); // -1
-
-            //OUTPUT
-            // -1
-            // -1
-
-            destList[1].MyStringUpper = "TEST";
-
-            Console.WriteLine(sourceList[1].MyStringLower); 
-            Console.WriteLine(destList[1].MyStringUpper);
-
-            //OUTPUT
-            // test
-            // TEST
-
-            sourceList[0].PropertyChanged += (sender,args) => Console.WriteLine("Source Event");
-            destList[0].PropertyChanged += (sender,args) => Console.WriteLine("Dest Event");
-
-            destList[0].MyNum = "100000";
-
-            //OUTPUT
-            //Dest Event
-            //Source Event
-
+        foreach (var item in obvBindPhoneFunc.ObservableListA) Console.WriteLine(item.PhoneNumber);
+        foreach (var item in obvBindPhoneFunc.ObservableListB) Console.WriteLine(item.PhoneString);
+        /// Output:
+        /// 1112223333
+        /// 111-222-3333
     }
-    
- //You don't need NotifyPropertySyncChanged to sync collections, they are used to sync item properties. 
- //A basic POCO would work for collections.
- 
-        public class Model : NotifyPropertySyncChanged {   
-            private int myNum;
-            private string myStringLower;
 
-            public int MyNum { get => myNum; set { myNum = value; OnPropertyChanged(null); } }
-            public string MyStringLower { get => myStringLower; set { myStringLower = value; OnPropertyChanged(null); } }
-        }
+    //This is the implmentation of the abstract class with a constructor and the convertItem(...) implemented.
+    public class ObservableListBindPhone : ObservableListBind<PhoneModel, PhoneViewModel> {
+        public ObservableListBindPhone(
+            IObservableList<PhoneModel> obvListPhoneModel,
+            IObservableList<PhoneViewModel> obvListPhoneViewModel,
+            bool isBidirectional)
+             : base(obvListPhoneModel, obvListPhoneViewModel, isBidirectional, ListIdentifier.ListA) { }
 
-        public class ViewModel : NotifyPropertySyncChanged {
+        public override PhoneViewModel ConvertItem(PhoneModel item) => new() { PhoneString = item.PhoneNumber.ToString("###-###-####") };
+        public override PhoneModel ConvertItem(PhoneViewModel item) => new() { PhoneNumber = long.Parse(Regex.Replace(item.PhoneString, "[^0-9]", "")) };
+    }
 
-            public Model SourceItem { get; set; }
-            public ViewModel() => SourceItem = new Model();
-            public ViewModel(Model sourceItem) => SourceItem = sourceItem;
+    public class PhoneModel {
+        public long PhoneNumber { get; set; }
+    }
 
-            public string MyNum { get => SourceItem.MyNum.ToString(); set => SourceItem.MyNum = int.Parse(value); }
-            public string MyStringUpper { get => SourceItem.MyStringLower.ToUpper(); set => SourceItem.MyStringLower = value.ToLower(); }
-
-        }
-
+    public class PhoneViewModel {
+        public string PhoneString { get; set; }
     }
 ``` 

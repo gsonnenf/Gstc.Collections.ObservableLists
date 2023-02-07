@@ -3,16 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Gstc.Collections.ObservableLists.Examples"
+        xmlns:observableListSync="clr-namespace:Gstc.Collections.ObservableLists.Examples.ObservableListBinder"
+        xmlns:observableList="clr-namespace:Gstc.Collections.ObservableLists.Examples.ObservableList"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1000">
     <Grid>
         <TabControl TabStripPlacement="Bottom">
-            <TabItem Header="Observable List Control">
-                <local:ObservableListControl></local:ObservableListControl>
+            <TabItem Header="Observable List Demo" Height="40px">
+                <DockPanel LastChildFill="True" >
+                    <Label FontWeight="Bold" FontSize="14">Observable List Demo</Label>
+                    <observableList:ObservableListControl />
+                </DockPanel>
             </TabItem>
-            <TabItem Header="Observable List Sync">
-                <local:ObservableListSyncControl x:Name="ObvListSync"></local:ObservableListSyncControl>
+            <TabItem Header="Observable List Bind Demo">
+                <StackPanel>
+                    <Label FontWeight="Bold" FontSize="14">Observable List Bind Demo</Label>
+                    <observableListSync:ObservableListBinderControl x:Name="ObvListSync"/>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </Grid>
