@@ -1,5 +1,13 @@
 # Gstc.Collections.ObservableLists
-<p align="center">
+***Gstc.Collections.ObservableLists*** contains lists/list wrappers that implement the observable pattern, provide events that are invoked when a list is modified, and a set of list binding classes that synchronize the content of observable lists using a conversion between item classes.<br>
+
+***Observable Lists***: `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, `IObservableList<TItem>`<br>
+
+
+***Observable List Binding***: `ObservableListBind<TItemA,TItemB>`, `ObservableListBindFunc<TItemA,TItemB>`, `ObservableListBindProperty<TItemA,TItemB>`, `ObservableListBindPropertyFunc<TItemA,TItemB>`
+
+## License
+<p align="left">
   <img src="https://user-images.githubusercontent.com/686792/53543486-0e638800-3ae0-11e9-9566-6d2f18a28e61.jpg" height="350">
 </p>
 
@@ -8,16 +16,6 @@ Gstc.Collections.ObservableLists <br>
 Author - Greg Sonnenfeld, Copyright 2019 to 2023 <br>
 License: LGPL 3.0 <br>
 Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
-
-## What is it? 
-A collection of lists that provides hooks that are invoked before and after list modified.<br>
-`ObservableList<TItem>`<br> `ObservableIList<TItem,TList<TItem>>`<br> `ObservableIListLocking<TItem,TList<TItem>>`<br> `IObservableList<TItem>`<br><br>
-
-A collection of tools that synchronize the content of two lists, `IObservableList<TItemA>` and `IObservableList<TItemB>`, with a user provided conversion method between TItemA and TItemB.<br>
-`ObservableListBind<TItemA,TItemB>`<br>
-`ObservableListBindFunc<TItemA,TItemB>`<br>
-`ObservableListBindProperty<TItemA,TItemB>`<br>
-`ObservableListBindPropertyFunc<TItemA,TItemB>`
   
 ## Observable List 
 The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when the list is modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
@@ -127,7 +125,7 @@ The following example shows usage of an `ObservableList<T>` :
 
 ### `ObservableListBind<TItemA,TItemB>` Example
 
-The following demonstrates how the ObservableListBind works. For examples of `ObservableListBindProperty<TItemA,TItemB>` see the Gstc.Collections.ObservableLists.ExampleTest namespace.
+The following demonstrates how the ObservableListBind works. For examples of `ObservableListBindProperty<TItemA,TItemB>` see the ***Gstc.Collections.ObservableLists.ExampleTest*** namespace.
 
 ```csharp
    public void ObservableListBindExample() {
