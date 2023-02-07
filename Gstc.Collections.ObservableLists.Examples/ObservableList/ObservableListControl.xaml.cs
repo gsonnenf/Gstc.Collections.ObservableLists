@@ -25,16 +25,16 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
             set => SetValue(BindingListProperty, value);
         }
 
-        private ObservableList<Customer> ObservableListCustomer { get; set; } = new ObservableList<Customer>() { IsResetForAddRange = true };
+        private ObservableList<Customer> ObservableListCustomer { get; set; } = new ObservableList<Customer>() { IsAddRangeResetEvent = true };
 
-        private ObservableIList<Customer, List<Customer>> ObservableIListCustomer { get; set; } = new ObservableIList<Customer, List<Customer>>() { IsResetForAddRange = true };
+        private ObservableIList<Customer, List<Customer>> ObservableIListCustomer { get; set; } = new ObservableIList<Customer, List<Customer>>() { IsAddRangeResetEvent = true };
 
-        private ObservableIListLocking<Customer, List<Customer>> ObservableIListLockingCustomer { get; set; } = new ObservableIListLocking<Customer, List<Customer>>() { IsResetForAddRange = true };
+        private ObservableIListLocking<Customer, List<Customer>> ObservableIListLockingCustomer { get; set; } = new ObservableIListLocking<Customer, List<Customer>>() { IsAddRangeResetEvent = true };
 
         public Dictionary<string, IObservableList<Customer>> ComboBoxDictionary;
 
         public ObservableListControl() {
-            ObservableListCustomer.IsResetForAddRange = true; //Fixes WPF issue with add range.
+            ObservableListCustomer.IsAddRangeResetEvent = true; //Fixes WPF issue with add range.
             ObservableListCustomer.List = Customer.GenerateCustomerList();
             ObservableIListCustomer.List = Customer.GenerateCustomerList();
             ObservableIListLockingCustomer.List = Customer.GenerateCustomerList();

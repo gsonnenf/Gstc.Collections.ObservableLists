@@ -25,7 +25,16 @@ public interface IObservableList<TItem> :
     new void Clear();
     new void RemoveAt(int index);
     new TItem this[int index] { get; set; }
+    /// <summary>
+    /// Adds a range of items to the <see cref="IObservableList{TItem}"/>.
+    /// </summary>
+    /// <param name="items"></param>
     void AddRange(IEnumerable<TItem> items);
+    /// <summary>
+    /// Moves the item in the <see cref="IObservableList{TItem}"/> at the current index to the new index.
+    /// </summary>
+    /// <param name="oldIndex">Current index of the item.</param>
+    /// <param name="newIndex">New index of the item.</param>
     void Move(int oldIndex, int newIndex);
 
 }

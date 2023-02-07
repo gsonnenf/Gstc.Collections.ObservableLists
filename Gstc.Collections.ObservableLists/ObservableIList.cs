@@ -87,10 +87,10 @@ public class ObservableIList<TItem, TList> :
     public bool IsReadOnly => _list.IsReadOnly;
 
     /// <summary>
-    /// A flag that will call the reset action instead of add action. This is primarily for
+    /// A flag that will use the reset event args instead of add event args when using <see cref="AddRange(IEnumerable{TItem})"/> a range of items. This is primarily for
     /// compatibility with WPF data binding which does not support OnChangeEventArgs with multiple added elements.
     /// </summary>
-    public bool IsResetForAddRange { get; set; }
+    public bool IsAddRangeResetEvent { get; set; }
 
     /// <summary>
     /// Gets the current internal list or replaces the current internal list with a new list. A Reset event will be triggered.
@@ -147,7 +147,7 @@ public class ObservableIList<TItem, TList> :
             foreach (var item in items) _list.Add(item);
             OnPropertyChangedCountAndIndex();
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (IsResetForAddRange)
+            if (IsAddRangeResetEvent)
                 CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             else CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
