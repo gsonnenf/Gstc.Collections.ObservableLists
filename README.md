@@ -13,24 +13,24 @@ Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
 A collection of lists that provides hooks that are invoked before and after list modified.<br>
 `ObservableList<TItem>`<br> `ObservableIList<TItem,TList<TItem>>`<br> `ObservableIListLocking<TItem,TList<TItem>>`<br> `IObservableList<TItem>`<br><br>
 
-A collection of tools that synchronize the content of two lists, `IObservableList<TItemA>` and `IObservableList<TItemB>`, provided a conversion between TItemA and TItemB.<br>
+A collection of tools that synchronize the content of two lists, `IObservableList<TItemA>` and `IObservableList<TItemB>`, with a user provided conversion method between TItemA and TItemB.<br>
 `ObservableListBind<TItemA,TItemB>`<br>
 `ObservableListBindFunc<TItemA,TItemB>`<br>
 `ObservableListBindProperty<TItemA,TItemB>`<br>
 `ObservableListBindPropertyFunc<TItemA,TItemB>`
   
 ## Observable List 
-The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
+The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when the list is modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
 
 #### Classes
-`ObservableList<TItem>` - is the default observable list contains an internal `List<TItem>`, and can serve as a wrapper for a pre-existing `List<T>`. It provides pre/post list modification events, maintains events on upcast, and provides reenetrancy protection.
+`ObservableList<TItem>` is the default observable list that utilizes an internal `List<TItem>` and can also serve as a wrapper for a pre-existing `List<T>`. It provides list modification events, maintains event calls on upcast, and provides reenetrancy protection.
 
 ```csharp
 var obvList = new ObservableList<Customer>();
 obvList.Adding += (sender,args)=> Console.WriteLine("Attempting to add a new customer.");
 ```
 
-`ObservableIList<TItem,TList<TItem>>` - is similar to `ObservableList<TItem>`, but allows the user to specify the internal list type with the `TList<TItem>` generic parameter. 
+`ObservableIList<TItem,TList<TItem>>` is similar to `ObservableList<TItem>`, but allows the user to specify the internal list type with the `TList<TItem>` generic parameter. 
 
 ```csharp
 Collection<Customer> customers = SomeDbApi.GetCustomers();
@@ -38,7 +38,7 @@ var obvList = new ObservableIList<Customer, Collection<Customer>>(customers);
 obvList.Adding += (sender,args)=> Console.WriteLine("Adding new customer to database mapped collection.");
 ```
 
-`ObservableIListLocking<TItem,TList<TItem>>` is similar to `ObservableIList<TItem,TList<TItem>>`, but implements locking for events and list access, and special reentrancy rules for asynchronous/multithread operation.<br>
+`ObservableIListLocking<TItem,TList<TItem>>` is similar to `ObservableIList<TItem,TList<TItem>>`, but implements a `ReaderWriterLockSlim` list access, `lock` for event access, and special reentrancy rules for asynchronous/multithread operation.<br>
 
 ```csharp
 var obvList = new ObservableIList<Customer, Collection<Customer>>() {List = SomeExampleCollection;}
@@ -46,15 +46,14 @@ obvList.Adding += (sender,args)=> Console.WriteLine("Fetching customer from Web 
 for (int index = 0; index < 1000; index++) Task task = Task.Run(() => obvList.Add( MyWebApi.getNewCustomer() ));
 ```
 
-These lists implement `IObservableList<Item>` that include `IList<T>`, `IList`, `ICollection<T>`, `INotifyCollectionChanging`, `INotifyCollectionChanged`, `INotifyListChangingEvents`, `INotifyListChangingEvents` <br>
-
+`IObservableList<Item>` is the interfae for these classes and includes `IList<T>`, `IList`, `ICollection<T>`, `INotifyCollectionChanging`, `INotifyCollectionChanged`, `INotifyListChangingEvents`, `INotifyListChangingEvents` <br>
 
 ## List Binding
 
 ### Observable List Bind
 `ObservableListBind<TItemA,TItemB>` provides synchronization between two ObservableLists of different but related types `<TItemA>` and `<TItemB>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other given a conversion method. `ObservableListBindFunc<TItemA,TItemB>` is an implementation that allows the conversion method to be passed in the constructor as an anonymous function.
 
-The `<TItemA>` and `<TItemB>` are classes that map to each other in a injective way, usually containing ommissions or data transformation. The user provides a `ConvertItem(...)` method that provide a two way conversion between a `<TItemA>` and `<TItemB>` object. This is most often used when one needs to transform model data for display or a public API.
+The `<TItemA>` and `<TItemB>` are classes that map to each other in an injective way, usually containing ommissions or data transformation. The user provides a `ConvertItem(...)` method that provide a two way conversion between a `<TItemA>` and `<TItemB>` object. This is most often used when one needs to transform model data for display or a public API.
 
 ```csharp
 var obvListBind = new ObservableListBindFunc<int, string>(
@@ -65,26 +64,27 @@ var obvListBind = new ObservableListBindFunc<int, string>(
        );
 ```
 ### Observable List Bind Property
-`ObservableListBindProperty<TItemA,TItemB>` provides the functionality of `ObservableListBind<TItemA,TItemB>` and also provides synchronization between the properties of list item when those items implement INotifyPropertyChanged. 
-
-The class provides several different methods for synchronizing properties:
-
-UpdateCollectionNotify - When a PropertyChanged event is raised, the corresponding item on the alternate list will be replaced by a new item created  item using the ConvertItem(...) method.
- 
-UpdatePropertyNotify - When a PropertyChanged event is raised, the corresponding item on the alternate list will have its PropertyChanged event triggered. The user is expected to provide any property synchronization. This is useful when the ItemB is a a wrapper for ItemA, and a PropertyChanged event is needed to trigger callbacks.
-   
-UpdateCustomNotify - When a PropertyChanged event is raised, the user provided ICustomPropertyMap is invoked to update item property on the alternate list.
+`ObservableListBindProperty<TItemA,TItemB>` provides the functionality of `ObservableListBind<TItemA,TItemB>` and also provides synchronization between the properties of list item that implement `INotifyPropertyChanged`. 
 
 ```csharp
 //See Gstc.Collections.ObservableLists.ExampleTest for example usage.
 ```
 
+#### The class provides several different methods for synchronizing item properties including:
+
+`UpdateCollectionNotify` - When a PropertyChanged event is raised, the corresponding item on the alternate list will be replaced by a new item created using the ConvertItem(...) method.
+ 
+`UpdatePropertyNotify` - When a PropertyChanged event is raised, the corresponding item on the alternate list will have its PropertyChanged event triggered. The user is expected to provide any property synchronization. This is useful when the ItemB is a a wrapper for ItemA, and a PropertyChanged event is needed to trigger callbacks.
+   
+`UpdateCustomNotify` - When a PropertyChanged event is raised, the user provided `ICustomPropertyMap` is invoked to update item property on the alternate list.
+
+
 ## How do I get started?
 
 The `ObservableList<T>` should work somewhat similar to the standard .NET `ObservableCollection<T>`. First, add the nuget package 
-[ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project. (The 2.0 version has not yet been updated! StayTuned!)
+[ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project. (The 2.0 version has not yet been updated! StayTuned!) Next utilize code from the following examples or check out the ***Gstc.Collections.ObservableLists.ExampleTest*** namespace!
 
-The following example shows usage of an `ObservableList<T>`:
+The following example shows usage of an `ObservableList<T>` :
 
 ### `ObservableList<T>` Example
 ```csharp
