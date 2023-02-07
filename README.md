@@ -13,7 +13,7 @@ A set of lists/list wrappers that implement the observable pattern, invoking eve
   <img src="https://user-images.githubusercontent.com/686792/53543486-0e638800-3ae0-11e9-9566-6d2f18a28e61.jpg" height="350">
 </p>
 
-***New Version 2 Release Candidate! (2023-02-07)<br>***
+***New Version 2! (2023-02-07)<br>***
 Gstc.Collections.ObservableLists <br>
 Author - Greg Sonnenfeld, Copyright 2019 to 2023 <br>
 License: LGPL 3.0 <br>
@@ -81,8 +81,11 @@ var obvListBind = new ObservableListBindFunc<int, string>(
 
 ## How do I get started?
 
-The `ObservableList<T>` should work somewhat similar to the standard .NET `ObservableCollection<T>`. First, add the nuget package 
-[ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project. (The 2.0 version has not yet been updated! StayTuned!) Next utilize code from the following examples or check out the ***Gstc.Collections.ObservableLists.ExampleTest*** namespace!
+The `ObservableList<T>` should work somewhat similar to the standard .NET `ObservableCollection<T>`. 
+
+First, add the nuget package [ https://www.nuget.org/packages/Gstc.Collections.ObservableLists ] or checkout the code and include it in you project.  
+
+Next utilize code from the following examples or look at the github examples in the ***Gstc.Collections.ObservableLists.ExampleTest*** namespace!
 
 The following example shows usage of an `ObservableList<T>` :
 
