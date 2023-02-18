@@ -16,7 +16,8 @@ public interface IObservableList<TItem> :
     IObservableCollection<TItem>,
     INotifyListChangedEvents,
     INotifyListChangingEvents,
-    IList<TItem> {
+    IList<TItem>,
+    IReadOnlyList<TItem> {
     //Note: IList has been removed from the IObservableList. It causes an issue where the the Add(object) method can't be hidden behind an explicit interface.
     // This creates an Add(object) overload that does generate compile time errors, but will create runtime errors instead.
 

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Gstc.Collections.ObservableLists.Abstract;
-
 /// <summary>
 /// <see cref="AbstractListUpcast{TItem}"/> provides upcast functionality for implementations of <see cref="IObservableList{TItem}"/>. 
 /// This allows observable lists to be upcast (e.g. <see cref="IList{T}"/>) and still provide notification functionality.
@@ -11,7 +10,8 @@ namespace Gstc.Collections.ObservableLists.Abstract;
 /// <typeparam name="TItem">The type of elements in the list.</typeparam>
 public abstract class AbstractListUpcast<TItem> :
     IList<TItem>,
-    IList {
+    IList,
+    IReadOnlyList<TItem> {
 
     #region abstract methods
     /// <summary>

@@ -11,11 +11,18 @@ namespace Gstc.Collections.ObservableLists.Test;
 [TestFixture]
 public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
 
+    #region DataSource
     public static object[] StaticDataSource => new object[] {
         new ObservableList<TestItem>(),
         new ObservableIList<TestItem, List<TestItem>>(),
         new ObservableIListLocking<TestItem,List<TestItem>>()
     };
+
+    public static object[] StaticDataSourceIList => new object[] {
+        new ObservableList<TestItem>(),
+        new ObservableIList<TestItem, List<TestItem>>(),
+    };
+    #endregion
 
     [SetUp]
     public new void TestInit() => base.TestInit();
@@ -152,14 +159,10 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         });
     }
 
-    public static object[] StaticDataSourceIList => new object[] {
-        new ObservableList<TestItem>(),
-        new ObservableIList<TestItem, List<TestItem>>(),
-    };
     [Test]
     [TestCaseSource(nameof(StaticDataSourceIList))]
     [Description("Tests functionality when upcast to IList interface.")]
-    public void UpcstToIList_MethodsStillWorkAndTriggerEvents(IList list) {
+    public void UpcastToIList_MethodsStillWorkAndTriggerEvents(IList list) {
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");
 
         //Add test
@@ -194,5 +197,16 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.That(list[0], Is.EqualTo(Item2));
         AssertPropertyCollectionTest();
     }
+    [Test]
+    [TestCaseSource(nameof(StaticDataSource))]
+    [Description("Tests functionality when upcast to IReadOnlyList<T> interface.")]
+    public void UpcastToIReadOnlyList_CastsSuccessfullyAndReadSuccess(IObservableList<TestItem> obvList) { //Todo: Move to IList
+        obvList.Add(Item1);
+        IReadOnlyList<TestItem> myReadOnlyList = obvList;
+        Assert.That(myReadOnlyList[0], Is.EqualTo(Item1));
+        Assert.That(myReadOnlyList, Has.Count.EqualTo(1));
+        foreach (var indexItem in myReadOnlyList) Assert.That(indexItem, Is.EqualTo(Item1));
+    }
+
     #endregion
 }

@@ -12,7 +12,8 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// and still provide notification functionality.
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
-public abstract class AbstractUpcastLockingIList<TItem> :
+public abstract class AbstractListUpcastLocking<TItem> :
+    IReadOnlyList<TItem>,
     IList<TItem>,
     ICollection {
 
