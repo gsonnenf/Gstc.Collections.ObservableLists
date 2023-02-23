@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.Fakes;
 using Gstc.Collections.ObservableLists.Test.Tools;
 using Gstc.Utility.UnitTest.Event;

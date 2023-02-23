@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.ComponentModel;
-using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists;
 
@@ -38,4 +37,5 @@ public interface IObservableList<TItem> :
     /// <param name="newIndex">New index of the item.</param>
     void Move(int oldIndex, int newIndex);
 
+    //Todo: Consider method RemoveRange(...)?
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Gstc.Collections.ObservableLists.Multithread;
+using Gstc.Collections.ObservableDictionary.ObservableList;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.Test;
@@ -53,7 +53,7 @@ public class ObservableListReentrancyTest {
             if (obvList.Count > 10) return;
             obvList.Add("Reentrancy trigger");
         };
-        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => obvList.Add("Event trigger"));
+        InvalidOperationException e = Assert.Throws<ReentrancyException>(() => obvList.Add("Event trigger"));
         Console.WriteLine(e.Message);
     }
 

@@ -2,7 +2,7 @@
 An observable lists library with upcast compatibility, list wrapping, reentrancy protection, thread safety, and robust unit testing.
 
 ***Observable Lists:***
-A set of lists/list wrappers that implement the observable pattern, invoking events when a list is modified.<br/>
+A set of lists/list wrappers/adapters that implement the observable pattern, invoking events when a list is modified.<br/>
 `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, `IObservableList<TItem>`<br>
 
 ***Observable List Bindings:*** A set of list bindings that synchronize the content of observable lists using a mapping between item types.<br/>
@@ -23,7 +23,7 @@ Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
 The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when the list is modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
 
 #### Classes
-`ObservableList<TItem>` is the default observable list that utilizes an internal `List<TItem>` and can also serve as a wrapper for a pre-existing `List<T>`. It provides list modification events, maintains event calls on upcast, and provides reenetrancy protection.
+`ObservableList<TItem>` is the default observable list that utilizes an internal `List<TItem>` and can also serve as a wrapper/adapter for a pre-existing `List<T>`. It provides list modification events, maintains event calls on upcast, and provides reenetrancy protection.
 
 ```csharp
 var obvList = new ObservableList<Customer>();

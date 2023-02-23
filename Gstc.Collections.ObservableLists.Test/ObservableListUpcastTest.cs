@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Gstc.Collections.ObservableLists.Multithread;
 using Gstc.Collections.ObservableLists.Test.Fakes;
 using Gstc.Collections.ObservableLists.Test.Tools;
 using NUnit.Framework;
@@ -18,9 +17,20 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         new ObservableIListLocking<TestItem,List<TestItem>>()
     };
 
-    public static object[] StaticDataSourceIList => new object[] {
+    //Special case for ensure List and IObservableLists have same functionality for casting issues.
+    public static object[] StaticDataSourceWithList => new object[] {
+        new List<TestItem>(), // Control group to ensure alignment of behavior between List<T> and ObservableList<T>.
         new ObservableList<TestItem>(),
         new ObservableIList<TestItem, List<TestItem>>(),
+        new ObservableIListLocking<TestItem,List<TestItem>>()
+    };
+
+    //Special case for ensure List and IObservableLists have same functionality for casting issues.
+    public static object[] StaticDataSourceWithListInt => new object[] {
+        new List<int>(), // Control group to ensure alignment of beahvior between List<T> and ObservableList<T>.
+        new ObservableList<int>(),
+        new ObservableIList<int, List<int>>(),
+        new ObservableIListLocking<int,List<int>>()
     };
     #endregion
 
@@ -160,9 +170,10 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
     }
 
     [Test]
-    [TestCaseSource(nameof(StaticDataSourceIList))]
+    [TestCaseSource(nameof(StaticDataSourceWithList))]
     [Description("Tests functionality when upcast to IList interface.")]
     public void UpcastToIList_MethodsStillWorkAndTriggerEvents(IList list) {
+        if (list is List<TestItem> && list is not IObservableList<TestItem>) return; //Control case for different test not use here.
         if (list is not IObservableList<TestItem> obvCollection) throw new InvalidCastException("Collection does not support the IObservable Interface");
 
         //Add test
@@ -197,6 +208,88 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.That(list[0], Is.EqualTo(Item2));
         AssertPropertyCollectionTest();
     }
+
+    [Test]
+    [TestCaseSource(nameof(StaticDataSourceWithList))]
+    public void IListCastingExceptionsReferenceTypes_HandlesCastingSimilarToListGeneric(IList list) {
+        TestItem baseItem = new();
+        DerivedItem derivedItem = new();
+
+        Console.WriteLine(derivedItem is TestItem);
+        list.Clear();
+        list.Add(baseItem);
+        //Derived case
+        Assert.That(list.Add(new DerivedItem()), Is.EqualTo(1));
+        Assert.DoesNotThrow(() => list[1] = derivedItem);
+        Assert.That(list.Contains(derivedItem), Is.True);
+        Assert.That(list.IndexOf(derivedItem), Is.EqualTo(1));
+        Assert.DoesNotThrow(() => list.Insert(0, new DerivedItem()));
+        Assert.DoesNotThrow(() => list.Remove(derivedItem));
+
+        list.Clear();
+        list.Add(baseItem);
+        //Null case
+        Assert.That(list.Add(null), Is.EqualTo(1));
+        Assert.DoesNotThrow(() => list[1] = null);
+        Assert.That(list.Contains(null), Is.True);
+        Assert.That(list.IndexOf(null), Is.EqualTo(1));
+        Assert.DoesNotThrow(() => list.Insert(0, null));
+        Assert.DoesNotThrow(() => list.Remove(null));
+
+        list.Clear();
+        list.Add(baseItem);
+        //Non-derived case
+        Assert.Throws<ArgumentException>(() => list.Add(new NonDerivedItem()));
+        Assert.Throws<ArgumentException>(() => list[0] = new NonDerivedItem());
+        Assert.That(list.Contains(new NonDerivedItem()), Is.False);
+        Assert.That(list.IndexOf(new NonDerivedItem()), Is.EqualTo(-1));
+        Assert.Throws<ArgumentException>(() => list.Insert(0, new NonDerivedItem()));
+        Assert.DoesNotThrow(() => list.Remove(new NonDerivedItem()));
+    }
+
+    [Test]
+    [TestCaseSource(nameof(StaticDataSourceWithListInt))]
+    public void IListCastingExceptionsValueTypes_HandlesCastingSimilarToListGeneric(IList list) {
+
+        var num1 = 1;
+        var num2 = 2;
+
+        list.Clear();
+        list.Add(num1);
+        //Standard case
+        Assert.That(list.Add(num2), Is.EqualTo(1));
+        Assert.DoesNotThrow(() => list[1] = num2);
+        Assert.That(list.Contains(num2), Is.True);
+        Assert.That(list.IndexOf(num2), Is.EqualTo(1));
+        Assert.DoesNotThrow(() => list.Insert(0, num2));
+        Assert.DoesNotThrow(() => list.Remove(num2));
+
+        list.Clear();
+        list.Add(num1);
+        //Null case
+        Assert.Throws<ArgumentNullException>(() => list.Add(null));
+        Assert.Throws<ArgumentNullException>(() => list[1] = null);
+        Assert.That(list.Contains(null), Is.False);
+        Assert.That(list.IndexOf(null), Is.EqualTo(-1));
+        Assert.Throws<ArgumentNullException>(() => list.Insert(0, null));
+        Assert.DoesNotThrow(() => list.Remove(null));
+
+        list.Clear();
+        list.Add(num1);
+        //Non-derived case
+        Assert.Throws<ArgumentException>(() => list.Add(new NonDerivedItem()));
+        Assert.Throws<ArgumentException>(() => list[0] = new NonDerivedItem());
+        Assert.That(list.Contains(new NonDerivedItem()), Is.False);
+        Assert.That(list.IndexOf(new NonDerivedItem()), Is.EqualTo(-1));
+        Assert.Throws<ArgumentException>(() => list.Insert(0, new NonDerivedItem()));
+        Assert.DoesNotThrow(() => list.Remove(new NonDerivedItem()));
+    }
+
+    private class DerivedItem : TestItem { }
+    private class NonDerivedItem { }//Used for testing failed IList casting
+    #endregion
+
+    #region IReadOnlyList
     [Test]
     [TestCaseSource(nameof(StaticDataSource))]
     [Description("Tests functionality when upcast to IReadOnlyList<T> interface.")]
@@ -207,6 +300,5 @@ public class ObservableListUpcastTest : CollectionTestBase<TestItem> {
         Assert.That(myReadOnlyList, Has.Count.EqualTo(1));
         foreach (var indexItem in myReadOnlyList) Assert.That(indexItem, Is.EqualTo(Item1));
     }
-
     #endregion
 }

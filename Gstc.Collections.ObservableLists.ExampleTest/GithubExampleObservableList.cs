@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using Gstc.Collections.ObservableLists.ExampleTest.Fakes;
-using Gstc.Collections.ObservableLists.Multithread;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.ExampleTest;

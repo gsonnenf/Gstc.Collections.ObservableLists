@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists.Examples.ObservableList {
     /// <summary>

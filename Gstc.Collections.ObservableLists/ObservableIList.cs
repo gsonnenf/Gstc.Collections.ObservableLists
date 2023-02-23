@@ -1,5 +1,4 @@
 ﻿#pragma warning disable CA1001 // Types that own disposable fields should be disposable
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -7,7 +6,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Gstc.Collections.ObservableLists.Abstract;
 using Gstc.Collections.ObservableLists.ComponentModel;
-using Gstc.Collections.ObservableLists.Multithread;
+using Gstc.Collections.ObservableLists.Utils;
 
 namespace Gstc.Collections.ObservableLists;
 
@@ -19,7 +18,7 @@ namespace Gstc.Collections.ObservableLists;
 /// and <see cref="INotifyListChangingEvents"/> interface. The list also contains two refresh methods: RefreshIndex(int) and RefreshAll(), 
 /// that will respectively trigger Replace and Reset events without changing the list.
 /// <br/><br/>
-/// The <see cref="ObservableIList{TItem, TList}"/> serves as an observable wrapper for an internal <see cref="IList{TItem}"/> specified by the
+/// The <see cref="ObservableIList{TItem, TList}"/> serves as an observable adapter/wrapper for an internal <see cref="IList{TItem}"/> specified by the
 /// <see cref="TList"/> parameter.  The <see cref="ObservableIList{TItem, TList}"/> is designed to be upcast and will still generate events when 
 /// upcast to its various interfaces such as <see cref="IList{TItem}"/> and <see cref="ICollection{TItem}"/>
 /// <br/><br/>
@@ -34,42 +33,27 @@ namespace Gstc.Collections.ObservableLists;
 /// <typeparam name="TItem">The type of elements in the list.</typeparam>
 /// /// <typeparam name="TList">The type of internal list.</typeparam>
 public class ObservableIList<TItem, TList> :
-    AbstractListUpcast<TItem>,
+    ListUpcastAbstract<TItem>,
     IObservableList<TItem>
     where TList : IList<TItem>, new() {
 
     #region Events Collection Changing
-
     public event NotifyCollectionChangedEventHandler CollectionChanging;
-
     public event NotifyCollectionChangedEventHandler Adding;
-
     public event NotifyCollectionChangedEventHandler Moving;
-
     public event NotifyCollectionChangedEventHandler Removing;
-
     public event NotifyCollectionChangedEventHandler Replacing;
-
     public event NotifyCollectionChangedEventHandler Resetting;
-
     public event PropertyChangedEventHandler PropertyChanged;
-
     #endregion
 
     #region Events Collection Changed
-
     public event NotifyCollectionChangedEventHandler CollectionChanged;
-
     public event NotifyCollectionChangedEventHandler Added;
-
     public event NotifyCollectionChangedEventHandler Moved;
-
     public event NotifyCollectionChangedEventHandler Removed;
-
     public event NotifyCollectionChangedEventHandler Replaced;
-
     public event NotifyCollectionChangedEventHandler Reset;
-
     #endregion
 
     #region Fields and Properties
@@ -79,10 +63,20 @@ public class ObservableIList<TItem, TList> :
     /// </summary>
     private TList _list;
 
+    private readonly ReentrancyMonitorSimple _monitor = new ReentrancyMonitorSimple();
     /// <summary>
     /// A reference to internal {TList} for use by base classes.
     /// </summary>
     protected override IList<TItem> InternalList => _list;
+
+    /// <summary>
+    /// Allows onChange events reentrancy when set to true. Be careful when allowing reentrancy, as it can cause stack overflow
+    /// from infinite calls due to conflicting callbacks.
+    /// </summary>
+    public bool AllowReentrancy {
+        get => _monitor.AllowReentrancy;
+        set => _monitor.AllowReentrancy = value;
+    }
 
     public bool IsReadOnly => _list.IsReadOnly;
 
@@ -98,7 +92,7 @@ public class ObservableIList<TItem, TList> :
     public TList List {
         get => _list;
         set {
-            using (BlockReentrancy()) {
+            using (_monitor.BlockReentrancy()) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 CollectionChanging?.Invoke(this, eventArgs);
                 Resetting?.Invoke(this, eventArgs);
@@ -138,17 +132,19 @@ public class ObservableIList<TItem, TList> :
     /// </summary>
     /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
     public void AddRange(IEnumerable<TItem> items) {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
 
             var eventArgs =
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
-            foreach (var item in items) _list.Add(item);
+
+            //foreach (var item in items) _list.Add(item);
+            AddRangeInternal(items);
+
             OnPropertyChangedCountAndIndex();
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (IsAddRangeResetEvent)
-                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            if (IsAddRangeResetEvent) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             else CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
         }
@@ -160,22 +156,44 @@ public class ObservableIList<TItem, TList> :
     /// <param name="oldIndex"></param>
     /// <param name="newIndex"></param>
     public void Move(int oldIndex, int newIndex) {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             var removedItem = this[oldIndex];
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex],
                 newIndex, oldIndex);
             CollectionChanging?.Invoke(this, eventArgs);
             Moving?.Invoke(this, eventArgs);
 
-            _list.RemoveAt(oldIndex);
-            _list.Insert(newIndex, removedItem);
+            MoveInternal(removedItem, oldIndex, newIndex);
 
             OnPropertyChangedIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Moved?.Invoke(this, eventArgs);
         }
     }
+    #endregion
 
+    #region Internal Methods
+    /// <summary>
+    /// Add range for a general IList{T} without a AddRange method. This should be override for List{T}, or other method, with an AddRange command.
+    /// List{T} uses Array.Copy for better performance than sequential adds.
+    /// 
+    /// Note: Benchmark shows foreach and for loop have aproximately the same insertion times, sor foreach is used.
+    /// </summary>
+    /// <param name="items"></param>
+    protected virtual void AddRangeInternal(IEnumerable<TItem> items) {
+        foreach (var item in items) _list.Add(item);
+    }
+
+    /// <summary>
+    /// Move for a general IList{T}. For a IList{T} implementation that implements a more performant Move(), override this method.
+    /// </summary>
+    /// <param name="movedItem"></param>
+    /// <param name="oldIndex"></param>
+    /// <param name="newIndex"></param>
+    protected virtual void MoveInternal(TItem movedItem, int oldIndex, int newIndex) {
+        _list.RemoveAt(oldIndex);
+        _list.Insert(newIndex, movedItem);
+    }
     #endregion
 
     #region Method Overrides
@@ -188,7 +206,7 @@ public class ObservableIList<TItem, TList> :
     public override TItem this[int index] {
         get => _list[index];
         set {
-            using (BlockReentrancy()) {
+            using (_monitor.BlockReentrancy()) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value,
                     _list[index], index);
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -208,7 +226,7 @@ public class ObservableIList<TItem, TList> :
     /// </summary>
     /// <param name="item">Item to add</param>
     public override void Add(TItem item) {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             //bug: Fix add event args for list types that may not append added element to the end of the list.
 
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
@@ -227,7 +245,7 @@ public class ObservableIList<TItem, TList> :
     /// Clears all item from the list. CollectionChanged and Reset event are triggered.
     /// </summary>
     public override void Clear() {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             CollectionChanging?.Invoke(this, eventArgs);
             Resetting?.Invoke(this, eventArgs);
@@ -246,7 +264,7 @@ public class ObservableIList<TItem, TList> :
     /// <param name="index"></param>
     /// <param name="item"></param>
     public override void Insert(int index, TItem item) {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
@@ -276,7 +294,7 @@ public class ObservableIList<TItem, TList> :
     /// Generates a reset event without modifying the underlying list.
     /// </summary>
     public void RefreshAll() {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             CollectionChanging?.Invoke(this, eventArgs);
             Resetting?.Invoke(this, eventArgs);
@@ -292,7 +310,7 @@ public class ObservableIList<TItem, TList> :
     /// <param name="item">Item to remove.</param>
     /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
     public override bool Remove(TItem item) {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             var index = _list.IndexOf(item);
             if (index == -1) return false;
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
@@ -314,7 +332,7 @@ public class ObservableIList<TItem, TList> :
     /// </summary>
     /// <param name="index"></param>
     public override void RemoveAt(int index) {
-        using (BlockReentrancy()) {
+        using (_monitor.BlockReentrancy()) {
             var item = _list[index];
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
@@ -327,7 +345,6 @@ public class ObservableIList<TItem, TList> :
             Removed?.Invoke(this, eventArgs);
         }
     }
-
     #endregion
 
     #region Property Notify Methods
@@ -350,31 +367,4 @@ public class ObservableIList<TItem, TList> :
 
     #endregion
 
-    #region Reentrancy Monitor
-
-    /// <summary>
-    /// Allows onChange events reentrancy when set to true. Be careful when allowing reentrancy, as it can cause stack overflow
-    /// from infinite calls due to conflicting callbacks.
-    /// </summary>
-    public bool AllowReentrancy { get; set; }
-
-    private SimpleMonitor ReentrancyMonitor => _monitor ??= new SimpleMonitor(this);
-    private SimpleMonitor _monitor;
-    private int _blockReentrancyCount;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected IDisposable BlockReentrancy() {
-        if (_blockReentrancyCount > 0 && !AllowReentrancy) throw new InvalidOperationException("ObservableCollectionReentrancyNotAllowed");
-        _blockReentrancyCount++;
-        return ReentrancyMonitor;
-    }
-
-    private class SimpleMonitor : IDisposable {
-        private readonly ObservableIList<TItem, TList> _list;
-        public SimpleMonitor(ObservableIList<TItem, TList> list) => _list = list;
-        public void Dispose() => _list._blockReentrancyCount--;
-    }
 }
-
-#endregion
-

@@ -1,14 +1,15 @@
 ﻿#pragma warning disable CA1001 // Types that own disposable fields should be disposable
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Gstc.Collections.ObservableLists.Base;
+using Gstc.Collections.ObservableLists.Utils;
 
-namespace Gstc.Collections.ObservableLists.Multithread;
+namespace Gstc.Collections.ObservableLists;
 
 /// <summary>
 /// <see cref="ObservableIListLocking{TItem, TList}"/> provides the functionality of the <see cref="ObservableIList{TItem, TList}"/> class
@@ -25,38 +26,27 @@ namespace Gstc.Collections.ObservableLists.Multithread;
 /// <typeparam name="TItem">The type of elements in the list.</typeparam>
 /// <typeparam name="TList">The type of internal list.</typeparam>
 public class ObservableIListLocking<TItem, TList> :
-    AbstractListUpcastLocking<TItem>,
+    ListUpcastLockingAbstract<TItem>,
     IObservableList<TItem>
     where TList : IList<TItem>, new() {
 
     #region Events Collection Changing
     public event NotifyCollectionChangedEventHandler CollectionChanging;
-
     public event NotifyCollectionChangedEventHandler Adding;
-
     public event NotifyCollectionChangedEventHandler Moving;
-
     public event NotifyCollectionChangedEventHandler Removing;
-
     public event NotifyCollectionChangedEventHandler Replacing;
-
     public event NotifyCollectionChangedEventHandler Resetting;
-
     public event PropertyChangedEventHandler PropertyChanged;
     #endregion
 
     #region Events Collection Changed 
 
     public event NotifyCollectionChangedEventHandler CollectionChanged;
-
     public event NotifyCollectionChangedEventHandler Added;
-
     public event NotifyCollectionChangedEventHandler Moved;
-
     public event NotifyCollectionChangedEventHandler Removed;
-
     public event NotifyCollectionChangedEventHandler Replaced;
-
     public event NotifyCollectionChangedEventHandler Reset;
     #endregion
 
@@ -67,9 +57,20 @@ public class ObservableIListLocking<TItem, TList> :
     private TList _list;
 
     /// <summary>
+    /// Monitor that prevents reentrancy from individual threads. Does not protect against reentrancy from threads created in events.
+    /// </summary>
+    private readonly ReentrancyMonitorMultithread _monitor = new();
+    /// <summary>
     /// A reference to internal {TList} for use by base classes.
     /// </summary>
     protected override IList<TItem> InternalList => _list;
+    protected object SyncRootEvents { get; } = new();
+    /// <summary>
+    /// This function is part of the API but is not supported by multithread.
+    /// </summary>
+    public bool AllowReentrancy {
+        set { if (value) throw new NotSupportedException("Single thread reentrancy not permitted as it would cause a deadlock. Multithread reentrancy is required."); }
+    }
 
     /// <summary>
     /// List is not readonly.
@@ -90,7 +91,7 @@ public class ObservableIListLocking<TItem, TList> :
     public TList List {
         get => _list;
         set {
-            using (_monitor.CheckReentrancy()) {
+            using (_monitor.CheckReentrancy())
                 lock (SyncRootEvents) {
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                     CollectionChanging?.Invoke(this, eventArgs);
@@ -102,10 +103,8 @@ public class ObservableIListLocking<TItem, TList> :
                     CollectionChanged?.Invoke(this, eventArgs);
                     Reset?.Invoke(this, eventArgs);
                 }
-            }
         }
     }
-
     #endregion
 
     #region Constructor
@@ -130,7 +129,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// </summary>
     /// <param name="items">Collection of items to add.</param>
     public void AddRange(IEnumerable<TItem> items) {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -142,7 +141,6 @@ public class ObservableIListLocking<TItem, TList> :
                 else CollectionChanged?.Invoke(this, eventArgs);
                 Added?.Invoke(this, eventArgs);
             }
-        }
     }
     /// <summary>
     /// Moves an item to a new index. CollectionChanging, CollectionChanged, PropertyChanged, Moving, Moved event are triggered.
@@ -150,7 +148,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// <param name="oldIndex">Current index of item</param>
     /// <param name="newIndex">Desired index of item</param>
     public void Move(int oldIndex, int newIndex) {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var removedItem = this[oldIndex];
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex], newIndex, oldIndex);
@@ -164,7 +162,6 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Moved?.Invoke(this, eventArgs);
             }
-        }
     }
     #endregion
 
@@ -179,8 +176,7 @@ public class ObservableIListLocking<TItem, TList> :
             using (ReadLock()) return _list[index];
         }
         set {
-            using (_monitor.CheckReentrancy()) {
-
+            using (_monitor.CheckReentrancy())
                 lock (SyncRootEvents) {
                     var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, _list[index], index);
                     CollectionChanging?.Invoke(this, eventArgs);
@@ -190,7 +186,6 @@ public class ObservableIListLocking<TItem, TList> :
                     CollectionChanged?.Invoke(this, eventArgs);
                     Replaced?.Invoke(this, eventArgs);
                 }
-            }
         }
     }
 
@@ -199,7 +194,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// </summary>
     /// <param name="item">Item to add.</param>
     public override void Add(TItem item) {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 //bug: Fix add event args for list types that may not append added element to the end of the list.
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
@@ -210,14 +205,13 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Added?.Invoke(this, eventArgs);
             }
-        }
     }
 
     /// <summary>
     /// Clears all item from the list. CollectionChanging, CollectionChanged, PropertyChanged, Resetting, Reset event are triggered.
     /// </summary>
     public override void Clear() {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -227,12 +221,10 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Reset?.Invoke(this, eventArgs);
             }
-        }
     }
 
     public void RefreshIndex(int index) {
-        using (_monitor.CheckReentrancy()) {
-
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, _list[index], _list[index], index);
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -241,11 +233,10 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Replaced?.Invoke(this, eventArgs);
             }
-        }
     }
 
     public void RefreshAll() {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -254,7 +245,6 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Reset?.Invoke(this, eventArgs);
             }
-        }
     }
 
     /// <summary>
@@ -263,7 +253,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// <param name="index">Index to insert item.</param>
     /// <param name="item">Item to add.</param>
     public override void Insert(int index, TItem item) {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
                 CollectionChanging?.Invoke(this, eventArgs);
@@ -273,7 +263,6 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Added?.Invoke(this, eventArgs);
             }
-        }
     }
 
     /// <summary>
@@ -282,7 +271,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// <param name="item">Item to remove.</param>
     /// <returns>Returns true if item was found and removed. Returns false if item does not exist.</returns>
     public override bool Remove(TItem item) {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 int index;
                 using (WriteLock()) index = _list.IndexOf(item);
@@ -296,7 +285,6 @@ public class ObservableIListLocking<TItem, TList> :
                 Removed?.Invoke(this, eventArgs);
                 return true;
             }
-        }
     }
 
     /// <summary>
@@ -304,7 +292,7 @@ public class ObservableIListLocking<TItem, TList> :
     /// </summary>
     /// <param name="index"></param>
     public override void RemoveAt(int index) {
-        using (_monitor.CheckReentrancy()) {
+        using (_monitor.CheckReentrancy())
             lock (SyncRootEvents) {
                 var item = _list[index];
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
@@ -315,7 +303,27 @@ public class ObservableIListLocking<TItem, TList> :
                 CollectionChanged?.Invoke(this, eventArgs);
                 Removed?.Invoke(this, eventArgs);
             }
-        }
+    }
+    #endregion
+
+    #region Protected Override Methods
+    /// <summary>
+    /// Adds an item to the list. CollectionChanging, CollectionChanged, PropertyChanged, Adding, Added event are triggered.
+    /// </summary>
+    /// <param name="item">Item to add.</param>
+    protected override int IList_AddCustom(TItem item) {
+        using (_monitor.CheckReentrancy()) lock (SyncRootEvents) {
+                //bug: Fix add event args for list types that may not append added element to the end of the list.
+                var newIndex = _list.Count;
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
+                CollectionChanging?.Invoke(this, eventArgs);
+                Adding?.Invoke(this, eventArgs);
+                using (WriteLock()) _list.Add(item);
+                OnPropertyChangedCountAndIndex();
+                CollectionChanged?.Invoke(this, eventArgs);
+                Added?.Invoke(this, eventArgs);
+                return newIndex;
+            }
     }
     #endregion
 
@@ -333,43 +341,6 @@ public class ObservableIListLocking<TItem, TList> :
     protected void OnPropertyChangedCountAndIndex() {
         OnPropertyChanged(CountString);
         OnPropertyChanged(IndexerName);
-    }
-    #endregion
-
-    #region Reentrancy Monitor and threading
-    /// <summary>
-    /// Monitor that allows each thread to access with single entrance using a dictionary of threadId to keep 
-    /// track of accessing threads. Reentrancy will be permitted if an event runs a write operation on a separate 
-    /// thread, so it is recommended to not do this without careful consideration.
-    /// </summary>
-
-    /// <summary>
-    /// Monitor that prevents reentrancy from individual threads. Does not protect against reentrancy
-    /// from threads created in events.
-    /// </summary>
-    private readonly MultithreadMonitor _monitor = new();
-
-    protected object SyncRootEvents { get; } = new();
-
-    public bool AllowReentrancy {
-        set {
-            if (value) throw new NotSupportedException("Single thread reentrancy not permitted as it would cause a deadlock. Multithread reentrancy is required.");
-        }
-    }
-
-    private class MultithreadMonitor : IDisposable {
-        private readonly ConcurrentDictionary<int, int> _reentrancyDictionary = new();
-
-        public MultithreadMonitor CheckReentrancy() {
-            var threadId = Environment.CurrentManagedThreadId;
-            if (!_reentrancyDictionary.TryAdd(threadId, threadId)) throw new InvalidOperationException("Single thread Reentrancy not permitted as it would cause a deadlock.");
-            return this;
-        }
-
-        public void Dispose() {
-            var threadId = Environment.CurrentManagedThreadId;
-            _ = _reentrancyDictionary.TryRemove(threadId, out _);
-        }
     }
     #endregion
 }
