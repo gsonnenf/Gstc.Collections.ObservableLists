@@ -57,11 +57,10 @@ public class ObservableIList<TItem, TList> :
     #endregion
 
     #region Fields and Properties
-
     /// <summary>
     /// The internal {TList} wrapped by the observable class.
     /// </summary>
-    private TList _list;
+    protected TList _list;
 
     private readonly ReentrancyMonitorSimple _monitor = new ReentrancyMonitorSimple();
     /// <summary>
@@ -96,16 +95,13 @@ public class ObservableIList<TItem, TList> :
                 var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                 CollectionChanging?.Invoke(this, eventArgs);
                 Resetting?.Invoke(this, eventArgs);
-
                 _list = value;
-
                 OnPropertyChangedCountAndIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
                 Reset?.Invoke(this, eventArgs);
             }
         }
     }
-
     #endregion
 
     #region Constructor
@@ -133,15 +129,10 @@ public class ObservableIList<TItem, TList> :
     /// <param name="items">List of items. The default .NET collection changed event args returns an IList, so this is the preferred type. </param>
     public void AddRange(IEnumerable<TItem> items) {
         using (_monitor.BlockReentrancy()) {
-
-            var eventArgs =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)items, _list.Count);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
-
-            //foreach (var item in items) _list.Add(item);
             AddRangeInternal(items);
-
             OnPropertyChangedCountAndIndex();
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (IsAddRangeResetEvent) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -158,13 +149,10 @@ public class ObservableIList<TItem, TList> :
     public void Move(int oldIndex, int newIndex) {
         using (_monitor.BlockReentrancy()) {
             var removedItem = this[oldIndex];
-            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this[oldIndex],
-                newIndex, oldIndex);
+            var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, removedItem, newIndex, oldIndex);
             CollectionChanging?.Invoke(this, eventArgs);
             Moving?.Invoke(this, eventArgs);
-
             MoveInternal(removedItem, oldIndex, newIndex);
-
             OnPropertyChangedIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Moved?.Invoke(this, eventArgs);
@@ -207,13 +195,11 @@ public class ObservableIList<TItem, TList> :
         get => _list[index];
         set {
             using (_monitor.BlockReentrancy()) {
-                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value,
-                    _list[index], index);
+                //Todo: Do we need bound checking before event is generated?
+                var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, _list[index], index);
                 CollectionChanging?.Invoke(this, eventArgs);
                 Replacing?.Invoke(this, eventArgs);
-
                 _list[index] = value;
-
                 OnPropertyChangedIndex();
                 CollectionChanged?.Invoke(this, eventArgs);
                 Replaced?.Invoke(this, eventArgs);
@@ -228,13 +214,10 @@ public class ObservableIList<TItem, TList> :
     public override void Add(TItem item) {
         using (_monitor.BlockReentrancy()) {
             //bug: Fix add event args for list types that may not append added element to the end of the list.
-
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
-
             _list.Add(item);
-
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
@@ -249,9 +232,7 @@ public class ObservableIList<TItem, TList> :
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
             CollectionChanging?.Invoke(this, eventArgs);
             Resetting?.Invoke(this, eventArgs);
-
             _list.Clear();
-
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Reset?.Invoke(this, eventArgs);
@@ -268,9 +249,7 @@ public class ObservableIList<TItem, TList> :
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Adding?.Invoke(this, eventArgs);
-
             _list.Insert(index, item);
-
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Added?.Invoke(this, eventArgs);
@@ -316,14 +295,11 @@ public class ObservableIList<TItem, TList> :
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Removing?.Invoke(this, eventArgs);
-
             _list.RemoveAt(index);
-
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Removed?.Invoke(this, eventArgs);
         }
-
         return true;
     }
 
@@ -337,9 +313,7 @@ public class ObservableIList<TItem, TList> :
             var eventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index);
             CollectionChanging?.Invoke(this, eventArgs);
             Removing?.Invoke(this, eventArgs);
-
             _list.RemoveAt(index);
-
             OnPropertyChangedCountAndIndex();
             CollectionChanged?.Invoke(this, eventArgs);
             Removed?.Invoke(this, eventArgs);
@@ -353,18 +327,15 @@ public class ObservableIList<TItem, TList> :
     protected const string IndexerName = "Item[]";
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void OnPropertyChanged(string propertyName) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void OnPropertyChangedIndex() => OnPropertyChanged(IndexerName);
+    protected void OnPropertyChangedIndex() => OnPropertyChanged(IndexerName);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void OnPropertyChangedCountAndIndex() {
+    protected void OnPropertyChangedCountAndIndex() {
         OnPropertyChanged(CountString);
         OnPropertyChanged(IndexerName);
     }
-
     #endregion
-
 }
