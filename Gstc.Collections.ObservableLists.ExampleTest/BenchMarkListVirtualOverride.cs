@@ -5,10 +5,9 @@ using Gstc.Collections.ObservableDictionary.Test.Tools;
 using NUnit.Framework;
 
 namespace Gstc.Collections.ObservableLists.ExampleTest;
-[TestFixture]
 public class BenchMarkListOverride {
 
-    [Test, Sequential, Ignore("Benchmarks take alot of time. Unignore to run benchmark.")]
+    //[Test, Sequential, Ignore("Benchmarks take alot of time. Unignore to run benchmark.")]
     [Description("Tests how much overhead is added for using an wrapper over the list class with various methods.")]
     public void ListOverride_Add_Benchmark(
            [Values(100000000)] int numOfItems) {
