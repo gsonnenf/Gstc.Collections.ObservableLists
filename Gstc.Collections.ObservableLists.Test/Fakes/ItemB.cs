@@ -10,8 +10,8 @@ public class ItemB : INotifyPropertyChanged {
             new() { MyNum = "2000", MyStringUpper = "CCCC" },
             new() { MyNum = "3000", MyStringUpper = "DDDD" },
         };
-    private string _myNum;
-    private string _myStringUpper;
+    private string _myNum = "0";
+    private string _myStringUpper = "0";
 
     public string MyNum {
         get => _myNum;

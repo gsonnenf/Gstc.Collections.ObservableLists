@@ -3,13 +3,13 @@ using System.Threading;
 
 namespace Gstc.Collections.ObservableLists.Utils;
 
-/// <inheritdoc cref="RwLockScope"/>
-public class ReadLockScope : IDisposable {
+/// <inheritdoc cref="LockRwScope"/>
+public class LockReadScope : IDisposable {
     private readonly ReaderWriterLockSlim _rwLock;
-    public ReadLockScope(ReaderWriterLockSlim rwLock) => _rwLock = rwLock;
+    public LockReadScope(ReaderWriterLockSlim rwLock) => _rwLock = rwLock;
     public void Dispose() => _rwLock.ExitReadLock();
 
-    public ReadLockScope Lock() {
+    public LockReadScope Lock() {
         _rwLock.EnterReadLock();
         return this;
     }

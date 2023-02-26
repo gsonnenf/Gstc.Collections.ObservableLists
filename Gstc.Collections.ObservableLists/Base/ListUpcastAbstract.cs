@@ -30,15 +30,15 @@ public abstract class ListUpcastAbstract<TItem> :
 
     #region Static Helpers
     private readonly static bool ItemDefaultIsNull = (default(TItem) == null);
-    private static ArgumentException CreateIListArgumentException(object value)
-        => new ArgumentException("The value \"" + value.GetType() + "\" + is not of type \"" + typeof(TItem) + "\" and cannot be used in this generic collection.", nameof(value));
+    private static ArgumentException ArgumentException_CreateCastMessage(object value)
+        => new("The value \"" + value.GetType() + "\" + is not of type \"" + typeof(TItem) + "\" and cannot be used in this generic collection.", nameof(value));
     #endregion
     object IList.this[int index] {
         get => this[index];
         set {
             if (value is TItem item) this[index] = item;
             else if (value == null) this[index] = (ItemDefaultIsNull) ? default : throw new ArgumentNullException(nameof(value));
-            else throw CreateIListArgumentException(value);
+            else throw ArgumentException_CreateCastMessage(value);
         }
     }
 
@@ -54,7 +54,7 @@ public abstract class ListUpcastAbstract<TItem> :
     int IList.Add(object value) {
         if (value is TItem item) return IList_AddCustom(item);
         else if (value == null) return (ItemDefaultIsNull) ? IList_AddCustom(default) : throw new ArgumentNullException(nameof(value));
-        else throw CreateIListArgumentException(value);
+        else throw ArgumentException_CreateCastMessage(value);
     }
     /// <summary>Override for custom implementation of the add method in <see cref="IList.Add(object)"/></summary>
     protected virtual int IList_AddCustom(TItem item) {
@@ -77,7 +77,7 @@ public abstract class ListUpcastAbstract<TItem> :
     void IList.Insert(int index, object value) {
         if (value is TItem item) Insert(index, item);
         else if (value == null) Insert(index, (ItemDefaultIsNull) ? default : throw new ArgumentNullException(nameof(value)));
-        else throw CreateIListArgumentException(value);
+        else throw ArgumentException_CreateCastMessage(value);
     }
 
     void IList.Remove(object value) {

@@ -52,8 +52,8 @@ public partial class AssertEvent<TEventArgs> : IDisposable
     public void Dispose() {
         _eventInfo.RemoveEventHandler(_parent, _delegate);
         AssertCallbackList.Clear();
-        AssertCallbackList = null;
-        _parent = null;
+        AssertCallbackList = default;
+        _parent = default;
     }
     #endregion
 

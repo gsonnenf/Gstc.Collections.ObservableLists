@@ -150,7 +150,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListBinder {
             else ListA.Add(new ItemA("Added ItemA") { Num1 = _rand.Next(1000), Num2 = _rand.Next(1000) });
         }
 
-        private void ButtonHandler_RemoveListA(object sender, RoutedEventArgs e) => ListA.Remove((IItemA)GridA.SelectedItem);
+        private void ButtonClick_RemoveListA(object sender, RoutedEventArgs e) => ListA.Remove((IItemA)GridA.SelectedItem);
 
         private void ButtonClick_MoveUpListA(object sender, RoutedEventArgs e) => Move(ListA, GridA, -1);
 
@@ -166,7 +166,7 @@ namespace Gstc.Collections.ObservableLists.Examples.ObservableListBinder {
             else ListB.Add(new ItemB("Added ItemB") { Num1String = _rand.Next(1000).ToString(), Num2 = _rand.Next(1000) });
         }
 
-        private void ButtonHandler_RemoveListB(object sender, RoutedEventArgs e) => ListB.Remove((IItemB)GridB.SelectedItem);
+        private void ButtonClick_RemoveListB(object sender, RoutedEventArgs e) => ListB.Remove((IItemB)GridB.SelectedItem);
 
         private void ButtonClick_MoveUpListB(object sender, RoutedEventArgs e) => Move(ListB, GridB, -1);
 

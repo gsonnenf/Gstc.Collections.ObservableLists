@@ -2,7 +2,7 @@
 
 namespace Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 internal class PropertyBinderUpdateCollectionNotify<TItemSource, TItemTarget>
-    : AbstractPropertyBinder<TItemSource, TItemTarget>
+    : PropertyBinderAbstract<TItemSource, TItemTarget>
     where TItemSource : class, INotifyPropertyChanged
     where TItemTarget : class, INotifyPropertyChanged {
 

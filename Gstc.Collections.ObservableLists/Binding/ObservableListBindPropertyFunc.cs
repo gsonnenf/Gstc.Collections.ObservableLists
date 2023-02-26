@@ -38,8 +38,8 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
         Func<TItemA, TItemB> convertItemAToB,
         Func<TItemB, TItemA> convertItemBToA,
         PropertyBindType bindType = PropertyBindType.UpdateCollectionNotify,
-        IObservableList<TItemA> observableListA = null,
-        IObservableList<TItemB> observableListB = null,
+        IObservableList<TItemA> observableListA = default,
+        IObservableList<TItemB> observableListB = default,
         bool isBidirectional = true, bool isPropertyBindEnabled = true) {
         ConvertItemAToB = convertItemAToB;
         ConvertItemBToA = convertItemBToA;
@@ -63,8 +63,8 @@ public class ObservableListBindPropertyFunc<TItemA, TItemB> : ObservableListBind
         Func<TItemA, TItemB> convertItemAToB,
         Func<TItemB, TItemA> convertItemBToA,
         ICustomPropertyMap<TItemA, TItemB> customPropertyMap,
-        IObservableList<TItemA> observableListA = null,
-        IObservableList<TItemB> observableListB = null,
+        IObservableList<TItemA> observableListA = default,
+        IObservableList<TItemB> observableListB = default,
         bool isBidirectional = true,
         bool isPropertyBindEnabled = true) {
         ConvertItemAToB = convertItemAToB;

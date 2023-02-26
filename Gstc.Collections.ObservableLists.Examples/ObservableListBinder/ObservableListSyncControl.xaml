@@ -16,7 +16,7 @@
                 <Label>List A:</Label>
                 <StackPanel Orientation="Horizontal">
                     <Button Padding="5" Margin="5" Click="ButtonClick_AddListA">Add Item</Button>
-                    <Button Padding="5" Margin="5" Click="ButtonHandler_RemoveListA">Remove Item</Button>
+                    <Button Padding="5" Margin="5" Click="ButtonClick_RemoveListA">Remove Item</Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
@@ -31,7 +31,7 @@
                 <Label>List B:</Label>
                 <StackPanel Orientation="Horizontal">
                     <Button Padding="5" Margin="5" Click="ButtonClick_AddListB">Add Item</Button>
-                    <Button Padding="5" Margin="5" Click="ButtonHandler_RemoveListB">Remove Item</Button>
+                    <Button Padding="5" Margin="5" Click="ButtonClick_RemoveListB">Remove Item</Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">

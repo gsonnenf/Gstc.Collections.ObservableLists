@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel;
+using Gstc.Collections.ObservableLists.Utils;
 
 namespace Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 
 internal class PropertyBinderUpdateCustom<TItemSource, TItemTarget>
-        : AbstractPropertyBinder<TItemSource, TItemTarget>
+        : PropertyBinderAbstract<TItemSource, TItemTarget>
         where TItemSource : class, INotifyPropertyChanged
         where TItemTarget : class, INotifyPropertyChanged {
 
     private ICustomPropertyMap<TItemSource, TItemTarget> _customPropertyMap;
 
-    private bool _isSynchronizationInProgress;
+    private readonly SyncingFlagScope _syncing = new();
 
     public PropertyBinderUpdateCustom(
         IObservableList<TItemSource> sourceList,
@@ -23,18 +24,14 @@ internal class PropertyBinderUpdateCustom<TItemSource, TItemTarget>
     }
 
     protected override void SourceItemChanged(TItemSource itemS, TItemTarget itemT, object sender, PropertyChangedEventArgs args) {
-        if (_isSynchronizationInProgress || !IsBindingEnabled) return;
-        _isSynchronizationInProgress = true;
-        _customPropertyMap.PropertyChangedSourceToTarget(args, itemS, itemT);
-        _isSynchronizationInProgress = false;
+        if (_syncing.InProgress || !IsBindingEnabled) return;
+        using (_syncing.Begin()) _customPropertyMap.PropertyChangedSourceToTarget(args, itemS, itemT);
     }
 
     protected override void TargetItemChanged(TItemSource itemS, TItemTarget itemT, object sender, PropertyChangedEventArgs args) {
-        if (_isSynchronizationInProgress || !IsBindingEnabled) return;
+        if (_syncing.InProgress || !IsBindingEnabled) return;
         if (!IsBidirectional) return;
-        _isSynchronizationInProgress = true;
-        _customPropertyMap.PropertyChangedTargetToSource(args, itemT, itemS);
-        _isSynchronizationInProgress = false;
+        using (_syncing.Begin()) _customPropertyMap.PropertyChangedTargetToSource(args, itemT, itemS);
     }
 }
 

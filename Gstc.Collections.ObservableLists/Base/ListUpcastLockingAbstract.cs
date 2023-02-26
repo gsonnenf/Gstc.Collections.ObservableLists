@@ -19,12 +19,12 @@ public abstract class ListUpcastLockingAbstract<TItem> :
     ICollection {
 
     #region Locking
-    public RwLockScope RwLock { get; set; } = new();
+    public LockRwScope RwLock { get; set; } = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadLockScope ReadLock() => RwLock.ReadLock.Lock();
+    public LockReadScope ReadLock() => RwLock.EnterReadLock();
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WriteLockScope WriteLock() => RwLock.WriteLock.Lock();
+    public LockWriteScope WriteLock() => RwLock.EnterWriteLock();
     #endregion
 
     #region abstract methods
@@ -89,7 +89,7 @@ public abstract class ListUpcastLockingAbstract<TItem> :
 
     #region Static Helpers
     private readonly static bool ItemDefaultIsNull = (default(TItem) == null);
-    private static ArgumentException CreateIListArgumentException(object value)
+    protected static ArgumentException ArgumentException_CreateCastMessage(object value)
         => new ArgumentException("The value \"" + value.GetType() + "\" + is not of type \"" + typeof(TItem) + "\" and cannot be used in this generic collection.", nameof(value));
     #endregion
     object IList.this[int index] {
@@ -97,7 +97,7 @@ public abstract class ListUpcastLockingAbstract<TItem> :
         set {
             if (value is TItem item) this[index] = item;
             else if (value == null) this[index] = (ItemDefaultIsNull) ? default : throw new ArgumentNullException(nameof(value));
-            else throw CreateIListArgumentException(value);
+            else throw ArgumentException_CreateCastMessage(value);
         }
     }
 
@@ -113,7 +113,7 @@ public abstract class ListUpcastLockingAbstract<TItem> :
     int IList.Add(object value) {
         if (value is TItem item) return IList_AddCustom(item);
         else if (value == null) return (ItemDefaultIsNull) ? IList_AddCustom(default) : throw new ArgumentNullException(nameof(value));
-        else throw CreateIListArgumentException(value);
+        else throw ArgumentException_CreateCastMessage(value);
     }
 
     bool IList.Contains(object value) {
@@ -131,7 +131,7 @@ public abstract class ListUpcastLockingAbstract<TItem> :
     void IList.Insert(int index, object value) {
         if (value is TItem item) Insert(index, item);
         else if (value == null) Insert(index, (ItemDefaultIsNull) ? default : throw new ArgumentNullException(nameof(value)));
-        else throw CreateIListArgumentException(value);
+        else throw ArgumentException_CreateCastMessage(value);
     }
 
     void IList.Remove(object value) {
