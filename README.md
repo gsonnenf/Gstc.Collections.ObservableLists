@@ -8,18 +8,54 @@ A set of lists/list wrappers/adapters that implement the observable pattern, inv
 ***Observable List Bindings:*** A set of list bindings that synchronize the content of observable lists using a mapping between item types.<br/>
 `ObservableListBind<TItemA,TItemB>`, `ObservableListBindFunc<TItemA,TItemB>`, `ObservableListBindProperty<TItemA,TItemB>`, `ObservableListBindPropertyFunc<TItemA,TItemB>`
 
-## License
+---
+
 <p align="left">
   <img src="https://user-images.githubusercontent.com/686792/53543486-0e638800-3ae0-11e9-9566-6d2f18a28e61.jpg" height="350">
 </p>
 
-***New Version 2! (2023-02-07)<br>***
+
 Gstc.Collections.ObservableLists <br>
-Author - Greg Sonnenfeld, Copyright 2019 to 2023 <br>
+Author: Greg Sonnenfeld, Copyright 2019 to 2023 <br>
+Version: 2.0<br>
 License: LGPL 3.0 <br>
 Nuget: https://www.nuget.org/packages/Gstc.Collections.ObservableLists <br>
-  
-## Observable List 
+
+---
+
+### Release Notes
+***Version 2.0.1 (2023-03-18)***<br>
+      
+      Features:
+      a. IReadOnlyList{T} added to IObservableList and implementations.
+      b. IList interface now does type checking similar to List{T}
+      c. IList interface added back into ObservableIListLocking
+      d. Utils folder added, with public SyncingFlagScope, ReentrancyMonitor and LockRwScope mechanism that were previously implemented internally in classes.
+      e. ObservableList{T} is now internally a type of ObservableList{T,List{T}}, addRange/Move are now ovveridable virtual methods.
+      
+      Bugfixes:
+      a. ObservableListBind inProgress flag has been made exception safe.
+      b. int IList.Add(object) now calls IList_AddCustom(TItem) which is overridable. This allows custom index return values.
+
+
+      Minor breaking changes:
+      a. ObservableIListLocking moved to main namespace.
+      b. ObservableLists now throws ReentrancyException derived from InvalidOperationException, instead of InvalidOperationException
+      c. ObservableListBinds now throws added type OneWayBindingException derived from NotSupportedException, instead of NotSupportedException
+      d. The names of some abstract classes have been changed.
+      e. Names of internally locking mechanisms changed, refactored.
+      f. Switches some classes to use 'default' instead of 'null' for better compatibility with value types.
+
+      Other:
+      Updated unit tests.
+      Some benchmark code.
+      fixed typos.
+
+
+***Version 2.0.0 (2023-02-07)***<br>
+Complete refactor of version 1.0.0. Check source and documentation for new functionality, as there are enough changes to constitute a new product.
+
+# Observable List 
 The `ObservableList<TItem>`, `ObservableIList<TItem,TList<TItem>>`, `ObservableIListLocking<TItem,TList<TItem>>`, provide `IList<T>` implementations that invoke events ( `OnCollectionChanged`, `OnCollectionChanging`, `Adding`, `Added`, `Moving`, `Moved`, `Removing`, `Removed`, `Replacing`, `Replaced`,`Resetting`, `Reset`) when the list is modified. They provide a robust alternative to the .Net `ObservableCollection<T>`.
 
 #### Classes
@@ -48,7 +84,7 @@ for (int index = 0; index < 1000; index++) Task task = Task.Run(() => obvList.Ad
 
 `IObservableList<Item>` is the interfae for these classes and includes `IList<T>`, `IList`, `ICollection<T>`, `INotifyCollectionChanging`, `INotifyCollectionChanged`, `INotifyListChangingEvents`, `INotifyListChangingEvents` <br>
 
-## List Binding
+# Observable List Binding
 
 ### Observable List Bind
 `ObservableListBind<TItemA,TItemB>` provides synchronization between two ObservableLists of different but related types `<TItemA>` and `<TItemB>`. List methods (Add, Remove, clear, etc) on one list is propogated to the other given a conversion method. `ObservableListBindFunc<TItemA,TItemB>` is an implementation that allows the conversion method to be passed in the constructor as an anonymous function.
@@ -79,7 +115,7 @@ var obvListBind = new ObservableListBindFunc<int, string>(
 `UpdateCustomNotify` - When a PropertyChanged event is raised, the user provided `ICustomPropertyMap` is invoked to update item property on the alternate list.
 
 
-## How do I get started?
+# How do I get started?
 
 The `ObservableList<T>` should work somewhat similar to the standard .NET `ObservableCollection<T>`. 
 
