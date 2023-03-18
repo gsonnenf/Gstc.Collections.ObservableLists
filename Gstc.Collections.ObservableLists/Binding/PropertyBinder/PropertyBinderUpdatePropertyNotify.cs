@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
+using Gstc.Collections.ObservableLists.Utils;
 
 namespace Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 internal class PropertyBinderUpdatePropertyNotify<TItemSource, TItemTarget>
-    : AbstractPropertyBinder<TItemSource, TItemTarget>
+    : PropertyBinderAbstract<TItemSource, TItemTarget>
     where TItemSource : class, INotifyPropertyChanged
     where TItemTarget : class, INotifyPropertyChanged {
 
@@ -14,7 +15,7 @@ internal class PropertyBinderUpdatePropertyNotify<TItemSource, TItemTarget>
     private MulticastDelegate _multicastDelegateSource;
     private MulticastDelegate _multicastDelegateTarget;
 
-    private bool _isSynchronizationInProgress;
+    private readonly SyncingFlagScope _syncing = new();
 
     private static bool IsPropertyChangedHookSource { get; } = typeof(INotifyPropertyChangedHook).IsAssignableFrom(typeof(TItemSource));
     private static bool IsPropertyChangedHookTarget { get; } = typeof(INotifyPropertyChangedHook).IsAssignableFrom(typeof(TItemTarget));
@@ -39,19 +40,19 @@ internal class PropertyBinderUpdatePropertyNotify<TItemSource, TItemTarget>
     }
 
     protected override void SourceItemChanged(TItemSource itemS, TItemTarget itemT, object sender, PropertyChangedEventArgs args) {
-        if (_isSynchronizationInProgress || !IsBindingEnabled) return;
-        _isSynchronizationInProgress = true;
-        if (IsPropertyChangedHookTarget) ((INotifyPropertyChangedHook)itemT).OnPropertyChanged(itemT, new PropertyChangedEventArgs(string.Empty));
-        else OnPropertyChangedReflection(itemT);
-        _isSynchronizationInProgress = false;
+        if (_syncing.InProgress || !IsBindingEnabled) return;
+        using (_syncing.Begin()) {
+            if (IsPropertyChangedHookTarget) ((INotifyPropertyChangedHook)itemT).OnPropertyChanged(itemT, new PropertyChangedEventArgs(string.Empty));
+            else OnPropertyChangedReflection(itemT);
+        }
     }
 
     protected override void TargetItemChanged(TItemSource itemS, TItemTarget itemT, object sender, PropertyChangedEventArgs args) {
-        if (_isSynchronizationInProgress || !IsBindingEnabled) return;
+        if (_syncing.InProgress || !IsBindingEnabled) return;
         if (!IsBidirectional) return;
-        _isSynchronizationInProgress = true;
-        if (IsPropertyChangedHookSource) ((INotifyPropertyChangedHook)itemS).OnPropertyChanged(itemS, new PropertyChangedEventArgs(string.Empty));
-        else OnPropertyChangedReflection(itemS);
-        _isSynchronizationInProgress = false;
+        using (_syncing.Begin()) {
+            if (IsPropertyChangedHookSource) ((INotifyPropertyChangedHook)itemS).OnPropertyChanged(itemS, new PropertyChangedEventArgs(string.Empty));
+            else OnPropertyChangedReflection(itemS);
+        }
     }
 }

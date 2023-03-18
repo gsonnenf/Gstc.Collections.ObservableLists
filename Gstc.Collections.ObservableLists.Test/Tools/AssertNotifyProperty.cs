@@ -38,8 +38,8 @@ public class AssertNotifyProperty : IDisposable {
     public void Dispose() {
         Observable.PropertyChanged -= PropertyChangedHandler;
         PropertyDictionary.Clear();
-        PropertyDictionary = null;
-        Observable = null;
+        PropertyDictionary = default;
+        Observable = default;
     }
 
     #region Arrange

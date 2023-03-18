@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Gstc.Collections.ObservableLists.ComponentModel;
-using Gstc.Collections.ObservableLists.Multithread;
 
 namespace Gstc.Collections.ObservableLists;
 
@@ -16,25 +15,33 @@ public interface IObservableList<TItem> :
     IObservableCollection<TItem>,
     INotifyListChangedEvents,
     INotifyListChangingEvents,
-    IList<TItem> {
+    IList<TItem>,
+    IReadOnlyList<TItem> {
     //Note: IList has been removed from the IObservableList. It causes an issue where the the Add(object) method can't be hidden behind an explicit interface.
     // This creates an Add(object) overload that does generate compile time errors, but will create runtime errors instead.
 
-    new int Count { get; } // 'new' fixes ambiguity between IList and ICollection{T}
-    new bool IsReadOnly { get; }
-    new void Clear();
-    new void RemoveAt(int index);
-    new TItem this[int index] { get; set; }
+    #region Methods
     /// <summary>
     /// Adds a range of items to the <see cref="IObservableList{TItem}"/>.
     /// </summary>
     /// <param name="items"></param>
     void AddRange(IEnumerable<TItem> items);
+
+    //Todo: Consider method RemoveRange(...) and other List<T> specific methods.
+
     /// <summary>
     /// Moves the item in the <see cref="IObservableList{TItem}"/> at the current index to the new index.
     /// </summary>
     /// <param name="oldIndex">Current index of the item.</param>
     /// <param name="newIndex">New index of the item.</param>
     void Move(int oldIndex, int newIndex);
+    #endregion
 
+    #region new fixes ambiguity between IList and ICollection{T}
+    new int Count { get; }
+    new bool IsReadOnly { get; }
+    new void Clear();
+    new void RemoveAt(int index);
+    new TItem this[int index] { get; set; }
+    #endregion
 }

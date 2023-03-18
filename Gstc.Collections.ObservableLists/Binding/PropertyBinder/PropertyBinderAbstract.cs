@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace Gstc.Collections.ObservableLists.Binding.PropertyBinder;
 
-abstract internal class AbstractPropertyBinder<TItemSource, TItemTarget> : IPropertyBinder<TItemSource, TItemTarget>
+abstract internal class PropertyBinderAbstract<TItemSource, TItemTarget> : IPropertyBinder<TItemSource, TItemTarget>
     where TItemSource : class, INotifyPropertyChanged
     where TItemTarget : class, INotifyPropertyChanged {
 
@@ -68,7 +68,7 @@ abstract internal class AbstractPropertyBinder<TItemSource, TItemTarget> : IProp
 
     #region ctor
 
-    public AbstractPropertyBinder(
+    public PropertyBinderAbstract(
         IObservableList<TItemSource> sourceList,
         IObservableList<TItemTarget> targetList,
         bool isBidirectional = true,

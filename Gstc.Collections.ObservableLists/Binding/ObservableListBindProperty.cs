@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using Gstc.Collections.ObservableLists.Binding.PropertyBinder;
+using Gstc.Collections.ObservableLists.Utils;
 
 namespace Gstc.Collections.ObservableLists.Binding;
 
@@ -23,7 +24,6 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     where TItemA : class, INotifyPropertyChanged
     where TItemB : class, INotifyPropertyChanged {
 
-
     #region Abstract
     /// <inheritdoc/>
     public abstract TItemB ConvertItem(TItemA item);
@@ -33,7 +33,7 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
 
     #region Fields
     internal IPropertyBinder<TItemA, TItemB> _bindTracker;
-    private bool _isSynchronizationInProgress;
+    internal readonly SyncingFlagScope Syncing = new();
     private IObservableList<TItemA> _observableListA;
     private IObservableList<TItemB> _observableListB;
     private bool _isBidirectional;
@@ -68,7 +68,7 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     public ListIdentifier SourceList {
         get => ListIdentifier.ListA;
         set {
-            if (value != ListIdentifier.ListA) throw new NotSupportedException("ObservableListBindProperty requires ObservableListA to always be the source.");
+            if (value != ListIdentifier.ListA) throw new OneWayBindingException("ObservableListBindProperty requires ObservableListA to always be the source.");
         }
     }
     #endregion
@@ -166,9 +166,9 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
         _bindTracker.UnbindAll();
         if (_observableListA != null) _observableListA.CollectionChanged -= ListAChanged;
         if (_observableListB != null) _observableListB.CollectionChanged -= ListBChanged;
-        _observableListA = null;
-        _observableListB = null;
-        _bindTracker = null;
+        _observableListA = default;
+        _observableListB = default;
+        _bindTracker = default;
     }
     #endregion
 
@@ -190,11 +190,11 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     }
 
     private void RebindLists() {
-        _isSynchronizationInProgress = true;
-        _observableListB?.Clear();
-        if (_observableListA != null && _observableListB != null)
-            foreach (var itemA in ObservableListA) _observableListB.Add(ConvertItem(itemA));
-        _isSynchronizationInProgress = false;
+        using (Syncing.Begin()) {
+            _observableListB?.Clear();
+            if (_observableListA != null && _observableListB != null)
+                foreach (var itemA in ObservableListA) _observableListB.Add(ConvertItem(itemA));
+        }
     }
     #endregion
 
@@ -205,13 +205,13 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
     private void Unbind(TItemB itemB, TItemA itemA) => _bindTracker.Unbind(itemA, itemB);
 
     private void ListAChanged(object sender, NotifyCollectionChangedEventArgs args) {
-        if (_isSynchronizationInProgress || _observableListB == null) return;
+        if (Syncing.InProgress || _observableListB == null) return;
         ListChanged(args, _observableListA, _observableListB, ConvertItem, Bind, Unbind);
     }
 
     private void ListBChanged(object sender, NotifyCollectionChangedEventArgs args) {
-        if (_isSynchronizationInProgress || _observableListA == null) return;
-        if (IsBidirectional == false) throw new InvalidOperationException("The target list was modified but bidirectional is not set to false.");
+        if (Syncing.InProgress || _observableListA == null) return;
+        if (IsBidirectional == false) throw OneWayBindingException.Create(); //("The target list was modified but bidirectional is not set to false.");
         ListChanged(args, _observableListB, _observableListA, ConvertItem, Bind, Unbind);
     }
 
@@ -223,63 +223,60 @@ public abstract class ObservableListBindProperty<TItemA, TItemB> : IObservableLi
             Action<TItemSource, TItemTarget> PropertyBind,
             Action<TItemSource, TItemTarget> PropertyUnbind
         ) {
-        _isSynchronizationInProgress = true;
+        using (Syncing.Begin()) {
+            switch (args.Action) {
+                case NotifyCollectionChangedAction.Add:
+                    for (var index = 0; index < args.NewItems.Count; index++) {
+                        var itemSource = (TItemSource)args.NewItems[index];
+                        var itemTarget = convertItem(itemSource);
+                        PropertyBind(itemSource, itemTarget);
+                        observableListTarget.Insert(args.NewStartingIndex + index, itemTarget);
+                    }
+                    break;
 
-        switch (args.Action) {
-            case NotifyCollectionChangedAction.Add:
-                for (var index = 0; index < args.NewItems.Count; index++) {
-                    var itemSource = (TItemSource)args.NewItems[index];
-                    var itemTarget = convertItem(itemSource);
-                    PropertyBind(itemSource, itemTarget);
-                    observableListTarget.Insert(args.NewStartingIndex + index, itemTarget);
-                }
-                break;
+                case NotifyCollectionChangedAction.Remove:
+                    for (var index = 0; index < args.OldItems.Count; index++) {
+                        var itemIndex = args.OldStartingIndex + index;
+                        var itemS = (TItemSource)args.OldItems[index];
+                        var itemT = observableListTarget[itemIndex];
+                        PropertyUnbind(itemS, itemT);
+                        observableListTarget.RemoveAt(itemIndex);
+                    }
+                    break;
 
-            case NotifyCollectionChangedAction.Remove:
-                for (var index = 0; index < args.OldItems.Count; index++) {
-                    var itemIndex = args.OldStartingIndex + index;
-                    var itemS = (TItemSource)args.OldItems[index];
-                    var itemT = observableListTarget[itemIndex];
-                    PropertyUnbind(itemS, itemT);
-                    observableListTarget.RemoveAt(itemIndex);
-                }
-                break;
+                case NotifyCollectionChangedAction.Replace:
+                    for (var index = 0; index < args.OldItems.Count; index++) {
+                        var itemS = (TItemSource)args.OldItems[index];
+                        var itemT = observableListTarget[args.OldStartingIndex + index];
+                        PropertyUnbind(itemS, itemT);
+                    }
 
-            case NotifyCollectionChangedAction.Replace:
-                for (var index = 0; index < args.OldItems.Count; index++) {
-                    var itemS = (TItemSource)args.OldItems[index];
-                    var itemT = observableListTarget[args.OldStartingIndex + index];
-                    PropertyUnbind(itemS, itemT);
-                }
+                    for (var index = 0; index < args.NewItems.Count; index++) {
+                        var itemSource = (TItemSource)args.NewItems[index];
+                        var itemTarget = convertItem(itemSource);
+                        PropertyBind(itemSource, itemTarget);
+                        observableListTarget[args.OldStartingIndex + index] = itemTarget;
+                    }
+                    break;
 
-                for (var index = 0; index < args.NewItems.Count; index++) {
-                    var itemSource = (TItemSource)args.NewItems[index];
-                    var itemTarget = convertItem(itemSource);
-                    PropertyBind(itemSource, itemTarget);
-                    observableListTarget[args.OldStartingIndex + index] = itemTarget;
-                }
-                break;
+                case NotifyCollectionChangedAction.Move:
+                    for (var index = 0; index < args.OldItems.Count; index++)
+                        observableListTarget.Move(args.OldStartingIndex + index, args.NewStartingIndex + index);
+                    break;
 
-            case NotifyCollectionChangedAction.Move:
-                for (var index = 0; index < args.OldItems.Count; index++)
-                    observableListTarget.Move(args.OldStartingIndex + index, args.NewStartingIndex + index);
-                break;
-
-            case NotifyCollectionChangedAction.Reset:
-                _bindTracker.UnbindAll();
-                observableListTarget.Clear();
-                foreach (var itemSource in observableListSource) {
-                    var itemTarget = convertItem(itemSource);
-                    observableListTarget.Add(itemTarget);
-                }
-                _bindTracker.BindAll();
-                break;
-
-            default:
-                _isSynchronizationInProgress = false;
-                throw new InvalidEnumArgumentException(args.Action.ToString());
+                case NotifyCollectionChangedAction.Reset:
+                    _bindTracker.UnbindAll();
+                    observableListTarget.Clear();
+                    foreach (var itemSource in observableListSource) {
+                        var itemTarget = convertItem(itemSource);
+                        observableListTarget.Add(itemTarget);
+                    }
+                    _bindTracker.BindAll();
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException(args.Action.ToString());
+            }
         }
-        _isSynchronizationInProgress = false;
     }
 }
 #endregion

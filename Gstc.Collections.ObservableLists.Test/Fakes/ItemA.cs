@@ -11,7 +11,7 @@ public class ItemA : INotifyPropertyChanged {
         };
 
     private int _myNum;
-    private string _myStringLower;
+    private string _myStringLower = "0";
 
     public int MyNum {
         get => _myNum;

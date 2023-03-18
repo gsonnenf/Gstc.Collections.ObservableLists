@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gstc.Collections.ObservableLists.ExampleTest.Fakes {
     public class Customer {
@@ -30,6 +31,9 @@ namespace Gstc.Collections.ObservableLists.ExampleTest.Fakes {
                 GenerateCustomer(),
                 GenerateCustomer(),
             };
+
+        public static List<Customer> GenerateCustomerList(int numOfItems)
+            => Enumerable.Range(0, numOfItems).Select(x => GenerateCustomer()).ToList();
 
         private readonly static List<string> FirstNameList = new List<string>() {
             "Emma",

@@ -14,11 +14,13 @@ public class AssertEvent {
         if (!eventInfo.IsMulticast) throw new NotSupportedException("The name does not correspond to a multicast delegate");
 
         Type targetType = parent.GetType();
-        const BindingFlags bindingFlags = BindingFlags.NonPublic |
-                        BindingFlags.Static | BindingFlags.Instance;
-        FieldInfo? fieldInfo = targetType.GetField(eventName, bindingFlags);
-
-
+        const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
+        FieldInfo fieldInfo = targetType.GetField(eventName, bindingFlags);
+        while (fieldInfo == null) {
+            if (targetType == typeof(object)) throw new MissingFieldException(parent.GetType().Name, eventName);
+            targetType = targetType.BaseType;
+            fieldInfo = targetType.GetField(eventName, bindingFlags);
+        }
         if (fieldInfo.GetValue(parent) is NotifyCollectionChangedEventHandler eventHandler) return eventHandler.GetInvocationList().Length;
         else return 0;
     }

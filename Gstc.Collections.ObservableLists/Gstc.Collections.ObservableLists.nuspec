@@ -2,22 +2,47 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Gstc.Collections.ObservableLists</id>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <title>ObservableList and ObservableListBind</title>
     <authors>Greg Sonnenfeld</authors>
     <owners>Greg Sonnenfeld</owners>
     <license type="expression">LGPL-3.0-only</license>
     <projectUrl>https://github.com/gsonnenf/Gstc.Collections.ObservableLists</projectUrl>
+    <repository type="git" url="https://github.com/gsonnenf/Gstc.Collections.ObservableLists.git" branch="master" commit="" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
-      An observable lists library with upcast compatibility, list wrapping, reentrancy protection, thread safety, and robust unit testing.
+      An observable lists library wrapper with upcast compatibility, list wrapping, reentrancy protection, thread safety, and robust unit testing.
     </summary>
       <description>
-      This library contains a set of lists/list wrappers that implement the observable pattern, invoking events when a list is modified, and
-      a set of list bindings that synchronize the content of observable lists using a mapping between item types.
-
+      This package contains a library of upcastable lists/list wrappers that implement the observable pattern, invoking events when a list is modified, and a set of list bindings that synchronize the content of observable lists using a mapping between item types.
     </description>
-    <releaseNotes>Version 2.0 is not compatible with version 1.0.</releaseNotes>
+    <releaseNotes>
+      Features:
+      a. IReadOnlyList{T} added to IObservableList and implementations.
+      b. IList interface now does type checking similar to List{T}
+      c. IList interface added back into ObservableIListLocking
+      d. Utils folder added, with public SyncingFlagScope, ReentrancyMonitor and LockRwScope mechanism that were previously implemented internally in classes.
+      e. ObservableList{T} is now internally a type of ObservableList{T,List{T}}, addRange/Move are now ovveridable virtual methods.
+
+
+      Bugfixes:
+      a. ObservableListBind inProgress flag has been made exception safe.
+      b. int IList.Add(object) now calls IList_AddCustom(TItem) which is overridable. This allows custom index return values.
+
+
+      Minor breaking changes:
+      a. ObservableIListLocking moved to main namespace.
+      b. ObservableLists now throws ReentrancyException derived from InvalidOperationException, instead of InvalidOperationException
+      c. ObservableListBinds now throws added type OneWayBindingException derived from NotSupportedException, instead of NotSupportedException
+      d. The names of some abstract classes have been changed.
+      e. Names of internally locking mechanisms changed, refactored.
+      f. Some classes use 'default' instead of 'null'.
+
+      Other:
+      Updated unit tests.
+      Some benchmark code.
+      fixed typos.
+    </releaseNotes>
     <copyright>Greg Sonnenfeld Copyright 2019 to 2023</copyright>
     <tags>ObservableList ObservableCollection IObservableList IObservableCollection IList List Collections Synchronization Binding Multithread async</tags>
     <icon>icon.png</icon>
